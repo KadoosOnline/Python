@@ -20,6 +20,11 @@ book/proofread/
 book/BOOK-PROGRESS.md
 book/mark-done.sh
 
+# Exception: the two evaluation sessions contain nothing but a README, so
+# without this they would disappear from the repository altogether.
+!S29-evaluation/README.md
+!S40-evaluation/README.md
+
 # =====================================================================
 # Standard exclusions (not requested, added as a safety net)
 # =====================================================================
