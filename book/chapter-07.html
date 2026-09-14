@@ -1,0 +1,439 @@
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="فصل هفت: حلقه‌های تودرتو، جدول ضرب، رسم مستطیل و مثلث و هرم با ستاره و صفحه شطرنج">
+    <title>فصل ۷: حلقه‌های تودرتو و الگوها</title>
+    <link rel="icon" href="logokm.png" type="image/png">
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<header class="book-bar">
+    <a class="name" href="index.html">برنامه‌نویسی پایتون</a>
+    <a href="index.html">فهرست مطالب</a>
+</header>
+
+<main class="paper">
+
+    <div class="chapter-head">
+        <span class="chapter-num">فصل ۷</span>
+        <h1 data-t="ch07-001">حلقه‌های تودرتو و الگوها</h1>
+        <p class="lead" data-t="ch07-002">
+            وقتی یک حلقه داخل حلقه دیگر می‌گذارید، از خط به صفحه می‌رسید. این
+            فصل تمرین محض است: کشیدن شکل با ستاره، که ساده به نظر می‌رسد ولی
+            بهترین راه برای اینکه حلقه واقعاً در ذهنتان جا بیفتد.
+        </p>
+    </div>
+
+    <div class="mini-toc">
+        <span class="box-title" data-t="ch07-003">در این فصل می‌خوانید</span>
+        <ol>
+            <li data-t="ch07-004"><a href="#s1">حلقه داخل حلقه</a></li>
+            <li data-t="ch07-005"><a href="#s2">مستطیل ستاره</a></li>
+            <li data-t="ch07-006"><a href="#s3">جدول ضرب</a></li>
+            <li data-t="ch07-007"><a href="#s4">مثلث رشدیابنده</a></li>
+            <li data-t="ch07-008"><a href="#s5">مثلث نزولی</a></li>
+            <li data-t="ch07-009"><a href="#s6">مثلث راست‌چین</a></li>
+            <li data-t="ch07-010"><a href="#s7">هرم</a></li>
+            <li data-t="ch07-011"><a href="#s8">مثلث عددی</a></li>
+            <li data-t="ch07-012"><a href="#s9">صفحه شطرنج</a></li>
+            <li data-t="ch07-013"><a href="#s10">قانون کلی حل مسائل الگو</a></li>
+        </ol>
+    </div>
+
+    <h2 id="s1" data-t="ch07-014">۱. حلقه داخل حلقه</h2>
+
+    <p data-t="ch07-015">
+        قانون طلایی این فصل یک جمله است: <strong>حلقه داخلی برای هر یک دور
+        حلقه بیرونی، از اول تا آخر کامل اجرا می‌شود.</strong>
+    </p>
+
+    <pre class="code"><code># The inner loop runs from start to end for EVERY single turn of the outer loop.
+# 3 outer turns x 4 inner turns = 12 lines.
+for i in range(3):
+    for j in range(4):
+        print(f'i={i}, j={j}')
+    print('--- end of one outer turn ---')</code></pre>
+    <p class="code-caption" data-t="ch07-016">اولین حلقه تودرتو: نمونه 01_first_nested_loop.py</p>
+
+    <pre class="out">i=0, j=0
+i=0, j=1
+i=0, j=2
+i=0, j=3
+--- end of one outer turn ---
+i=1, j=0
+i=1, j=1
+i=1, j=2
+i=1, j=3
+--- end of one outer turn ---
+i=2, j=0
+i=2, j=1
+i=2, j=2
+i=2, j=3
+--- end of one outer turn ---</pre>
+
+    <h3 data-t="ch07-017">شرح مثال</h3>
+
+    <ul>
+        <li data-t="ch07-018">حلقه بیرونی سه بار می‌چرخد، حلقه داخلی چهار بار. مجموع اجرای بدنه داخلی: سه ضربدر چهار، یعنی دوازده بار.</li>
+        <li data-t="ch07-019">متغیر <code>i</code> کند حرکت می‌کند و <code>j</code> تند. برای هر مقدار <code>i</code>، تمام مقدارهای <code>j</code> طی می‌شوند.</li>
+        <li data-t="ch07-020">خط آخر داخل حلقه بیرونی است ولی بیرون حلقه داخلی، پس فقط سه بار اجرا می‌شود. تورفتگی است که این را مشخص می‌کند.</li>
+    </ul>
+
+    <div class="tip">
+        <span class="box-title" data-t="ch07-021">مقایسه‌ای که کار را آسان می‌کند</span>
+        <p data-t="ch07-022">
+            به عقربه‌های ساعت فکر کنید. عقربه ساعت‌شمار حلقه بیرونی است و
+            دقیقه‌شمار حلقه داخلی. برای هر یک ساعت، دقیقه‌شمار یک دور کامل ۶۰
+            تایی می‌زند.
+        </p>
+    </div>
+
+    <h2 id="s2" data-t="ch07-023">۲. مستطیل ستاره</h2>
+
+    <p data-t="ch07-024">
+        از اینجا به بعد یک الگوی ثابت داریم: حلقه بیرونی
+        <strong>سطرها</strong> را می‌شمارد و حلقه داخلی <strong>ستون‌ها</strong>
+        را. کلید کار، دو تا <code>print</code> است.
+    </p>
+
+    <pre class="code"><code># A rectangle of stars: the outer loop counts the rows,
+# the inner loop prints the characters of one row.
+ROWS = 4
+COLUMNS = 8
+
+for row in range(ROWS):
+    for column in range(COLUMNS):
+        # end='' keeps the cursor on the same line
+        print('*', end=' ')
+    # this print() ends the current line and starts a new one
+    print()</code></pre>
+    <p class="code-caption" data-t="ch07-025">مستطیل: نمونه 02_rectangle.py</p>
+
+    <pre class="out">* * * * * * * * 
+* * * * * * * * 
+* * * * * * * * 
+* * * * * * * * </pre>
+
+    <h3 data-t="ch07-026">شرح مثال</h3>
+
+    <ul>
+        <li data-t="ch07-027"><code>print('*', end=' ')</code> ستاره را چاپ می‌کند و روی همان خط می‌ماند. بدون <code>end</code>، هر ستاره یک خط جدا می‌گرفت.</li>
+        <li data-t="ch07-028"><code>print()</code> خالی بعد از حلقه داخلی، سطر را می‌بندد. این خط <strong>حتماً</strong> باید بیرون حلقه داخلی و داخل حلقه بیرونی باشد.</li>
+        <li data-t="ch07-029">اگر شکل شما به هم ریخت، اولین چیزی که باید چک کنید تورفتگی همین <code>print()</code> خالی است.</li>
+    </ul>
+
+    <h2 id="s3" data-t="ch07-030">۳. جدول ضرب</h2>
+
+    <pre class="code"><code># The multiplication table of the numbers 1..n
+user_input = input('Enter a number: ')
+n = int(user_input)
+
+for i in range(1, n + 1):
+    for j in range(1, n + 1):
+        print(i * j, end='\t')   # \t keeps the columns aligned
+    print()</code></pre>
+    <p class="code-caption" data-t="ch07-031">جدول ضرب: نمونه 03_multiplication_table.py</p>
+
+    <pre class="out">Enter a number: 5
+1	2	3	4	5	
+2	4	6	8	10	
+3	6	9	12	15	
+4	8	12	16	20	
+5	10	15	20	25	</pre>
+
+    <p data-t="ch07-032">
+        اینجا مقدار چاپ‌شده به <strong>هر دو</strong> متغیر حلقه بستگی دارد:
+        <code>i * j</code>. این تفاوت جدول ضرب با مستطیل ساده است. کاراکتر تب
+        ستون‌ها را مرتب نگه می‌دارد.
+    </p>
+
+    <h2 id="s4" data-t="ch07-033">۴. مثلث رشدیابنده</h2>
+
+    <p data-t="ch07-034">
+        برای مثلث، تعداد ستاره‌های هر سطر باید متفاوت باشد. یعنی حلقه داخلی
+        نباید عدد ثابت داشته باشد، بلکه باید به <code>i</code> وابسته باشد.
+    </p>
+
+    <pre class="code"><code># Row 0 gets 0 stars, row 1 gets 1 star, row 2 gets 2 stars ...
+# Version 1: the inner loop simply runs 'i' times. This is the clean way.
+for i in range(5):
+    for j in range(i):
+        print('*', end=' ')
+    print()
+
+print('---')
+
+# Version 2: the inner loop always runs 5 times but only prints when i &gt; j.
+# It gives the same drawing; it just does more useless turns.
+for i in range(5):
+    for j in range(5):
+        if i &gt; j:
+            print('*', end=' ')
+    print()</code></pre>
+    <p class="code-caption" data-t="ch07-035">مثلث چپ‌چین، دو روش: نمونه 04_left_triangle.py</p>
+
+    <pre class="out">
+* 
+* * 
+* * * 
+* * * * </pre>
+
+    <h3 data-t="ch07-036">شرح مثال</h3>
+
+    <ul>
+        <li data-t="ch07-037">روش اول: <code>range(i)</code> یعنی حلقه داخلی به اندازه شماره سطر می‌چرخد. سطر صفر هیچ ستاره‌ای ندارد، سطر یک، یک ستاره و همین‌طور تا آخر.</li>
+        <li data-t="ch07-038">روش دوم: حلقه داخلی همیشه پنج بار می‌چرخد ولی فقط وقتی <code>i &gt; j</code> باشد چیزی چاپ می‌کند. نتیجه یکی است ولی نصف دورها بی‌فایده‌اند.</li>
+        <li data-t="ch07-039">هر دو نسخه در فایل نمونه آمده‌اند تا مقایسه کنید. در برنامه واقعی روش اول را انتخاب کنید: هم سریع‌تر است و هم قصد نویسنده را روشن‌تر بیان می‌کند.</li>
+    </ul>
+
+    <h2 id="s5" data-t="ch07-040">۵. مثلث نزولی</h2>
+
+    <pre class="code"><code># A triangle that shrinks: 5 stars, then 4, then 3 ...
+SIZE = 5
+
+for i in range(SIZE, 0, -1):
+    for j in range(i):
+        print('*', end=' ')
+    print()
+
+print('---')
+
+# The same shape written with a condition instead of a counting-down range.
+for i in range(SIZE):
+    for j in range(SIZE):
+        if i &lt;= j:
+            print('*', end=' ')
+    print()</code></pre>
+    <p class="code-caption" data-t="ch07-041">مثلث نزولی: نمونه 05_reverse_triangle.py</p>
+
+    <pre class="out">* * * * * 
+* * * * 
+* * * 
+* * 
+* </pre>
+
+    <p data-t="ch07-042">
+        روش اول از گام منفی استفاده می‌کند: <code>range(5, 0, -1)</code> یعنی ۵ و
+        ۴ و ۳ و ۲ و ۱. روش دوم همان شکل را با شرط می‌سازد.
+    </p>
+
+    <h2 id="s6" data-t="ch07-043">۶. مثلث راست‌چین</h2>
+
+    <p data-t="ch07-044">
+        برای اینکه ستاره‌ها به سمت راست هل داده شوند، باید پیش از آنها
+        <strong>فاصله</strong> چاپ کنیم. فاصله هم یک کاراکتر است و جا اشغال
+        می‌کند.
+    </p>
+
+    <pre class="code"><code># To push the stars to the right we print SPACES first.
+# Row i gets (SIZE - 1 - i) spaces and (i + 1) stars.
+SIZE = 5
+
+for i in range(SIZE):
+    for j in range(SIZE):
+        if j &lt; SIZE - 1 - i:
+            print(' ', end=' ')   # a space keeps the column width
+        else:
+            print('*', end=' ')
+    print()</code></pre>
+    <p class="code-caption" data-t="ch07-045">مثلث راست‌چین: نمونه 06_right_aligned_triangle.py</p>
+
+    <pre class="out">        * 
+      * * 
+    * * * 
+  * * * * 
+* * * * * </pre>
+
+    <p data-t="ch07-046">
+        فرمول <code>SIZE - 1 - i</code> تعداد فاصله‌های هر سطر را می‌دهد. سطر
+        صفر چهار فاصله دارد، سطر آخر هیچ. اگر این فرمول را نمی‌فهمید، روی کاغذ
+        یک جدول پنج سطری بکشید و برای هر سطر تعداد فاصله و ستاره را بنویسید. کل
+        هنر مسائل الگو همین است.
+    </p>
+
+    <h2 id="s7" data-t="ch07-047">۷. هرم</h2>
+
+    <pre class="code"><code># A centred pyramid: row i has (SIZE - 1 - i) leading spaces
+# and (2 * i + 1) stars.
+SIZE = 5
+
+for i in range(SIZE):
+    for space in range(SIZE - 1 - i):
+        print(' ', end='')
+    for star in range(2 * i + 1):
+        print('*', end='')
+    print()
+
+print('---')
+
+# The same pyramid in one line per row, using string repetition.
+for i in range(SIZE):
+    print(' ' * (SIZE - 1 - i) + '*' * (2 * i + 1))</code></pre>
+    <p class="code-caption" data-t="ch07-048">هرم، دو روش: نمونه 07_pyramid.py</p>
+
+    <pre class="out">    *
+   ***
+  *****
+ *******
+*********</pre>
+
+    <h3 data-t="ch07-049">شرح مثال</h3>
+
+    <ul>
+        <li data-t="ch07-050">در هر سطر <strong>دو</strong> حلقه داخلی پشت سر هم داریم: یکی برای فاصله‌ها و یکی برای ستاره‌ها. این کاملاً مجاز است.</li>
+        <li data-t="ch07-051">تعداد ستاره‌ها <code>2 * i + 1</code> است، یعنی همیشه فرد: ۱ و ۳ و ۵ و ۷ و ۹. برای همین هرم قرینه در می‌آید.</li>
+        <li data-t="ch07-052">نسخه دوم همان شکل را با <strong>تکرار رشته</strong> می‌سازد: <code>' ' * n</code> یعنی n فاصله. یک خط به جای چهار خط، و کاملاً خواناتر. این نمونه خوبی است از اینکه دانستن ابزار درست، کد را کوتاه می‌کند.</li>
+    </ul>
+
+    <h2 id="s8" data-t="ch07-053">۸. مثلث عددی</h2>
+
+    <pre class="code"><code># Instead of a star we can print the value of the inner counter.
+SIZE = 6
+
+for i in range(1, SIZE + 1):
+    for j in range(1, i + 1):
+        print(j, end=' ')
+    print()
+
+print('---')
+
+# And here the row number is repeated instead.
+for i in range(1, SIZE + 1):
+    for j in range(1, i + 1):
+        print(i, end=' ')
+    print()</code></pre>
+    <p class="code-caption" data-t="ch07-054">مثلث عددی: نمونه 08_number_triangle.py</p>
+
+    <pre class="out">1 
+1 2 
+1 2 3 
+1 2 3 4 
+1 2 3 4 5 
+1 2 3 4 5 6 
+---
+1 
+2 2 
+3 3 3 
+4 4 4 4 
+5 5 5 5 5 
+6 6 6 6 6 6 </pre>
+
+    <p data-t="ch07-055">
+        تنها تفاوت دو نسخه این است که در اولی <code>j</code> چاپ می‌شود و در
+        دومی <code>i</code>. ساختار حلقه‌ها کاملاً یکسان است. این نشان می‌دهد که
+        بعد از ساختن اسکلت حلقه، تغییر شکل خروجی کار ساده‌ای است.
+    </p>
+
+    <h2 id="s9" data-t="ch07-056">۹. صفحه شطرنج</h2>
+
+    <pre class="code"><code># The character depends on both counters: when (row + column) is even we print
+# one character, otherwise the other one.
+SIZE = 8
+
+for row in range(SIZE):
+    for column in range(SIZE):
+        if (row + column) % 2 == 0:
+            print('#', end=' ')
+        else:
+            print('.', end=' ')
+    print()</code></pre>
+    <p class="code-caption" data-t="ch07-057">صفحه شطرنج: نمونه 09_chess_board.py</p>
+
+    <pre class="out"># . # . # . # . 
+. # . # . # . # 
+# . # . # . # . 
+. # . # . # . # </pre>
+
+    <p data-t="ch07-058">
+        ترفند اینجا ترکیب <code>%</code> فصل دوم با دو شمارنده است. مجموع شماره
+        سطر و ستون، یک در میان زوج و فرد می‌شود و همین الگوی شطرنجی را می‌سازد.
+    </p>
+
+    <h2 id="s10" data-t="ch07-059">۱۰. قانون کلی حل مسائل الگو</h2>
+
+    <p data-t="ch07-060">
+        هر مسئله الگو، هر قدر هم پیچیده به نظر برسد، با همین چهار قدم حل می‌شود:
+    </p>
+
+    <ol>
+        <li data-t="ch07-061"><strong>روی کاغذ بکشیدش.</strong> پیش از کد زدن، شکل نهایی را با دست رسم کنید.</li>
+        <li data-t="ch07-062"><strong>سطرها را بشمارید.</strong> این عدد، حلقه بیرونی شماست.</li>
+        <li data-t="ch07-063">
+            <strong>برای هر سطر بپرسید چند فاصله و چند نویسه لازم است.</strong>
+            یک جدول کوچک بسازید: شماره سطر، تعداد فاصله، تعداد ستاره.
+        </li>
+        <li data-t="ch07-064">
+            <strong>رابطه آن ستون‌ها با شماره سطر را پیدا کنید.</strong> این
+            رابطه، همان چیزی است که داخل <code>range</code> حلقه داخلی می‌نویسید.
+        </li>
+    </ol>
+
+    <div class="table-scroll">
+        <table>
+            <thead>
+                <tr><th data-t="ch07-065">سطر i</th><th data-t="ch07-066">فاصله در هرم</th><th data-t="ch07-067">ستاره در هرم</th></tr>
+            </thead>
+            <tbody>
+                <tr><td data-t="ch07-068">۰</td><td data-t="ch07-069">۴</td><td data-t="ch07-070">۱</td></tr>
+                <tr><td data-t="ch07-071">۱</td><td data-t="ch07-072">۳</td><td data-t="ch07-073">۳</td></tr>
+                <tr><td data-t="ch07-074">۲</td><td data-t="ch07-075">۲</td><td data-t="ch07-076">۵</td></tr>
+                <tr><td data-t="ch07-077">۳</td><td data-t="ch07-078">۱</td><td data-t="ch07-079">۷</td></tr>
+                <tr><td data-t="ch07-080">۴</td><td data-t="ch07-081">۰</td><td data-t="ch07-082">۹</td></tr>
+                <tr><td data-t="ch07-083">رابطه</td><td><code>SIZE - 1 - i</code></td><td><code>2 * i + 1</code></td></tr>
+            </tbody>
+        </table>
+    </div>
+
+    <div class="folder-ref">
+        <span class="box-title" data-t="ch07-084">فایل‌های تمرینی این فصل</span>
+        <p data-t="ch07-085">
+            پوشه <code>S07-nested-loops-and-patterns</code> شامل نمونه‌های
+            <code>01_first_nested_loop.py</code> تا <code>09_chess_board.py</code>.
+        </p>
+    </div>
+
+    <h2 data-t="ch07-086">خلاصه فصل</h2>
+
+    <div class="table-scroll">
+        <table>
+            <thead>
+                <tr><th data-t="ch07-087">مفهوم</th><th data-t="ch07-088">توضیح</th></tr>
+            </thead>
+            <tbody>
+                <tr><td data-t="ch07-089">حلقه تودرتو</td><td data-t="ch07-090">حلقه داخلی برای هر دور حلقه بیرونی کامل اجرا می‌شود</td></tr>
+                <tr><td data-t="ch07-091">تعداد کل اجرا</td><td data-t="ch07-092">حاصل‌ضرب تعداد دورهای دو حلقه</td></tr>
+                <tr><td data-t="ch07-093">حلقه بیرونی</td><td data-t="ch07-094">سطرها</td></tr>
+                <tr><td data-t="ch07-095">حلقه داخلی</td><td data-t="ch07-096">ستون‌های یک سطر</td></tr>
+                <tr><td><code>end=' '</code></td><td data-t="ch07-097">ماندن روی همان خط</td></tr>
+                <tr><td data-t="ch07-098"><code>print()</code> خالی</td><td data-t="ch07-099">بستن سطر. بیرون حلقه داخلی، داخل حلقه بیرونی</td></tr>
+                <tr><td><code>range(i)</code></td><td data-t="ch07-100">حلقه داخلی وابسته به شماره سطر، برای شکل‌های مثلثی</td></tr>
+                <tr><td><code>' ' * n</code></td><td data-t="ch07-101">راه کوتاه ساختن n فاصله، بدون حلقه</td></tr>
+            </tbody>
+        </table>
+    </div>
+
+    <div class="exercise">
+        <h3 data-t="ch07-102">تمرین‌های فصل هفت</h3>
+        <ol>
+            <li data-t="ch07-103">مربعی از ستاره به ابعاد <code>n</code> در <code>n</code> رسم کنید که <code>n</code> را کاربر می‌دهد.</li>
+            <li data-t="ch07-104">مثلثی رسم کنید که اول بزرگ شود و بعد کوچک، یعنی یک لوزی.</li>
+            <li data-t="ch07-105">مربع توخالی رسم کنید: فقط لبه‌ها ستاره باشند و داخلش خالی.</li>
+            <li data-t="ch07-106">جدول ضرب ۱ تا ۱۰ را با یک سطر عنوان در بالا چاپ کنید.</li>
+            <li data-t="ch07-107">همه زوج‌های <code>(i, j)</code> را چاپ کنید که در آنها <code>1 &lt;= i &lt; j &lt;= 5</code>.</li>
+            <li data-t="ch07-108">عدد <code>n</code> را بگیرید و همه جفت‌های عددی کوچک‌تر از <code>n</code> که مجموعشان <code>n</code> می‌شود را چاپ کنید.</li>
+            <li data-t="ch07-109">مثلثی از حروف بسازید: سطر اول <code>A</code>، سطر دوم <code>A B</code>، سطر سوم <code>A B C</code> و همین‌طور ادامه.</li>
+        </ol>
+    </div>
+
+    <div class="pager">
+        <a href="chapter-06.html">فصل قبل: حلقه for</a>
+        <a href="chapter-08.html">فصل بعد: حلقه while</a>
+    </div>
+
+</main>
+
+</body>
+</html>

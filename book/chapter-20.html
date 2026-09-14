@@ -1,0 +1,535 @@
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="فصل بیست: پروژه‌های ترم اول، حدس عدد، سنگ کاغذ قیچی، وردل، دوز و بازی آزمون با سؤال‌های داخل فایل">
+    <title>فصل ۲۰: پروژه‌های ترم اول</title>
+    <link rel="icon" href="logokm.png" type="image/png">
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<header class="book-bar">
+    <a class="name" href="index.html">برنامه‌نویسی پایتون</a>
+    <a href="index.html">فهرست مطالب</a>
+</header>
+
+<main class="paper">
+
+    <div class="chapter-head">
+        <span class="chapter-num">فصل ۲۰</span>
+        <h1 data-t="ch20-001">پروژه‌های ترم اول</h1>
+        <p class="lead" data-t="ch20-002">
+            پایان ترم اول. در این فصل مطلب تازه‌ای یاد نمی‌گیرید؛ همه چیزهایی
+            که خوانده‌اید را در پنج برنامه کامل کنار هم می‌گذاریم. هر پنج پروژه
+            فقط از ابزارهای فصل یک تا نوزده استفاده می‌کنند.
+        </p>
+    </div>
+
+    <div class="mini-toc">
+        <span class="box-title" data-t="ch20-003">در این فصل می‌خوانید</span>
+        <ol>
+            <li data-t="ch20-004"><a href="#s1">چطور یک پروژه را شروع کنیم</a></li>
+            <li data-t="ch20-005"><a href="#s2">پروژه یک: حدس عدد با مرحله و جان</a></li>
+            <li data-t="ch20-006"><a href="#s3">پروژه دو: سنگ کاغذ قیچی</a></li>
+            <li data-t="ch20-007"><a href="#s4">پروژه سه: وردل</a></li>
+            <li data-t="ch20-008"><a href="#s5">پروژه چهار: دوز</a></li>
+            <li data-t="ch20-009"><a href="#s6">پروژه پنج: بازی آزمون</a></li>
+            <li data-t="ch20-010"><a href="#s7">درس‌های مشترک این پنج پروژه</a></li>
+        </ol>
+    </div>
+
+    <h2 id="s1" data-t="ch20-011">۱. چطور یک پروژه را شروع کنیم</h2>
+
+    <p data-t="ch20-012">
+        بزرگ‌ترین مشکل تازه‌کارها این نیست که پایتون بلد نیستند؛ این است که
+        نمی‌دانند از کجا شروع کنند. روش کار همیشه همین است:
+    </p>
+
+    <ol>
+        <li data-t="ch20-013"><strong>بازی را روی کاغذ توضیح دهید.</strong> اگر نمی‌توانید به فارسی بگویید چه اتفاقی می‌افتد، نمی‌توانید به پایتون هم بگویید.</li>
+        <li data-t="ch20-014"><strong>داده‌ها را مشخص کنید.</strong> چه چیزهایی را باید نگه دارید؟ امتیاز، صفحه بازی، لیست کلمات؟ نوع ظرفشان را انتخاب کنید.</li>
+        <li data-t="ch20-015"><strong>کارها را به تابع بشکنید.</strong> «صفحه را نشان بده»، «حرکت بگیر»، «برنده را پیدا کن».</li>
+        <li data-t="ch20-016"><strong>ساده‌ترین نسخه کارکننده را بنویسید.</strong> بدون امتیاز، بدون مرحله، بدون زیبایی.</li>
+        <li data-t="ch20-017"><strong>بعد کامل کنید.</strong> اعتبارسنجی ورودی، پیام‌های بهتر، ذخیره در فایل.</li>
+    </ol>
+
+    <h2 id="s2" data-t="ch20-018">۲. پروژه یک: حدس عدد با مرحله و جان</h2>
+
+    <p data-t="ch20-019">
+        نسخه پیشرفته بازی فصل هشتم: چند مرحله، تعدادی جان، و همه متن‌ها در یک
+        ماژول تنظیمات.
+    </p>
+
+    <pre class="code"><code>'''All the texts and the levels of the game.'''
+
+LEVELS = [
+    {
+        'level_number': 1,
+        'number': 2,
+        'hint': 'A number between 1 and 3: ',
+    },
+    {
+        'level_number': 2,
+        'number': -7,
+        'hint': "A negative number greater than -10: ",
+    },
+    {
+        'level_number': 3,
+        'number': 42,
+        'hint': 'A number between 1 and 100: ',
+    },
+]
+
+START_HEARTS = 5
+
+MESSAGE_WIN = 'You won the level!'
+MESSAGE_GREATER = 'The secret number is greater!'
+MESSAGE_LOWER = 'The secret number is lower!'
+MESSAGE_GAMEOVER = 'Game over!'
+MESSAGE_FINISHED = 'There are no more levels right now!'</code></pre>
+    <p class="code-caption" data-t="ch20-020">فایل constants.py: پروژه 01_number_guess</p>
+
+    <pre class="code"><code>def play_level(level: dict, hearts: int) -&gt; int:
+    '''Play one level.
+
+    Returns the number of hearts left; 0 means the player lost.
+    '''
+    secret = level['number']
+
+    while hearts &gt; 0:
+        guess = read_number(level['hint'])
+
+        if guess == secret:
+            print(MESSAGE_WIN)
+            hearts += 1                 # a bonus life for winning the level
+            show_hearts(hearts)
+            return hearts
+
+        if guess &gt; secret:
+            print(MESSAGE_LOWER)
+        else:
+            print(MESSAGE_GREATER)
+
+        hearts -= 1
+        show_hearts(hearts)
+
+    return 0
+
+
+def main() -&gt; None:
+    hearts = START_HEARTS
+    show_hearts(hearts)
+
+    for level in LEVELS:
+        print(f"\n--- Level {level['level_number']} ---")
+        hearts = play_level(level, hearts)
+
+        if hearts == 0:
+            print(MESSAGE_GAMEOVER)
+            return          # leave the game at once
+
+    print(MESSAGE_FINISHED)</code></pre>
+    <p class="code-caption" data-t="ch20-021">منطق بازی: پروژه 01_number_guess</p>
+
+    <h3 data-t="ch20-022">شرح پروژه</h3>
+
+    <ul>
+        <li data-t="ch20-023">مرحله‌ها یک <strong>لیستی از دیکشنری‌ها</strong> هستند، همان ساختار فصل پانزدهم. برای اضافه کردن مرحله چهارم فقط چند خط داده اضافه می‌شود و هیچ کدی عوض نمی‌شود.</li>
+        <li data-t="ch20-024">تابع <code>play_level</code> تعداد جان باقی‌مانده را <strong>برمی‌گرداند</strong> و <code>main</code> آن را در متغیر خودش نگه می‌دارد. هیچ <code>global</code> در کار نیست.</li>
+        <li data-t="ch20-025">صفر برگرداندن یعنی باخت. <code>main</code> با دیدن صفر، بلافاصله <code>return</code> می‌کند.</li>
+    </ul>
+
+    <div class="warn">
+        <span class="box-title" data-t="ch20-026">باگ‌هایی که در نسخه اصلی این بازی بود</span>
+        <p data-t="ch20-027">
+            نسخه اولیه سه مشکل داشت: از <code>global hearts</code> استفاده
+            می‌کرد، بعد از تمام شدن جان‌ها بازی <strong>ادامه پیدا می‌کرد</strong>
+            و به مرحله بعد می‌رفت، و پیام «همه مراحل را تمام کردید» را
+            <strong>همیشه</strong> چاپ می‌کرد، حتی وقتی بازیکن باخته بود. هر سه
+            با برگرداندن مقدار به جای متغیر سراسری حل شدند.
+        </p>
+    </div>
+
+    <h2 id="s3" data-t="ch20-028">۳. پروژه دو: سنگ کاغذ قیچی</h2>
+
+    <pre class="code"><code>'''Rock - paper - scissors, first player to three points wins.'''
+
+import random
+
+ROCK = 'rock'
+PAPER = 'paper'
+SCISSORS = 'scissors'
+
+MOVES = [ROCK, PAPER, SCISSORS]
+
+# BEATS[a] is the move that 'a' defeats. One dictionary replaces six elif lines.
+BEATS = {
+    ROCK: SCISSORS,
+    PAPER: ROCK,
+    SCISSORS: PAPER,
+}
+
+POINTS_TO_WIN = 3
+
+
+def read_move(player: str) -&gt; str:
+    'Ask a player for a valid move (or "exit").'
+    while True:
+        move = input(f'{player}, enter your move (rock/paper/scissors): ').lower().strip()
+
+        if move == 'exit' or move in MOVES:
+            return move
+
+        print('Unknown move, try again.')
+
+
+def winner_of(move1: str, move2: str) -&gt; int:
+    '''Return 0 for a draw, 1 when move1 wins, 2 when move2 wins.'''
+    if move1 == move2:
+        return 0
+    if BEATS[move1] == move2:
+        return 1
+    return 2</code></pre>
+    <p class="code-caption" data-t="ch20-029">قواعد بازی: پروژه 02_rock_paper_scissors</p>
+
+    <h3 data-t="ch20-030">شرح پروژه</h3>
+
+    <ul>
+        <li data-t="ch20-031">ستاره این پروژه، دیکشنری <code>BEATS</code> است. بدون آن باید شش شاخه <code>elif</code> بنویسید. با آن، کل قاعده بازی سه خط داده است.</li>
+        <li data-t="ch20-032">این یک درس مهم برنامه‌نویسی است: <strong>داده به جای کد</strong>. اگر بخواهید بازی را به نسخه پنج‌حالته گسترش دهید، فقط دیکشنری را بزرگ‌تر می‌کنید.</li>
+        <li data-t="ch20-033">تابع <code>winner_of</code> عدد برمی‌گرداند و هیچ چاپی ندارد. پس می‌شود جداگانه آزمایشش کرد و در نسخه گرافیکی هم به کار برد.</li>
+        <li data-t="ch20-034">ترکیب <code>.lower().strip()</code> روی ورودی، حرف بزرگ و فاصله اضافه را خنثی می‌کند.</li>
+    </ul>
+
+    <h2 id="s4" data-t="ch20-035">۴. پروژه سه: وردل</h2>
+
+    <pre class="code"><code>def mask_word(word: str, found_letters: set[str]) -&gt; str:
+    'Show the letters already found and hide the others behind "_".'
+    masked = ''
+    for letter in word:
+        if letter in found_letters:
+            masked += letter
+        else:
+            masked += '_'
+        masked += ' '
+    return masked.strip()
+
+
+def read_letter(already_tried: set[str]) -&gt; str:
+    'Ask for one single letter that was not tried before.'
+    while True:
+        letter = input('Enter a letter: ').lower().strip()
+
+        if len(letter) != 1:
+            print('You can only enter one letter!')
+            continue
+
+        if not letter.isalpha():
+            print('Letters only, please.')
+            continue
+
+        if letter in already_tried:
+            print('You already tried that one.')
+            continue
+
+        return letter</code></pre>
+    <p class="code-caption" data-t="ch20-036">نمایش و ورودی: پروژه 03_wordle</p>
+
+    <pre class="code"><code>def play(word: str) -&gt; bool:
+    'Play one word. Return True when the player found it.'
+    found_letters: set[str] = set()
+    tried_letters: set[str] = set()
+    wrong_guesses = 0
+
+    print(f'\nThe word has {len(word)} letters!')
+    print(mask_word(word, found_letters))
+
+    while wrong_guesses &lt; MAX_WRONG_GUESSES:
+        letter = read_letter(tried_letters)
+        tried_letters.add(letter)
+
+        if letter in word:
+            found_letters.add(letter)
+            print('Yes!')
+        else:
+            wrong_guesses += 1
+
+        print(mask_word(word, found_letters))
+
+        # The word is complete when every one of its letters has been found.
+        if set(word) == set(word) &amp; found_letters:
+            print(f'You win! The word was {word.capitalize()}.')
+            return True
+
+    print(f'You lost. The word was {word.capitalize()}.')
+    return False</code></pre>
+    <p class="code-caption" data-t="ch20-037">حلقه بازی: پروژه 03_wordle</p>
+
+    <pre class="out">The word has 6 letters!
+_ _ _ _ _ _
+Enter a letter: a
+Yes!
+_ a _ _ _ _
+Enter a letter: o
+Yes!
+_ a _ o o _</pre>
+
+    <h3 data-t="ch20-038">شرح پروژه</h3>
+
+    <ul>
+        <li data-t="ch20-039">دو <strong>مجموعه</strong> استفاده شده است: حروف پیدا شده و حروف امتحان‌شده. مجموعه انتخاب درستی است چون تکرار در آن معنا ندارد و بررسی عضویتش سریع است.</li>
+        <li data-t="ch20-040">شرط برد با عملیات مجموعه‌ای فصل چهاردهم نوشته شده: اگر همه حروف کلمه در مجموعه پیدا شده‌ها باشند، بازیکن برده است.</li>
+        <li data-t="ch20-041">تابع <code>read_letter</code> نمونه کامل اعتبارسنجی است: باید یک کاراکتر باشد، باید حرف باشد، و نباید تکراری باشد.</li>
+    </ul>
+
+    <div class="warn">
+        <span class="box-title" data-t="ch20-042">باگ‌های نسخه اصلی</span>
+        <p data-t="ch20-043">
+            در نسخه اولیه، کاربر می‌توانست به جای یک حرف، یک کلمه کامل وارد کند
+            و اگر آن کلمه بخشی از پاسخ بود، برنده اعلام می‌شد. به‌علاوه
+            محدودیتی برای تعداد حدس‌های غلط وجود نداشت و راهی برای خروج از بازی
+            هم نبود. هر سه اصلاح شده‌اند.
+        </p>
+    </div>
+
+    <h2 id="s5" data-t="ch20-044">۵. پروژه چهار: دوز</h2>
+
+    <pre class="code"><code>PLAYER_SIGN = 'X'
+AI_SIGN = 'O'
+
+WINNING_LINES = [
+    (0, 1, 2), (3, 4, 5), (6, 7, 8),      # rows
+    (0, 3, 6), (1, 4, 7), (2, 5, 8),      # columns
+    (0, 4, 8), (2, 4, 6),                 # diagonals
+]
+
+
+def new_board() -&gt; list[str]:
+    'Return a fresh board where every cell shows its own number.'
+    return ['1', '2', '3', '4', '5', '6', '7', '8', '9']
+
+
+def show_board(board: list[str]) -&gt; None:
+    'Draw the board.'
+    print()
+    print(f' {board[0]} | {board[1]} | {board[2]} ')
+    print('---+---+---')
+    print(f' {board[3]} | {board[4]} | {board[5]} ')
+    print('---+---+---')
+    print(f' {board[6]} | {board[7]} | {board[8]} ')
+    print()
+
+
+def is_legal(board: list[str], move: str) -&gt; bool:
+    'A move is legal when it is 1-9 and the cell is still free.'
+    if not move.isdigit():
+        return False
+
+    number = int(move)
+    if number &lt; 1 or number &gt; 9:
+        return False
+
+    return board[number - 1] not in (PLAYER_SIGN, AI_SIGN)</code></pre>
+    <p class="code-caption" data-t="ch20-045">صفحه و قواعد: پروژه 04_tic_tac_toe</p>
+
+    <pre class="code"><code>def convert_persian_digits(text: str) -&gt; str:
+    'Turn Persian digits into English ones so both keyboards work.'
+    persian_digits = '۰۱۲۳۴۵۶۷۸۹'
+    english_digits = '0123456789'
+    table = str.maketrans(persian_digits, english_digits)
+    return text.translate(table)</code></pre>
+    <p class="code-caption" data-t="ch20-046">پشتیبانی از کیبورد فارسی: پروژه 04_tic_tac_toe</p>
+
+    <h3 data-t="ch20-047">شرح پروژه</h3>
+
+    <ul>
+        <li data-t="ch20-048">صفحه یک <strong>لیست نه‌تایی</strong> است، نه ماتریس سه در سه. کار با اندیس ساده‌تر می‌شود و شماره خانه‌ها برای کاربر طبیعی است.</li>
+        <li data-t="ch20-049">هشت خط برنده در یک لیست از تاپل‌ها ذخیره شده است. بررسی برد فقط یک حلقه روی همین لیست است. باز هم <strong>داده به جای کد</strong>.</li>
+        <li data-t="ch20-050">خانه‌های خالی شماره خودشان را نشان می‌دهند، پس بازیکن ضرورتی ندارد شماره‌گذاری را حفظ کند.</li>
+        <li data-t="ch20-051">تابع تبدیل ارقام فارسی نکته خوبی است: کاربر ایرانی ممکن است با کیبورد فارسی عدد بزند و برنامه باید هر دو را بفهمد.</li>
+        <li data-t="ch20-052">هوش مصنوعی این نسخه ساده است و فقط خانه تصادفی می‌گیرد. یکی از تمرین‌های فصل این است که باهوشش کنید.</li>
+    </ul>
+
+    <div class="warn">
+        <span class="box-title" data-t="ch20-053">باگ‌های نسخه اصلی</span>
+        <p data-t="ch20-054">
+            ورودی غیرعددی باعث <code>ValueError</code> و خراب شدن برنامه
+            می‌شد، امتیازها در متغیرهای سراسری نگه داشته می‌شدند، و برای خروج
+            از <code>sys.exit()</code> استفاده شده بود که برنامه را ناگهانی
+            قطع می‌کند. نسخه اصلاح‌شده با <code>isdigit()</code> بررسی می‌کند و
+            با <code>return</code> تمیز بیرون می‌آید.
+        </p>
+    </div>
+
+    <h2 id="s6" data-t="ch20-055">۶. پروژه پنج: بازی آزمون</h2>
+
+    <p data-t="ch20-056">
+        این پروژه تازه‌ای است که در نسخه اصلی دوره وجود نداشت و برای تمرین
+        فصل هجدهم اضافه شده است: سؤال‌ها در فایل متنی هستند، نه داخل کد.
+    </p>
+
+    <pre class="out">Which keyword defines a function in Python?|def|class|func|define
+What does len('Kadoos') return?|6|5|7|error
+Which type is the result of input()?|str|int|float|bool</pre>
+    <p class="code-caption" data-t="ch20-057">قالب فایل questions.txt: سؤال، پاسخ درست، سپس گزینه‌های غلط</p>
+
+    <pre class="code"><code>def load_questions(path: str) -&gt; list[dict]:
+    '''Read the file and return a list of questions.
+
+    Every question is a dictionary: {'text': ..., 'correct': ..., 'options': [...]}
+    '''
+    if not os.path.exists(path):
+        raise FileNotFoundError(f'{path} was not found')
+
+    questions: list[dict] = []
+
+    with open(path, encoding='utf-8') as f:
+        for line_number, line in enumerate(f, start=1):
+            line = line.strip()
+            if line == '':
+                continue
+
+            parts = line.split('|')
+            if len(parts) &lt; 3:
+                print(f'[warning] line {line_number} is ignored (wrong format)')
+                continue
+
+            text = parts[0]
+            correct = parts[1]
+            options = parts[1:]
+            random.shuffle(options)
+
+            questions.append({
+                'text': text,
+                'correct': correct,
+                'options': options,
+            })
+
+    return questions</code></pre>
+    <p class="code-caption" data-t="ch20-058">خواندن سؤال‌ها از فایل: پروژه 05_quiz</p>
+
+    <h3 data-t="ch20-059">شرح پروژه</h3>
+
+    <ul>
+        <li data-t="ch20-060">سؤال‌ها <strong>بیرون از کد</strong> هستند. معلم می‌تواند سؤال اضافه کند بدون اینکه یک خط پایتون بلد باشد. این یکی از مهم‌ترین اصول طراحی نرم‌افزار است.</li>
+        <li data-t="ch20-061">هر خط با <code>split('|')</code> شکسته می‌شود. اولین تکه متن سؤال است، دومی پاسخ درست، و بقیه گزینه‌های غلط.</li>
+        <li data-t="ch20-062">خط‌های خراب <strong>نادیده گرفته می‌شوند</strong> با یک هشدار، به جای اینکه کل برنامه را از کار بیندازند. شماره خط هم چاپ می‌شود تا معلم بتواند اصلاحش کند.</li>
+        <li data-t="ch20-063">گزینه‌ها بُر زده می‌شوند تا پاسخ درست همیشه گزینه اول نباشد.</li>
+        <li data-t="ch20-064"><code>load_questions</code> خودش خطا می‌اندازد و <code>main</code> آن را می‌گیرد؛ همان تقسیم مسئولیت فصل نوزدهم.</li>
+    </ul>
+
+    <h2 id="s7" data-t="ch20-065">۷. درس‌های مشترک این پنج پروژه</h2>
+
+    <p data-t="ch20-066">اگر هر پنج پروژه را بخوانید، الگوهای یکسانی می‌بینید. این موارد همان چیزی است که از ترم اول باید با خودتان ببرید:</p>
+
+    <div class="table-scroll">
+        <table>
+            <thead>
+                <tr><th data-t="ch20-067">الگو</th><th data-t="ch20-068">توضیح</th></tr>
+            </thead>
+            <tbody>
+                <tr><td data-t="ch20-069">ثابت‌ها در بالای فایل</td><td data-t="ch20-070">با حروف بزرگ. برای تغییر تنظیمات، کد را نمی‌گردید</td></tr>
+                <tr><td data-t="ch20-071">داده به جای کد</td><td data-t="ch20-072">دیکشنری <code>BEATS</code>، لیست <code>WINNING_LINES</code>، لیست <code>LEVELS</code></td></tr>
+                <tr><td data-t="ch20-073">هر تابع یک کار</td><td data-t="ch20-074">خواندن، محاسبه، نمایش، جدا از هم</td></tr>
+                <tr><td data-t="ch20-075">توابع بدون چاپ</td><td data-t="ch20-076">تابعی که فقط مقدار برمی‌گرداند، همه‌جا قابل استفاده است</td></tr>
+                <tr><td data-t="ch20-077">اعتبارسنجی هر ورودی</td><td data-t="ch20-078">حلقه تا وقتی جواب معتبر شود</td></tr>
+                <tr><td data-t="ch20-079">راه خروج</td><td data-t="ch20-080">هر بازی باید گزینه exit داشته باشد</td></tr>
+                <tr><td data-t="ch20-081"><code>main()</code> و نگهبان</td><td data-t="ch20-082">در هر پنج پروژه</td></tr>
+                <tr><td data-t="ch20-083">بدون <code>global</code></td><td data-t="ch20-084">مقدار را برگردانید، متغیر سراسری نسازید</td></tr>
+            </tbody>
+        </table>
+    </div>
+
+    <div class="try">
+        <span class="box-title" data-t="ch20-085">پیشنهاد جدی</span>
+        <p data-t="ch20-086">
+            پیش از خواندن کد هر پروژه، خودتان یک نسخه ساده‌اش را بنویسید. بعد
+            کد این فصل را بخوانید و مقایسه کنید. تفاوت‌ها را یادداشت کنید. این
+            کار ده برابر بیشتر از خواندن صرف به شما یاد می‌دهد.
+        </p>
+    </div>
+
+    <div class="folder-ref">
+        <span class="box-title" data-t="ch20-087">فایل‌های تمرینی این فصل</span>
+        <p data-t="ch20-088">
+            پوشه <code>S20-term1-projects</code> شامل پنج پوشه پروژه:
+            <code>01_number_guess</code>، <code>02_rock_paper_scissors</code>،
+            <code>03_wordle</code>، <code>04_tic_tac_toe</code> و
+            <code>05_quiz</code>. هر کدام را از داخل پوشه خودش با
+            <code>python app.py</code> اجرا کنید.
+        </p>
+    </div>
+
+    <h2 data-t="ch20-089">پایان ترم اول</h2>
+
+    <p data-t="ch20-090">
+        تا اینجا شما می‌توانید هر برنامه متنی‌ای را بنویسید: داده بگیرید،
+        پردازش کنید، در فایل ذخیره کنید و خطاها را مدیریت کنید. این پایه
+        محکمی است.
+    </p>
+
+    <p data-t="ch20-091">
+        ترم دوم از فصل بیست و یکم شروع می‌شود و کاملاً متفاوت است: به جای
+        نوشتن دستورها، یاد می‌گیرید <strong>مدل بسازید</strong>. شیءگرایی،
+        پایگاه داده، رابط گرافیکی و وب. اگر مطالب ترم اول را خوب بلد نیستید،
+        پیش از رفتن به فصل بعد یک بار دیگر تمرین‌های فصل‌های یازده تا نوزده را
+        انجام دهید.
+    </p>
+
+    <div class="exercise">
+        <h3 data-t="ch20-092">تمرین‌های فصل بیست</h3>
+
+        <p data-t="ch20-093"><strong>حدس عدد</strong></p>
+        <ol>
+            <li data-t="ch20-094">بهترین رکورد (کمترین تعداد حدس) را در فایل ذخیره کنید و در شروع هر بازی نشانش دهید.</li>
+            <li data-t="ch20-095">بازی را برعکس کنید: شما عددی در ذهن بگیرید و کامپیوتر حدس بزند و بپرسد «بیشتر یا کمتر». برای بازه ۱ تا ۱۰۰ چند حدس لازم دارد و چرا؟</li>
+            <li data-t="ch20-096">مرحله‌ای اضافه کنید که بازه ۱ تا ۱۰۰۰ باشد ولی فقط ده حدس داشته باشید.</li>
+        </ol>
+
+        <p data-t="ch20-097"><strong>سنگ کاغذ قیچی</strong></p>
+        <ol start="4">
+            <li data-t="ch20-098">به جای یک دور، سه برد از پنج بازی کنید.</li>
+            <li data-t="ch20-099">بشمارید بازیکن بیشتر چه چیزی می‌زند و کامپیوتر از آن استفاده کند. آیا شروع به بردن می‌کند؟</li>
+            <li data-t="ch20-100">حالت‌های «مارمولک» و «اسپاک» را اضافه کنید. قواعد را در دیکشنری بگذارید، نه در زنجیره <code>if</code>.</li>
+        </ol>
+
+        <p data-t="ch20-101"><strong>وردل</strong></p>
+        <ol start="7">
+            <li data-t="ch20-102">فهرست کلمات را به جای لیست پایتونی، از فایل بخوانید.</li>
+            <li data-t="ch20-103">حروف امتحان‌شده را نشان دهید و از تکرارشان جلوگیری کنید.</li>
+            <li data-t="ch20-104">یک وردل واقعی بسازید: پنج حرف، شش تلاش، و برای هر حرف یک علامت (درست و در جای درست، درست ولی جای غلط، اصلاً نیست).</li>
+        </ol>
+
+        <p data-t="ch20-105"><strong>دوز</strong></p>
+        <ol start="10">
+            <li data-t="ch20-106">حالت دو نفره روی یک کیبورد اضافه کنید.</li>
+            <li data-t="ch20-107">کامپیوتر را باهوش کنید: اگر حرکت برنده دارد بزند، وگرنه جلوی برد حریف را بگیرد.</li>
+            <li data-t="ch20-108">امتیاز چند بازی را نگه دارید و در پایان نشان دهید.</li>
+        </ol>
+
+        <p data-t="ch20-109"><strong>بازی آزمون</strong></p>
+        <ol start="13">
+            <li data-t="ch20-110">زمان‌سنج اضافه کنید: ده ثانیه برای هر سؤال.</li>
+            <li data-t="ch20-111">به سؤال‌ها دسته‌بندی بدهید و بگذارید بازیکن انتخاب کند.</li>
+            <li data-t="ch20-112">نتیجه هر بازی را در فایل بنویسید و صفحه «پنج نفر برتر» بسازید.</li>
+        </ol>
+
+        <p data-t="ch20-113"><strong>مشترک بین پروژه‌ها</strong></p>
+        <ol start="16">
+            <li data-t="ch20-114">چیزهای مشترک هر پنج برنامه (پاک کردن صفحه، خواندن امن عدد، انتظار برای اینتر) را در ماژول <code>helpers.py</code> بگذارید.</li>
+            <li data-t="ch20-115">یک <code>menu.py</code> بنویسید که پنج بازی را نشان دهد و بازی انتخاب‌شده را اجرا کند.</li>
+            <li data-t="ch20-116">کد خودتان را مرور کنید و مطمئن شوید هر برنامه در برابر جواب غلط، خط خالی و <code>Ctrl + C</code> مقاوم است.</li>
+        </ol>
+    </div>
+
+    <div class="pager">
+        <a href="chapter-19.html">فصل قبل: خطاها و استثناها</a>
+        <a href="chapter-21.html">فصل بعد: شیءگرایی</a>
+    </div>
+
+</main>
+
+</body>
+</html>

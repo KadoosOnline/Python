@@ -1,0 +1,647 @@
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="فصل بیست و شش: تابع lambda، کلید مرتب‌سازی، map و filter، functools، دکوراتور، مولد و ماژول itertools">
+    <title>فصل ۲۶: کد پایتونی، بخش دوم</title>
+    <link rel="icon" href="logokm.png" type="image/png">
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<header class="book-bar">
+    <a class="name" href="index.html">برنامه‌نویسی پایتون</a>
+    <a href="index.html">فهرست مطالب</a>
+</header>
+
+<main class="paper">
+
+    <div class="chapter-head">
+        <span class="chapter-num">فصل ۲۶</span>
+        <h1 data-t="ch26-001">کد پایتونی، بخش دوم</h1>
+        <p class="lead" data-t="ch26-002">
+            در پایتون، تابع هم یک <strong>مقدار</strong> است: می‌شود در متغیر
+            ریختش، به تابع دیگری داد و از تابع برگرداندش. این فصل درباره همین
+            ایده و پیامدهای قدرتمندش است.
+        </p>
+    </div>
+
+    <div class="mini-toc">
+        <span class="box-title" data-t="ch26-003">در این فصل می‌خوانید</span>
+        <ol>
+            <li data-t="ch26-004"><a href="#s1">تابع lambda</a></li>
+            <li data-t="ch26-005"><a href="#s2">مرتب‌سازی با کلید</a></li>
+            <li data-t="ch26-006"><a href="#s3">توابع map و filter</a></li>
+            <li data-t="ch26-007"><a href="#s4">ماژول functools</a></li>
+            <li data-t="ch26-008"><a href="#s5">اولین دکوراتور</a></li>
+            <li data-t="ch26-009"><a href="#s6">دکوراتور wraps</a></li>
+            <li data-t="ch26-010"><a href="#s7">دکوراتور با پارامتر</a></li>
+            <li data-t="ch26-011"><a href="#s8">دکوراتور زمان‌سنجی</a></li>
+            <li data-t="ch26-012"><a href="#s9">مولدها</a></li>
+            <li data-t="ch26-013"><a href="#s10">خط لوله مولدها</a></li>
+            <li data-t="ch26-014"><a href="#s11">ماژول itertools</a></li>
+        </ol>
+    </div>
+
+    <h2 id="s1" data-t="ch26-015">۱. تابع lambda</h2>
+
+    <pre class="code"><code># 'lambda arguments: expression' creates a function without a name.
+# It can only contain ONE expression, and it returns it automatically.
+double = lambda x: x * 2
+print(double(5))
+
+# Exactly the same thing, written normally - and this version is better,
+# because the function then has a real name in the tracebacks.
+def double_v2(x):
+    return x * 2
+
+print(double_v2(5))
+
+# A lambda earns its place when a function is needed for one single moment,
+# usually as an argument of another function.
+students = [('Ali', 18), ('Sara', 20), ('Reza', 12)]
+print(sorted(students, key=lambda student: student[1]))
+
+# Several parameters are allowed.
+add = lambda a, b: a + b
+print(add(2, 3))</code></pre>
+    <p class="code-caption" data-t="ch26-016">تابع بی‌نام: نمونه 01_lambda.py</p>
+
+    <h3 data-t="ch26-017">شرح مثال</h3>
+
+    <ul>
+        <li data-t="ch26-018"><code>lambda</code> یک تابع <strong>بی‌نام</strong> می‌سازد که فقط یک عبارت دارد و همان را برمی‌گرداند. <code>return</code> ندارد و نمی‌تواند داشته باشد.</li>
+        <li data-t="ch26-019">جایش آنجاست که یک تابع کوچک برای یک لحظه لازم است، معمولاً به عنوان آرگومان تابعی دیگر.</li>
+        <li data-t="ch26-020">اگر می‌خواهید به lambda نام بدهید و در متغیر بریزیدش، همان <code>def</code> را بنویسید. کوتاه‌تر نمی‌شود و در پیام‌های خطا نام واقعی نشان می‌دهد.</li>
+    </ul>
+
+    <h2 id="s2" data-t="ch26-021">۲. مرتب‌سازی با کلید</h2>
+
+    <pre class="code"><code>students = [
+    {'name': 'Ali', 'score': 18, 'age': 20},
+    {'name': 'Sara', 'score': 20, 'age': 19},
+    {'name': 'Reza', 'score': 12, 'age': 22},
+]
+
+# 'key' is a function that says WHAT to compare for each item.
+print(sorted(students, key=lambda s: s['score']))
+print(sorted(students, key=lambda s: s['score'], reverse=True))
+
+# Sorting by two criteria: return a tuple.
+print([s['name'] for s in sorted(students, key=lambda s: (-s['score'], s['name']))])
+
+# operator.itemgetter / attrgetter are the faster, ready-made version.
+from operator import itemgetter
+print([s['name'] for s in sorted(students, key=itemgetter('age'))])
+
+# min / max accept the same key.
+print(max(students, key=lambda s: s['score'])['name'])
+
+# Sorting words by length, then alphabetically.
+words = ['banana', 'kiwi', 'apple', 'fig']
+print(sorted(words, key=lambda w: (len(w), w)))</code></pre>
+    <p class="code-caption" data-t="ch26-022">مرتب‌سازی با کلید: نمونه 02_sort_with_key.py</p>
+
+    <div class="tip">
+        <span class="box-title" data-t="ch26-023">دو ترفند مرتب‌سازی که باید بدانید</span>
+        <p data-t="ch26-024">
+            <strong>یک:</strong> برای مرتب‌سازی چندمعیاره، تاپل برگردانید.
+            پایتون اول عضو اول را مقایسه می‌کند و در صورت تساوی، عضو دوم را.
+            <strong>دو:</strong> برای اینکه یک معیار نزولی و بقیه صعودی باشند،
+            علامت منفی جلوی معیار عددی بگذارید:
+            <code>(-s['score'], s['name'])</code> یعنی نمره از زیاد به کم و در
+            نمره برابر، نام الفبایی.
+        </p>
+    </div>
+
+    <h2 id="s3" data-t="ch26-025">۳. توابع map و filter</h2>
+
+    <pre class="code"><code>numbers = [1, 2, 3, 4, 5, 6]
+
+# map() applies a function to every item.
+print(list(map(lambda x: x ** 2, numbers)))
+# The comprehension says the same thing more clearly:
+print([x ** 2 for x in numbers])
+
+# filter() keeps the items for which the function returns True.
+print(list(filter(lambda x: x % 2 == 0, numbers)))
+print([x for x in numbers if x % 2 == 0])
+
+# map() shines when the function already exists and has a name.
+words = ['10', '20', '30']
+print(list(map(int, words)))
+print(list(map(str.upper, ['ali', 'sara'])))
+
+# Both return an ITERATOR, not a list: they compute nothing until you loop.
+result = map(lambda x: x * 2, numbers)
+print(result)              # &lt;map object ...&gt;
+print(list(result))        # now it is computed
+print(list(result))        # [] - an iterator can only be read once!</code></pre>
+    <p class="code-caption" data-t="ch26-026">map و filter: نمونه 03_map_filter.py</p>
+
+    <h3 data-t="ch26-027">شرح مثال</h3>
+
+    <ul>
+        <li data-t="ch26-028"><code>map</code> یک تابع را روی همه اعضا اعمال می‌کند و <code>filter</code> اعضایی را نگه می‌دارد که تابع برایشان <code>True</code> برگرداند.</li>
+        <li data-t="ch26-029">در بیشتر موارد، <strong>درک لیستی خواناتر است</strong>. جامعه پایتون هم همان را ترجیح می‌دهد.</li>
+        <li data-t="ch26-030">استثنا: وقتی تابع از قبل نام دارد، مثل <code>map(int, words)</code>، شکل <code>map</code> تمیزتر است.</li>
+        <li data-t="ch26-031">هر دو یک <strong>تکرارگر</strong> برمی‌گردانند، نه لیست. تا وقتی رویش حلقه نزنید یا <code>list()</code> نکنید، هیچ محاسبه‌ای انجام نمی‌شود. و مهم‌تر: <strong>فقط یک بار</strong> قابل خواندن است. خط آخر مثال، دام رایجی را نشان می‌دهد.</li>
+    </ul>
+
+    <h2 id="s4" data-t="ch26-032">۴. ماژول functools</h2>
+
+    <pre class="code"><code>from functools import reduce, partial, lru_cache
+import time
+
+# reduce() folds a sequence into a single value.
+numbers = [1, 2, 3, 4, 5]
+print(reduce(lambda a, b: a + b, numbers))          # 15 - but sum() is better
+print(reduce(lambda a, b: a * b, numbers))          # 120 - here it is useful
+
+# partial() freezes some arguments of a function.
+def power(base, exponent):
+    return base ** exponent
+
+square = partial(power, exponent=2)
+cube = partial(power, exponent=3)
+print(square(5), cube(5))
+
+# lru_cache remembers the results: a huge win for recursive functions.
+def slow_fibonacci(n):
+    if n &lt; 2:
+        return n
+    return slow_fibonacci(n - 1) + slow_fibonacci(n - 2)
+
+
+@lru_cache(maxsize=None)
+def fast_fibonacci(n):
+    if n &lt; 2:
+        return n
+    return fast_fibonacci(n - 1) + fast_fibonacci(n - 2)
+
+
+start = time.perf_counter()
+slow_fibonacci(30)
+print(f'without cache: {time.perf_counter() - start:.3f} s')
+
+start = time.perf_counter()
+fast_fibonacci(30)
+print(f'with cache:    {time.perf_counter() - start:.6f} s')</code></pre>
+    <p class="code-caption" data-t="ch26-033">ماژول functools: نمونه 04_functools.py</p>
+
+    <pre class="out">15
+120
+25 125
+without cache: 0.253 s
+with cache:    0.000027 s</pre>
+
+    <div class="table-scroll">
+        <table>
+            <thead>
+                <tr><th data-t="ch26-034">ابزار</th><th data-t="ch26-035">وظیفه آن</th></tr>
+            </thead>
+            <tbody>
+                <tr><td><code>reduce</code></td><td data-t="ch26-036">تا کردن یک دنباله به یک مقدار. برای جمع، <code>sum</code> بهتر است</td></tr>
+                <tr><td><code>partial</code></td><td data-t="ch26-037">ثابت کردن بعضی آرگومان‌های یک تابع</td></tr>
+                <tr><td><code>lru_cache</code></td><td data-t="ch26-038">حفظ نتیجه‌ها. برای توابع بازگشتی معجزه می‌کند</td></tr>
+            </tbody>
+        </table>
+    </div>
+
+    <p data-t="ch26-039">
+        آن اختلاف زمانی را ببینید: فیبوناچی بازگشتی فصل سیزدهم که چند ثانیه طول
+        می‌کشید، با یک خط <code>@lru_cache</code> عملاً آنی می‌شود. دلیلش این
+        است که هر مقدار فقط یک بار محاسبه و بعد ذخیره می‌شود.
+    </p>
+
+    <h2 id="s5" data-t="ch26-040">۵. اولین دکوراتور</h2>
+
+    <p data-t="ch26-041">
+        <strong>دکوراتور</strong> تابعی است که یک تابع می‌گیرد و تابع تازه‌ای
+        برمی‌گرداند. با آن می‌شود رفتاری به تابع اضافه کرد
+        <strong>بدون دست زدن به کد خودش</strong>.
+    </p>
+
+    <pre class="code"><code># A decorator is a function that takes a function and returns a new one.
+def logger(func):
+    def wrapper(*args, **kwargs):
+        print(f'Call {func.__name__} with {args} {kwargs}')
+        result = func(*args, **kwargs)
+        print(f'{func.__name__} returned {result}')
+        return result                # never forget to return the result!
+    return wrapper
+
+
+@logger                              # exactly the same as: add = logger(add)
+def add(num1: float, num2: float) -&gt; float:
+    return num1 + num2
+
+
+def main() -&gt; None:
+    total = add(3, 4)
+
+    # Without the '@' syntax it would be written like this:
+    def sub(a, b):
+        return a - b
+
+    sub = logger(sub)
+    sub(10, 3)</code></pre>
+    <p class="code-caption" data-t="ch26-042">اولین دکوراتور: نمونه 05_decorator_basics.py</p>
+
+    <pre class="out">Call add with (3, 4) {}
+add returned 7</pre>
+
+    <h3 data-t="ch26-043">چطور کار می‌کند</h3>
+
+    <ol>
+        <li data-t="ch26-044"><code>@logger</code> بالای <code>def add</code> دقیقاً یعنی <code>add = logger(add)</code>. همین و بس.</li>
+        <li data-t="ch26-045"><code>logger</code> تابع اصلی را می‌گیرد و تابع <code>wrapper</code> را برمی‌گرداند.</li>
+        <li data-t="ch26-046">از این به بعد، هر بار که <code>add</code> صدا زده شود، در عمل <code>wrapper</code> اجرا می‌شود.</li>
+        <li data-t="ch26-047"><code>wrapper</code> کارهای اضافه را انجام می‌دهد، تابع اصلی را صدا می‌زند و نتیجه‌اش را <strong>برمی‌گرداند</strong>.</li>
+    </ol>
+
+    <div class="warn">
+        <span class="box-title" data-t="ch26-048">فراموش نکردن return</span>
+        <p data-t="ch26-049">
+            اگر در <code>wrapper</code> بنویسید <code>func(*args)</code> و
+            نتیجه‌اش را برنگردانید، تابع تزیین‌شده همیشه <code>None</code>
+            می‌دهد. این رایج‌ترین باگ دکوراتورهاست و پیدا کردنش سخت است، چون
+            هیچ خطایی نمی‌دهد.
+        </p>
+    </div>
+
+    <p data-t="ch26-050">
+        استفاده از <code>*args, **kwargs</code> باعث می‌شود دکوراتور با
+        <strong>هر</strong> تابعی کار کند، مهم نیست چند پارامتر داشته باشد.
+        این همان تکنیک فصل سیزدهم است.
+    </p>
+
+    <h2 id="s6" data-t="ch26-051">۶. دکوراتور wraps</h2>
+
+    <pre class="code"><code>from functools import wraps
+
+
+# Problem: a naive decorator replaces the function, so its name and its
+# docstring disappear.
+def bad_decorator(func):
+    def wrapper(*args, **kwargs):
+        return func(*args, **kwargs)
+    return wrapper
+
+
+def good_decorator(func):
+    @wraps(func)              # copies __name__, __doc__, ... onto the wrapper
+    def wrapper(*args, **kwargs):
+        return func(*args, **kwargs)
+    return wrapper
+
+
+@bad_decorator
+def hello_bad():
+    'Say hello.'
+
+
+@good_decorator
+def hello_good():
+    'Say hello.'
+
+
+print(hello_bad.__name__, '|', hello_bad.__doc__)     # wrapper | None
+print(hello_good.__name__, '|', hello_good.__doc__)   # hello_good | Say hello.</code></pre>
+    <p class="code-caption" data-t="ch26-052">دکوراتور wraps: نمونه 06_decorator_wraps.py</p>
+
+    <p data-t="ch26-053">
+        بدون <code>@wraps</code>، نام و مستند تابع اصلی گم می‌شوند و
+        <code>help()</code> چیز بی‌فایده‌ای نشان می‌دهد. یک خط است و همیشه
+        بنویسیدش.
+    </p>
+
+    <h2 id="s7" data-t="ch26-054">۷. دکوراتور با پارامتر</h2>
+
+    <pre class="code"><code>from functools import wraps
+
+
+# A decorator that takes parameters needs THREE levels:
+#   the factory -&gt; the decorator -&gt; the wrapper
+def repeat(times: int):
+    'Run the decorated function "times" times.'
+    def decorator(func):
+        @wraps(func)
+        def wrapper(*args, **kwargs):
+            result = None
+            for _ in range(times):
+                result = func(*args, **kwargs)
+            return result
+        return wrapper
+    return decorator
+
+
+@repeat(3)
+def greet(name: str) -&gt; None:
+    print(f'Hello {name}!')
+
+
+def require_positive(func):
+    'A decorator that validates the arguments.'
+    @wraps(func)
+    def wrapper(*args, **kwargs):
+        for value in args:
+            if isinstance(value, (int, float)) and value &lt; 0:
+                raise ValueError(f'{func.__name__} refuses negative values')
+        return func(*args, **kwargs)
+    return wrapper
+
+
+@require_positive
+def area(width: float, height: float) -&gt; float:
+    return width * height</code></pre>
+    <p class="code-caption" data-t="ch26-055">دکوراتور با پارامتر: نمونه 07_decorator_with_arguments.py</p>
+
+    <p data-t="ch26-056">
+        وقتی دکوراتور پارامتر بگیرد، <strong>سه</strong> سطح تابع لازم است.
+        دلیلش ساده است: <code>@repeat(3)</code> یعنی اول <code>repeat(3)</code>
+        صدا زده می‌شود و <strong>نتیجه‌اش</strong> دکوراتور واقعی است. پس
+        بیرونی‌ترین تابع باید یک دکوراتور برگرداند.
+    </p>
+
+    <h2 id="s8" data-t="ch26-057">۸. دکوراتور زمان‌سنجی</h2>
+
+    <pre class="code"><code>'''The most useful decorator of everyday life: measuring a function.'''
+
+import time
+from functools import wraps
+
+
+def timing(func):
+    @wraps(func)
+    def wrapper(*args, **kwargs):
+        start = time.perf_counter()
+        result = func(*args, **kwargs)
+        elapsed = time.perf_counter() - start
+        print(f'{func.__name__} took {elapsed:.4f} seconds')
+        return result
+    return wrapper
+
+
+@timing
+def sum_with_loop(n: int) -&gt; int:
+    total = 0
+    for i in range(n):
+        total += i
+    return total
+
+
+@timing
+def sum_with_builtin(n: int) -&gt; int:
+    return sum(range(n))
+
+
+if __name__ == '__main__':
+    sum_with_loop(5_000_000)
+    sum_with_builtin(5_000_000)</code></pre>
+    <p class="code-caption" data-t="ch26-058">زمان‌سنجی: نمونه 08_timing_decorator.py</p>
+
+    <pre class="out">sum_with_loop took 0.3120 seconds
+sum_with_builtin took 0.0680 seconds</pre>
+
+    <p data-t="ch26-059">
+        این دکوراتور را در هر پروژه‌ای کپی کنید. برای پیدا کردن اینکه کدام
+        بخش برنامه کند است، فقط کافی است یک خط بالای تابع بگذارید و بعد
+        برش دارید.
+    </p>
+
+    <h2 id="s9" data-t="ch26-060">۹. مولدها</h2>
+
+    <pre class="code"><code># A function that contains 'yield' is a GENERATOR: it does not run when it is
+# called; it runs a little more every time you ask for the next value.
+def simple_gen():
+    print('Start')
+    yield 1
+    print('Yield after 1')
+    yield 2
+    print('Yield after 2')
+    yield 3
+    print('Finish!')
+
+
+def main() -&gt; None:
+    g = simple_gen()
+    print(g)                 # &lt;generator object ...&gt; - nothing has run yet
+
+    print(next(g))           # runs until the first yield
+    print(next(g))
+    print(next(g))
+
+    # A fourth next() would raise StopIteration - that is exactly what a
+    # 'for' loop catches for us.
+    try:
+        next(g)
+    except StopIteration:
+        print('the generator is exhausted')
+
+    print('--- with a for loop ---')
+    for value in simple_gen():
+        print('got', value)
+
+    # A generator can only be read once.
+    g2 = simple_gen()
+    print(list(g2))
+    print(list(g2))          # [] - already exhausted</code></pre>
+    <p class="code-caption" data-t="ch26-061">مولد: نمونه 09_generators.py</p>
+
+    <h3 data-t="ch26-062">شرح مثال</h3>
+
+    <ul>
+        <li data-t="ch26-063">هر تابعی که <code>yield</code> داشته باشد، <strong>مولد</strong> است. صدا زدنش هیچ کدی را اجرا نمی‌کند و فقط یک شیء مولد می‌سازد.</li>
+        <li data-t="ch26-064">هر <code>next()</code> تابع را تا <code>yield</code> بعدی اجرا می‌کند و <strong>همان جا متوقفش می‌کند</strong>. حالت متغیرها حفظ می‌شود.</li>
+        <li data-t="ch26-065">وقتی تابع تمام شود، <code>StopIteration</code> می‌اندازد. حلقه <code>for</code> خودش این را می‌گیرد، پس شما هیچ‌وقت ضرورتی ندارد به آن فکر کنید.</li>
+        <li data-t="ch26-066">مولد <strong>یک بار مصرف</strong> است. اگر دو بار لازمش دارید، دو بار بسازیدش.</li>
+    </ul>
+
+    <h2 id="s10" data-t="ch26-067">۱۰. خط لوله مولدها</h2>
+
+    <pre class="code"><code>'''Why generators matter: laziness and memory.'''
+
+
+def primes():
+    'An INFINITE generator of prime numbers.'
+    number = 2
+    while True:
+        for divisor in range(2, int(number ** 0.5) + 1):
+            if number % divisor == 0:
+                break
+        else:
+            yield number
+        number += 1
+
+
+def read_large_file(path: str):
+    'Yield the lines of a file one by one, whatever its size.'
+    with open(path, 'r', encoding='utf-8') as f:
+        for line in f:
+            yield line.rstrip('\n')
+
+
+def main() -&gt; None:
+    # An infinite generator is fine as long as we stop asking.
+    generator = primes()
+    for _ in range(20):
+        print(next(generator), end=' ')
+    print()
+
+    # A list comprehension builds everything in memory,
+    # a generator expression computes on demand.
+    import sys
+    as_list = [x ** 2 for x in range(100_000)]
+    as_generator = (x ** 2 for x in range(100_000))
+    print('list      :', sys.getsizeof(as_list), 'bytes')
+    print('generator :', sys.getsizeof(as_generator), 'bytes')
+
+    # A pipeline: each step is lazy, nothing is stored.
+    lines = read_large_file('demo.txt')
+    non_empty = (line for line in lines if line.strip())
+    numbers = (int(line) for line in non_empty)
+    positives = (n for n in numbers if n &gt; 0)
+
+    print('sum of the positive numbers:', sum(positives))</code></pre>
+    <p class="code-caption" data-t="ch26-068">خط لوله: نمونه 10_generator_pipeline.py</p>
+
+    <pre class="out">2 3 5 7 11 13 17 19 23 29 31 37 41 43 47 53 59 61 67 71 
+list      : 800984 bytes
+generator : 200 bytes</pre>
+
+    <h3 data-t="ch26-069">سه درس این مثال</h3>
+
+    <ul>
+        <li data-t="ch26-070"><strong>دنباله بی‌پایان.</strong> تابع <code>primes</code> حلقه‌ای بی‌پایان دارد ولی برنامه هنگ نمی‌کند، چون فقط هر وقت مقدار بخواهید یک قدم جلو می‌رود.</li>
+        <li data-t="ch26-071"><strong>حافظه.</strong> لیست صدهزارتایی نزدیک هشتصد کیلوبایت می‌گیرد و مولد فقط دویست بایت. برای فایل چندگیگابایتی، این تفاوت بین کار کردن و از کار افتادن است.</li>
+        <li data-t="ch26-072"><strong>خط لوله.</strong> چهار مرحله پشت سر هم چیده شده‌اند و <strong>هیچ‌کدام</strong> تا لحظه <code>sum</code> اجرا نمی‌شوند. آن وقت داده‌ها یکی‌یکی از کل لوله عبور می‌کنند. این الگو در پردازش داده‌های بزرگ حیاتی است.</li>
+    </ul>
+
+    <h2 id="s11" data-t="ch26-073">۱۱. ماژول itertools</h2>
+
+    <pre class="code"><code>import itertools
+
+# count() - an infinite counter
+for i in itertools.count(10, 5):
+    if i &gt; 30:
+        break
+    print(i, end=' ')
+print()
+
+# cycle() - repeats a sequence for ever
+colors = itertools.cycle(['red', 'green', 'blue'])
+print([next(colors) for _ in range(7)])
+
+# chain() - glues several sequences into one
+print(list(itertools.chain([1, 2], [3, 4], 'ab')))
+
+# islice() - a slice of any iterator (even an infinite one)
+print(list(itertools.islice(itertools.count(), 5)))
+
+# combinations() / permutations() / product()
+print(list(itertools.combinations('ABC', 2)))
+print(list(itertools.permutations('ABC', 2)))
+print(list(itertools.product([1, 2], 'ab')))
+
+# groupby() - groups CONSECUTIVE items, so sort first!
+students = [
+    {'name': 'Ali', 'city': 'Rasht'},
+    {'name': 'Sara', 'city': 'Rasht'},
+    {'name': 'Reza', 'city': 'Lahijan'},
+]
+students.sort(key=lambda s: s['city'])
+for city, group in itertools.groupby(students, key=lambda s: s['city']):
+    print(city, [s['name'] for s in group])
+
+# accumulate() - the running total
+print(list(itertools.accumulate([1, 2, 3, 4])))</code></pre>
+    <p class="code-caption" data-t="ch26-074">ماژول itertools: نمونه 11_itertools.py</p>
+
+    <div class="table-scroll">
+        <table>
+            <thead>
+                <tr><th data-t="ch26-075">ابزار</th><th data-t="ch26-076">وظیفه آن</th></tr>
+            </thead>
+            <tbody>
+                <tr><td><code>count(a, b)</code></td><td data-t="ch26-077">شمارنده بی‌پایان</td></tr>
+                <tr><td><code>cycle(seq)</code></td><td data-t="ch26-078">تکرار بی‌پایان یک دنباله</td></tr>
+                <tr><td><code>chain(a, b)</code></td><td data-t="ch26-079">چسباندن چند دنباله</td></tr>
+                <tr><td><code>islice(it, n)</code></td><td data-t="ch26-080">برش از هر تکرارگر، حتی بی‌پایان</td></tr>
+                <tr><td><code>combinations</code></td><td data-t="ch26-081">همه ترکیب‌ها، بدون اهمیت ترتیب</td></tr>
+                <tr><td><code>permutations</code></td><td data-t="ch26-082">همه جایگشت‌ها، با اهمیت ترتیب</td></tr>
+                <tr><td><code>product</code></td><td data-t="ch26-083">ضرب دکارتی، مثل حلقه تودرتو</td></tr>
+                <tr><td><code>groupby</code></td><td data-t="ch26-084">گروه‌بندی اعضای <strong>پشت سر هم</strong></td></tr>
+                <tr><td><code>accumulate</code></td><td data-t="ch26-085">مجموع در حال اجرا</td></tr>
+            </tbody>
+        </table>
+    </div>
+
+    <div class="warn">
+        <span class="box-title" data-t="ch26-086">دام groupby</span>
+        <p data-t="ch26-087">
+            <code>groupby</code> فقط اعضای <strong>مجاور</strong> را گروه
+            می‌کند. اگر داده مرتب نباشد، یک شهر ممکن است چند بار در نتیجه
+            ظاهر شود. همیشه اول با همان کلید <code>sort</code> کنید. اگر
+            گروه‌بندی ساده می‌خواهید، <code>defaultdict(list)</code> فصل
+            پانزدهم راحت‌تر است.
+        </p>
+    </div>
+
+    <div class="folder-ref">
+        <span class="box-title" data-t="ch26-088">فایل‌های تمرینی این فصل</span>
+        <p data-t="ch26-089">
+            پوشه <code>S26-pythonic-code-2</code> شامل نمونه‌های
+            <code>01_lambda.py</code> تا <code>11_itertools.py</code>.
+        </p>
+    </div>
+
+    <h2 data-t="ch26-090">خلاصه فصل</h2>
+
+    <div class="table-scroll">
+        <table>
+            <thead>
+                <tr><th data-t="ch26-091">ابزار</th><th data-t="ch26-092">وظیفه آن</th></tr>
+            </thead>
+            <tbody>
+                <tr><td><code>lambda x: ...</code></td><td data-t="ch26-093">تابع بی‌نام یک‌خطی، برای استفاده یک‌باره</td></tr>
+                <tr><td><code>sorted(key=...)</code></td><td data-t="ch26-094">مرتب‌سازی بر اساس هر معیاری. تاپل برای چند معیار</td></tr>
+                <tr><td data-t="ch26-095"><code>map</code> و <code>filter</code></td><td data-t="ch26-096">معمولاً درک لیستی خواناتر است</td></tr>
+                <tr><td><code>partial</code></td><td data-t="ch26-097">ثابت کردن بعضی آرگومان‌ها</td></tr>
+                <tr><td><code>@lru_cache</code></td><td data-t="ch26-098">حفظ نتیجه‌های تکراری</td></tr>
+                <tr><td data-t="ch26-099">دکوراتور</td><td data-t="ch26-100">تابعی که تابع می‌گیرد و تابع برمی‌گرداند</td></tr>
+                <tr><td><code>@wraps(func)</code></td><td data-t="ch26-101">حفظ نام و مستند تابع اصلی. همیشه بنویسیدش</td></tr>
+                <tr><td data-t="ch26-102">دکوراتور با پارامتر</td><td data-t="ch26-103">سه سطح تابع لازم دارد</td></tr>
+                <tr><td><code>yield</code></td><td data-t="ch26-104">ساختن مولد. تنبل، کم‌حافظه، یک‌بار مصرف</td></tr>
+                <tr><td><code>(x for x in ...)</code></td><td data-t="ch26-105">عبارت مولد</td></tr>
+                <tr><td><code>itertools</code></td><td data-t="ch26-106">جعبه‌ابزار آماده کار با دنباله‌ها</td></tr>
+            </tbody>
+        </table>
+    </div>
+
+    <div class="exercise">
+        <h3 data-t="ch26-107">تمرین‌های فصل بیست و شش</h3>
+        <ol>
+            <li data-t="ch26-108">لیستی از دانشجویان را با <code>sorted(key=...)</code> اول بر اساس نمره و بعد بر اساس نام مرتب کنید.</li>
+            <li data-t="ch26-109">سه فراخوانی <code>map</code> و <code>filter</code> را به درک لیستی تبدیل کنید و خوانایی‌شان را مقایسه کنید.</li>
+            <li data-t="ch26-110">دکوراتور <code>@count_calls</code> بنویسید که بگوید تابع چند بار صدا زده شده است.</li>
+            <li data-t="ch26-111">دکوراتور <code>@retry(times)</code> بنویسید که اگر تابع خطا داد، دوباره صدایش بزند.</li>
+            <li data-t="ch26-112">دکوراتور <code>@cache_result</code> بنویسید که نتیجه‌ها را در دیکشنری نگه دارد و آن را با <code>lru_cache</code> مقایسه کنید.</li>
+            <li data-t="ch26-113">مولد <code>even_numbers()</code> بنویسید که تا بی‌نهایت اعداد زوج تولید کند.</li>
+            <li data-t="ch26-114">مولدی بنویسید که فایلی را بخواند و فقط خط‌های حاوی یک کلمه خاص را بدهد.</li>
+            <li data-t="ch26-115">خط لوله‌ای از سه مولد روی فایل اعداد بسازید: خواندن، فیلتر مثبت‌ها، و جمع زدن.</li>
+            <li data-t="ch26-116">با <code>itertools.combinations</code> همه جفت‌های یک لیست از نام‌ها را چاپ کنید.</li>
+            <li data-t="ch26-117">با <code>itertools.groupby</code> لیستی از دانشجویان را بر اساس شهر گروه کنید. به خاطر داشته باشید اول مرتب کنید.</li>
+        </ol>
+    </div>
+
+    <div class="pager">
+        <a href="chapter-25.html">فصل قبل: کد پایتونی، بخش اول</a>
+        <a href="chapter-27.html">فصل بعد: CSV و JSON</a>
+    </div>
+
+</main>
+
+</body>
+</html>

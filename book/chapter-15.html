@@ -1,0 +1,524 @@
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="فصل پانزده: لیستی از دیکشنری‌ها، دیکشنری از لیست‌ها، دسترسی تودرتو، تبدیل ظرف‌ها، zip و ماژول collections">
+    <title>فصل ۱۵: ساختارهای داده تودرتو</title>
+    <link rel="icon" href="logokm.png" type="image/png">
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<header class="book-bar">
+    <a class="name" href="index.html">برنامه‌نویسی پایتون</a>
+    <a href="index.html">فهرست مطالب</a>
+</header>
+
+<main class="paper">
+
+    <div class="chapter-head">
+        <span class="chapter-num">فصل ۱۵</span>
+        <h1 data-t="ch15-001">ساختارهای داده تودرتو</h1>
+        <p class="lead" data-t="ch15-002">
+            داده واقعی هیچ‌وقت یک لیست ساده نیست. یک جدول دانشجویان، یک سبد
+            خرید، پاسخ یک وب‌سرویس: همه‌شان ظرف‌های تودرتو هستند. این فصل درباره
+            ساختن و خواندن آنهاست.
+        </p>
+    </div>
+
+    <div class="mini-toc">
+        <span class="box-title" data-t="ch15-003">در این فصل می‌خوانید</span>
+        <ol>
+            <li data-t="ch15-004"><a href="#s1">لیستی از لیست‌ها</a></li>
+            <li data-t="ch15-005"><a href="#s2">لیستی از دیکشنری‌ها</a></li>
+            <li data-t="ch15-006"><a href="#s3">دیکشنری از لیست‌ها</a></li>
+            <li data-t="ch15-007"><a href="#s4">دسترسی امن به عمق ساختار</a></li>
+            <li data-t="ch15-008"><a href="#s5">تبدیل به لیست</a></li>
+            <li data-t="ch15-009"><a href="#s6">تبدیل به تاپل و مجموعه</a></li>
+            <li data-t="ch15-010"><a href="#s7">تبدیل به دیکشنری و تابع zip</a></li>
+            <li data-t="ch15-011"><a href="#s8">حذف تکراری‌ها</a></li>
+            <li data-t="ch15-012"><a href="#s9">ماژول collections</a></li>
+            <li data-t="ch15-013"><a href="#s10">برنامه کامل گزارش دانشجویان</a></li>
+        </ol>
+    </div>
+
+    <h2 id="s1" data-t="ch15-014">۱. لیستی از لیست‌ها</h2>
+
+    <p data-t="ch15-015">
+        این را در فصل دهم دیدیم. اینجا فقط یادآوری می‌کنیم، چون پایه بقیه فصل
+        است.
+    </p>
+
+    <pre class="code"><code># The items of a list can themselves be lists.
+def main() -&gt; None:
+    matrix = [
+        [4, 17, 81],
+        [11, 41, 17],
+        [20, 12, 13],
+    ]
+
+    # A new row is appended like any other item.
+    matrix.append([4, 5, 6])
+
+    print(matrix[1][1])     # 41  -&gt; row 1, column 1
+
+    # Two loops to visit every value.
+    for row in matrix:
+        for value in row:
+            print(value, end='\t')
+        print()
+
+if __name__ == '__main__':
+    main()</code></pre>
+    <p class="code-caption" data-t="ch15-016">ماتریس: نمونه 01_list_of_lists.py</p>
+
+    <h2 id="s2" data-t="ch15-017">۲. لیستی از دیکشنری‌ها</h2>
+
+    <p data-t="ch15-018">
+        این مهم‌ترین ساختار این فصل است. هر جدول داده در دنیای واقعی به همین شکل
+        نمایش داده می‌شود: هر سطر یک دیکشنری، و کلیدها نام ستون‌ها.
+    </p>
+
+    <pre class="code"><code># A list of dictionaries is how a table of data is normally represented:
+# one dictionary per row, the keys are the column names.
+def main() -&gt; None:
+    students = [
+        {'name': 'Ali', 'age': 18, 'email': 'ali@kadoosedu.ir'},
+        {'name': 'Reza', 'age': 20, 'email': 'reza@kadoosedu.ir'},
+        {'name': 'Ahmad', 'age': 23, 'email': 'ahmad@kadoosedu.ir'},
+    ]
+
+    print(students[1]['name'])     # Reza
+
+    # NOTE: use double quotes OUTSIDE the f-string when the keys are written
+    # with single quotes - it works on every version of Python.
+    print('Name\tAge\tEmail')
+    for student in students:
+        print(f"{student['name']}\t{student['age']}\t{student['email']}")
+
+    # Filtering the table.
+    adults = []
+    for student in students:
+        if student['age'] &gt;= 20:
+            adults.append(student['name'])
+    print('20 or older:', adults)
+
+if __name__ == '__main__':
+    main()</code></pre>
+    <p class="code-caption" data-t="ch15-019">جدول داده: نمونه 02_list_of_dicts.py</p>
+
+    <h3 data-t="ch15-020">شرح مثال</h3>
+
+    <ul>
+        <li data-t="ch15-021"><code>students[1]['name']</code> را از چپ بخوانید: سطر شماره ۱ را بگیر، بعد از آن دیکشنری، کلید <code>name</code> را بخوان.</li>
+        <li data-t="ch15-022">پیمایش با یک حلقه ساده انجام می‌شود و در هر دور، <code>student</code> یک دیکشنری کامل است.</li>
+        <li data-t="ch15-023">نکته گیومه‌ها مهم است: وقتی داخل f-string از کلیدی با تک‌گیومه استفاده می‌کنید، بیرونش جفت‌گیومه بگذارید. در پایتون‌های پیش از ۳٫۱۲، یکسان بودنشان خطای نگارشی است. این دقیقاً یکی از باگ‌هایی بود که در فایل‌های اصلی این دوره وجود داشت.</li>
+        <li data-t="ch15-024">فیلتر کردن جدول همان الگوی «لیست خالی بساز و پرش کن» است. در فصل بیست و پنجم همین را در یک خط می‌نویسیم.</li>
+    </ul>
+
+    <h2 id="s3" data-t="ch15-025">۳. دیکشنری از لیست‌ها</h2>
+
+    <p data-t="ch15-026">
+        وقتی می‌خواهید چیزها را <strong>گروه‌بندی</strong> کنید، دیکشنری‌ای
+        می‌سازید که مقدار هر کلیدش یک لیست است.
+    </p>
+
+    <pre class="code"><code># A dictionary whose values are lists is used to GROUP things.
+def main() -&gt; None:
+    classes = {
+        'python': ['Ali', 'Sara'],
+        'linux': ['Reza'],
+    }
+
+    # Adding a student to an existing group.
+    classes['python'].append('Maryam')
+
+    # Adding a brand new group.
+    classes['csharp'] = ['Omid']
+
+    for course, students in classes.items():
+        print(f'{course} ({len(students)}): {", ".join(students)}')
+
+    # A dictionary of dictionaries: scores per student per subject.
+    scores = {
+        'Ali': {'math': 20, 'physics': 18},
+        'Sara': {'math': 19, 'physics': 20},
+    }
+    print(scores['Sara']['physics'])     # 20
+
+    for name, subjects in scores.items():
+        average = sum(subjects.values()) / len(subjects)
+        print(f'{name}: average {average}')
+
+if __name__ == '__main__':
+    main()</code></pre>
+    <p class="code-caption" data-t="ch15-027">گروه‌بندی: نمونه 03_dict_of_lists.py</p>
+
+    <p data-t="ch15-028">
+        دقت کنید <code>classes['python'].append('Maryam')</code> چطور کار
+        می‌کند: اول دیکشنری را با کلید می‌خوانیم که یک لیست می‌دهد، بعد روی آن
+        لیست <code>append</code> می‌زنیم. چون لیست تغییرپذیر است، تغییر واقعاً
+        داخل دیکشنری اتفاق می‌افتد.
+    </p>
+
+    <h2 id="s4" data-t="ch15-029">۴. دسترسی امن به عمق ساختار</h2>
+
+    <pre class="code"><code># Reaching deep into a structure is easy, but every level can be missing.
+def main() -&gt; None:
+    data = {
+        'school': 'Kadoos',
+        'classes': [
+            {'title': 'Python', 'students': ['Ali', 'Sara']},
+            {'title': 'Linux', 'students': []},
+        ],
+    }
+
+    print(data['classes'][0]['students'][1])     # 'Sara'
+
+    # A missing key raises KeyError, a missing index raises IndexError.
+    # get() with a default protects us level by level.
+    teacher = data.get('teacher', 'unknown')
+    print(teacher)
+
+    for course in data['classes']:
+        students = course.get('students', [])
+        if len(students) == 0:
+            print(f"{course['title']}: no student yet")
+        else:
+            print(f"{course['title']}: {len(students)} student(s)")
+
+if __name__ == '__main__':
+    main()</code></pre>
+    <p class="code-caption" data-t="ch15-030">دسترسی تودرتو: نمونه 04_nested_access.py</p>
+
+    <div class="warn">
+        <span class="box-title" data-t="ch15-031">هر سطح یک احتمال خطاست</span>
+        <p data-t="ch15-032">
+            در عبارت <code>data['classes'][0]['students'][1]</code> چهار جا
+            می‌تواند خطا بدهد: کلید <code>classes</code> نباشد، لیست خالی باشد،
+            کلید <code>students</code> نباشد، یا دانشجوی دوم وجود نداشته باشد.
+            وقتی داده از فایل یا از اینترنت می‌آید، در هر سطح از
+            <code>get</code> با مقدار پیش‌فرض استفاده کنید. در فصل بیست و هفتم
+            که با JSON کار می‌کنیم، این درس حیاتی می‌شود.
+        </p>
+    </div>
+
+    <h2 id="s5" data-t="ch15-033">۵. تبدیل به لیست</h2>
+
+    <pre class="code"><code># list() builds a list out of anything we can loop over.
+def main() -&gt; None:
+    t = (1, 2, 3)
+    print(list(t))                # [1, 2, 3]
+
+    s = {4, 5, 6}
+    print(list(s))                # order is not guaranteed
+
+    d = {'a': 1, 'b': 2}
+    print(list(d))                # ['a', 'b']  -&gt; the KEYS
+    print(list(d.values()))       # [1, 2]
+    print(list(d.items()))        # [('a', 1), ('b', 2)]
+
+    print(list('Kadoos'))         # ['K', 'a', 'd', 'o', 'o', 's']
+    print(list(range(5)))         # [0, 1, 2, 3, 4]
+
+if __name__ == '__main__':
+    main()</code></pre>
+    <p class="code-caption" data-t="ch15-034">تبدیل به لیست: نمونه 05_to_list.py</p>
+
+    <p data-t="ch15-035">
+        قاعده ساده: <code>list()</code> هر چیزی که بشود رویش حلقه زد را به لیست
+        تبدیل می‌کند. روی دیکشنری، <strong>کلیدها</strong> را می‌دهد، چون
+        پیمایش دیکشنری هم کلیدها را می‌دهد.
+    </p>
+
+    <h2 id="s6" data-t="ch15-036">۶. تبدیل به تاپل و مجموعه</h2>
+
+    <pre class="code"><code>def main() -&gt; None:
+    l = [1, 2, 3]
+    print(tuple(l))
+
+    d = {'a': 1, 'b': 2}
+    print(tuple(d))            # the keys
+    print(tuple(d.items()))    # (('a', 1), ('b', 2))
+
+    # set() drops the duplicates
+    print(set([1, 2, 2, 3]))   # {1, 2, 3}
+
+    # Only immutable values can go into a set:
+    # set([[1, 2]])   -&gt;  TypeError: unhashable type: 'list'
+
+if __name__ == '__main__':
+    main()</code></pre>
+    <p class="code-caption" data-t="ch15-037">تبدیل به تاپل و مجموعه: نمونه‌های 06_to_tuple.py و 07_to_set.py</p>
+
+    <p data-t="ch15-038">آن خطای <code>unhashable</code> را به خاطر داشته باشید: مجموعه فقط چیزهای تغییرناپذیر را قبول می‌کند. لیست داخل مجموعه نمی‌رود، ولی تاپل می‌رود.</p>
+
+    <h2 id="s7" data-t="ch15-039">۷. تبدیل به دیکشنری و تابع zip</h2>
+
+    <pre class="code"><code>def main() -&gt; None:
+    # dict() accepts a sequence of (key, value) pairs.
+    pairs = [('a', 1), ('b', 2)]
+    print(dict(pairs))
+
+    pairs_tuple = (('x', 10), ('y', 20))
+    print(dict(pairs_tuple))
+
+    # zip() glues two sequences together, item by item.
+    keys = ['name', 'age']
+    values = ['Ali', 20]
+    print(dict(zip(keys, values)))
+
+    # zip() stops at the shortest sequence.
+    print(list(zip([1, 2, 3], 'ab')))
+
+    # It is also very handy in a loop.
+    subjects = ['math', 'physics', 'english']
+    scores = [20, 18, 19]
+    for subject, score in zip(subjects, scores):
+        print(f'{subject}: {score}')
+
+if __name__ == '__main__':
+    main()</code></pre>
+    <p class="code-caption" data-t="ch15-040">zip و dict: نمونه 08_to_dict.py</p>
+
+    <pre class="out">{'a': 1, 'b': 2}
+{'x': 10, 'y': 20}
+{'name': 'Ali', 'age': 20}
+[(1, 'a'), (2, 'b')]
+math: 20
+physics: 18
+english: 19</pre>
+
+    <h3 data-t="ch15-041">شرح مثال</h3>
+
+    <ul>
+        <li data-t="ch15-042"><code>zip</code> دو یا چند دنباله را عضو به عضو کنار هم می‌گذارد، مثل زیپ لباس که دو طرف را جفت می‌کند.</li>
+        <li data-t="ch15-043">اگر دنباله‌ها هم‌طول نباشند، <code>zip</code> روی کوتاه‌ترین متوقف می‌شود و بقیه را نادیده می‌گیرد. این می‌تواند باگ پنهان بسازد، پس مراقب باشید.</li>
+        <li data-t="ch15-044">ترکیب <code>dict(zip(keys, values))</code> اصطلاح استانداردی است برای ساختن دیکشنری از دو لیست موازی.</li>
+        <li data-t="ch15-045"><code>zip</code> در حلقه هم عالی است: وقتی دو لیست هم‌طول دارید و می‌خواهید با هم پیمایششان کنید، به جای کار با اندیس از <code>zip</code> استفاده کنید.</li>
+    </ul>
+
+    <h2 id="s8" data-t="ch15-046">۸. حذف تکراری‌ها</h2>
+
+    <pre class="code"><code># How do I remove the duplicates from a list?
+def main() -&gt; None:
+    numbers = [1, 2, 3, 3, 4, 5, 5, 5]
+
+    # set() drops the duplicates, list() turns it back into a list.
+    print(list(set(numbers)))
+
+    # A set has no order, so sort it when the order matters.
+    print(sorted(set(numbers)))
+
+    # A complete program: read numbers until 'stop', then show them
+    # without duplicates and in order.
+    values: list[float] = []
+    while True:
+        user_input = input('Enter a number (or "stop"): ')
+        if user_input == 'stop':
+            break
+        values.append(float(user_input))
+
+    print(sorted(set(values)))
+
+if __name__ == '__main__':
+    main()</code></pre>
+    <p class="code-caption" data-t="ch15-047">حذف تکراری: نمونه 09_remove_duplicates.py</p>
+
+    <p data-t="ch15-048">
+        عبارت <code>sorted(set(x))</code> را حفظ کنید: «یکتا و مرتب». از تو به
+        بیرون خوانده می‌شود، یعنی اول مجموعه ساخته می‌شود و بعد مرتب.
+    </p>
+
+    <h2 id="s9" data-t="ch15-049">۹. ماژول collections</h2>
+
+    <p data-t="ch15-050">
+        پایتون ظرف‌های آماده‌ای دارد که کارهای رایج را ساده می‌کنند. سه تای
+        پرکاربردش را ببینیم.
+    </p>
+
+    <pre class="code"><code># The standard module 'collections' offers ready-made containers.
+from collections import Counter, defaultdict, namedtuple
+
+def main() -&gt; None:
+    # Counter counts everything for us.
+    text = 'kadoos institute rasht'
+    counter = Counter(text.replace(' ', ''))
+    print(counter)
+    print(counter.most_common(3))     # the three most frequent letters
+
+    words = ['python', 'linux', 'python', 'sql', 'python']
+    print(Counter(words))
+
+    # defaultdict creates the missing value automatically.
+    groups = defaultdict(list)
+    students = [('python', 'Ali'), ('linux', 'Reza'), ('python', 'Sara')]
+    for course, name in students:
+        groups[course].append(name)   # no need to test whether the key exists
+    print(dict(groups))
+
+    # namedtuple: a tuple whose fields have names.
+    Point = namedtuple('Point', ['x', 'y'])
+    p = Point(3, 4)
+    print(p, p.x, p.y)
+
+if __name__ == '__main__':
+    main()</code></pre>
+    <p class="code-caption" data-t="ch15-051">ماژول collections: نمونه 10_collections_module.py</p>
+
+    <div class="table-scroll">
+        <table>
+            <thead>
+                <tr><th data-t="ch15-052">ابزار</th><th data-t="ch15-053">وظیفه آن</th><th data-t="ch15-054">جایگزین دستی‌اش</th></tr>
+            </thead>
+            <tbody>
+                <tr><td><code>Counter</code></td><td data-t="ch15-055">شمردن همه چیز در یک خط</td><td data-t="ch15-056">حلقه با <code>get(x, 0) + 1</code></td></tr>
+                <tr><td><code>most_common(n)</code></td><td data-t="ch15-057">n مورد پرتکرار</td><td data-t="ch15-058">مرتب‌سازی دیکشنری بر اساس مقدار</td></tr>
+                <tr><td><code>defaultdict(list)</code></td><td data-t="ch15-059">کلید نبود، خودش لیست خالی می‌سازد</td><td><code>if key not in d: d[key] = []</code></td></tr>
+                <tr><td><code>namedtuple</code></td><td data-t="ch15-060">تاپلی که فیلدهایش نام دارند</td><td data-t="ch15-061">تاپل ساده با اندیس‌های گنگ</td></tr>
+            </tbody>
+        </table>
+    </div>
+
+    <p data-t="ch15-062">
+        دستور <code>from ... import ...</code> اینجا برای اولین بار آمده است.
+        در فصل شانزدهم و هفدهم کاملاً درباره‌اش صحبت می‌کنیم. فعلاً یعنی «از
+        ماژول collections، این سه چیز را بیاور».
+    </p>
+
+    <h2 id="s10" data-t="ch15-063">۱۰. برنامه کامل گزارش دانشجویان</h2>
+
+    <pre class="code"><code>'''A small report built on a list of dictionaries.'''
+
+STUDENTS = [
+    {'name': 'Ali', 'city': 'Rasht', 'scores': [20, 18, 15]},
+    {'name': 'Sara', 'city': 'Rasht', 'scores': [19, 20, 20]},
+    {'name': 'Reza', 'city': 'Lahijan', 'scores': [12, 14, 9]},
+    {'name': 'Maryam', 'city': 'Anzali', 'scores': [17, 16, 18]},
+]
+
+
+def average(numbers: list[float]) -&gt; float:
+    'Return the average of a list of numbers (0 for an empty list).'
+    if len(numbers) == 0:
+        return 0
+    return sum(numbers) / len(numbers)
+
+
+def print_table() -&gt; None:
+    'Print one line per student with their average.'
+    print(f"{'Name':&lt;10}{'City':&lt;10}{'Average':&gt;8}")
+    print('-' * 28)
+    for student in STUDENTS:
+        avg = average(student['scores'])
+        print(f"{student['name']:&lt;10}{student['city']:&lt;10}{avg:&gt;8.2f}")
+
+
+def best_student() -&gt; dict:
+    'Return the student with the best average.'
+    best = STUDENTS[0]
+    for student in STUDENTS:
+        if average(student['scores']) &gt; average(best['scores']):
+            best = student
+    return best
+
+
+def group_by_city() -&gt; dict[str, list[str]]:
+    'Return {city: [names]}.'
+    groups: dict[str, list[str]] = {}
+    for student in STUDENTS:
+        city = student['city']
+        if city not in groups:
+            groups[city] = []
+        groups[city].append(student['name'])
+    return groups
+
+
+def main() -&gt; None:
+    print_table()
+    print()
+    print('Best student:', best_student()['name'])
+    print('By city:', group_by_city())
+    print('Cities:', sorted({student['city'] for student in STUDENTS}))
+
+
+if __name__ == '__main__':
+    main()</code></pre>
+    <p class="code-caption" data-t="ch15-064">گزارش دانشجویان: نمونه 11_students_report.py</p>
+
+    <pre class="out">Name      City       Average
+----------------------------
+Ali       Rasht         17.67
+Sara      Rasht         19.67
+Reza      Lahijan       11.67
+Maryam    Anzali        17.00
+
+Best student: Sara
+By city: {'Rasht': ['Ali', 'Sara'], 'Lahijan': ['Reza'], 'Anzali': ['Maryam']}
+Cities: ['Anzali', 'Lahijan', 'Rasht']</pre>
+
+    <h3 data-t="ch15-065">شرح مثال</h3>
+
+    <ul>
+        <li data-t="ch15-066">داده در بالای فایل و با حروف بزرگ نوشته شده، چون ثابت است.</li>
+        <li data-t="ch15-067">هر تابع یک کار می‌کند و <code>main</code> فقط آنها را کنار هم می‌گذارد. همان درس فصل دوازدهم.</li>
+        <li data-t="ch15-068">قالب‌بندی جدول با <code>{'Name':&lt;10}</code> انجام شده که از فصل سوم آمده است. ستون‌ها با عرض ثابت مرتب می‌مانند.</li>
+        <li data-t="ch15-069"><code>best_student</code> همان الگوی «قهرمان فعلی» فصل دهم است، این بار روی دیکشنری.</li>
+        <li data-t="ch15-070">خط آخر یک <strong>درک مجموعه‌ای</strong> دارد که موضوع فصل بیست و پنجم است. فعلاً بدانید یعنی «مجموعه شهرهای همه دانشجویان».</li>
+    </ul>
+
+    <div class="folder-ref">
+        <span class="box-title" data-t="ch15-071">فایل‌های تمرینی این فصل</span>
+        <p data-t="ch15-072">
+            پوشه <code>S15-nested-data-structures</code> شامل نمونه‌های
+            <code>01_list_of_lists.py</code> تا <code>11_students_report.py</code>.
+        </p>
+    </div>
+
+    <h2 data-t="ch15-073">خلاصه فصل</h2>
+
+    <div class="table-scroll">
+        <table>
+            <thead>
+                <tr><th data-t="ch15-074">ساختار یا ابزار</th><th data-t="ch15-075">کاربرد</th></tr>
+            </thead>
+            <tbody>
+                <tr><td data-t="ch15-076">لیستی از لیست‌ها</td><td data-t="ch15-077">ماتریس، جدول عددی، صفحه بازی</td></tr>
+                <tr><td data-t="ch15-078">لیستی از دیکشنری‌ها</td><td data-t="ch15-079">جدول داده. رایج‌ترین شکل داده واقعی</td></tr>
+                <tr><td data-t="ch15-080">دیکشنری از لیست‌ها</td><td data-t="ch15-081">گروه‌بندی</td></tr>
+                <tr><td data-t="ch15-082">دیکشنری از دیکشنری‌ها</td><td data-t="ch15-083">داده دوسطحی، مثل نمره هر درس هر دانشجو</td></tr>
+                <tr><td data-t="ch15-084"><code>get</code> در هر سطح</td><td data-t="ch15-085">محافظت در برابر کلید یا عضو گم‌شده</td></tr>
+                <tr><td><code>list tuple set dict</code></td><td data-t="ch15-086">تبدیل ظرف‌ها به هم</td></tr>
+                <tr><td><code>zip(a, b)</code></td><td data-t="ch15-087">جفت کردن دو دنباله. روی کوتاه‌ترین می‌ایستد</td></tr>
+                <tr><td><code>sorted(set(x))</code></td><td data-t="ch15-088">یکتا و مرتب</td></tr>
+                <tr><td><code>Counter</code></td><td data-t="ch15-089">شمردن، به‌علاوه <code>most_common</code></td></tr>
+                <tr><td><code>defaultdict(list)</code></td><td data-t="ch15-090">گروه‌بندی بدون بررسی وجود کلید</td></tr>
+                <tr><td><code>namedtuple</code></td><td data-t="ch15-091">تاپل با فیلدهای نام‌دار</td></tr>
+            </tbody>
+        </table>
+    </div>
+
+    <div class="exercise">
+        <h3 data-t="ch15-092">تمرین‌های فصل پانزده</h3>
+        <ol>
+            <li data-t="ch15-093">لیستی از دیکشنری برای پنج کالا بسازید (نام، قیمت، موجودی) و به شکل جدول چاپش کنید.</li>
+            <li data-t="ch15-094">گران‌ترین کالای همان لیست را پیدا کنید.</li>
+            <li data-t="ch15-095">کالاها را با دیکشنری از لیست‌ها بر اساس دسته‌بندی گروه کنید.</li>
+            <li data-t="ch15-096">یک جمله بگیرید و <code>{کلمه: تعداد}</code> بسازید، یک بار با دیکشنری ساده و یک بار با <code>Counter</code>.</li>
+            <li data-t="ch15-097">دو لیست <code>names</code> و <code>scores</code> دارید؛ دیکشنری <code>{نام: نمره}</code> بسازید.</li>
+            <li data-t="ch15-098">از دیکشنری <code>{نام: نمره}</code>، دیکشنری برعکس <code>{نمره: نام}</code> بسازید.</li>
+            <li data-t="ch15-099">یک ماتریس سه در سه از کاربر بگیرید و ترانهاده‌اش را چاپ کنید.</li>
+            <li data-t="ch15-100">تابع <code>unique_sorted(values)</code> را بنویسید که مقدارهای یکتا و مرتب را برگرداند.</li>
+        </ol>
+    </div>
+
+    <div class="pager">
+        <a href="chapter-14.html">فصل قبل: دیکشنری، تاپل و مجموعه</a>
+        <a href="chapter-16.html">فصل بعد: کتابخانه استاندارد</a>
+    </div>
+
+</main>
+
+</body>
+</html>

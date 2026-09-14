@@ -1,0 +1,608 @@
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="فصل سی و یک: ماژول sqlite3، اتصال و مکان‌نما، پرس‌وجوی پارامتری، تراکنش، row_factory و پشتیبان‌گیری">
+    <title>فصل ۳۱: sqlite3 در پایتون</title>
+    <link rel="icon" href="logokm.png" type="image/png">
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<header class="book-bar">
+    <a class="name" href="index.html">برنامه‌نویسی پایتون</a>
+    <a href="index.html">فهرست مطالب</a>
+</header>
+
+<main class="paper">
+
+    <div class="chapter-head">
+        <span class="chapter-num">فصل ۳۱</span>
+        <h1 data-t="ch31-001">sqlite3 در پایتون</h1>
+        <p class="lead" data-t="ch31-002">
+            در فصل قبل زبان پایگاه داده را یاد گرفتیم. حالا همان دستورها را از
+            داخل پایتون اجرا می‌کنیم. ماژول <code>sqlite3</code> جزو کتابخانه
+            استاندارد است و نصب نمی‌خواهد.
+        </p>
+    </div>
+
+    <div class="mini-toc">
+        <span class="box-title" data-t="ch31-003">در این فصل می‌خوانید</span>
+        <ol>
+            <li data-t="ch31-004"><a href="#s1">اتصال و مکان‌نما</a></li>
+            <li data-t="ch31-005"><a href="#s2">ساختن ساختار جدول‌ها</a></li>
+            <li data-t="ch31-006"><a href="#s3">درج داده با پارامتر</a></li>
+            <li data-t="ch31-007"><a href="#s4">خواندن داده</a></li>
+            <li data-t="ch31-008"><a href="#s5">تغییر و حذف</a></li>
+            <li data-t="ch31-009"><a href="#s6">پیوند از داخل پایتون</a></li>
+            <li data-t="ch31-010"><a href="#s7">پیدا کردن یک رکورد</a></li>
+            <li data-t="ch31-011"><a href="#s8">تراکنش</a></li>
+            <li data-t="ch31-012"><a href="#s9">پشتیبان‌گیری</a></li>
+            <li data-t="ch31-013"><a href="#s10">سطر به شکل دیکشنری</a></li>
+            <li data-t="ch31-014"><a href="#s11">تزریق SQL در عمل</a></li>
+            <li data-t="ch31-015"><a href="#s12">برنامه کامل</a></li>
+        </ol>
+    </div>
+
+    <h2 id="s1" data-t="ch31-016">۱. اتصال و مکان‌نما</h2>
+
+    <pre class="code"><code>'''Opening a connection to a SQLite database.
+
+sqlite3 is part of the standard library - there is nothing to install.
+connect() CREATES the file when it does not exist yet.
+'''
+
+import sqlite3
+
+
+def main() -&gt; None:
+    # The file is created next to the program, in the current folder.
+    conn = sqlite3.connect('database.db')
+
+    # SQLite ignores the foreign keys unless we switch them on,
+    # and it forgets the setting at every new connection.
+    conn.execute('PRAGMA foreign_keys = ON')
+
+    # The cursor is the object that runs the queries and holds the results.
+    cursor = conn.cursor()
+
+    # A first query to prove that everything works.
+    cursor.execute('SELECT sqlite_version()')
+    print('SQLite version:', cursor.fetchone()[0])
+
+    # Always close what you opened.
+    conn.close()
+
+    # ':memory:' creates a database that only lives in the RAM - perfect
+    # for trying things out.
+    temp = sqlite3.connect(':memory:')
+    temp.close()</code></pre>
+    <p class="code-caption" data-t="ch31-017">اتصال: نمونه 01_connect.py</p>
+
+    <div class="table-scroll">
+        <table>
+            <thead>
+                <tr><th data-t="ch31-018">مفهوم</th><th data-t="ch31-019">یعنی</th></tr>
+            </thead>
+            <tbody>
+                <tr><td data-t="ch31-020">اتصال</td><td data-t="ch31-021">پل بین برنامه و فایل پایگاه داده</td></tr>
+                <tr><td data-t="ch31-022">مکان‌نما</td><td data-t="ch31-023">شیئی که پرس‌وجو را اجرا می‌کند و نتیجه را نگه می‌دارد</td></tr>
+                <tr><td><code>commit()</code></td><td data-t="ch31-024">تثبیت تغییرها روی دیسک</td></tr>
+                <tr><td><code>close()</code></td><td data-t="ch31-025">بستن اتصال</td></tr>
+                <tr><td><code>':memory:'</code></td><td data-t="ch31-026">پایگاه داده موقتی در حافظه</td></tr>
+            </tbody>
+        </table>
+    </div>
+
+    <div class="warn">
+        <span class="box-title" data-t="ch31-027">PRAGMA در هر اتصال</span>
+        <p data-t="ch31-028">
+            SQLite تنظیم کلیدهای خارجی را در هر اتصال <strong>فراموش</strong>
+            می‌کند. پس <code>PRAGMA foreign_keys = ON</code> باید بلافاصله بعد
+            از هر <code>connect</code> نوشته شود. بهترین راه، ساختن یک تابع
+            کمکی اتصال است که همیشه این کار را بکند؛ در بخش دوازدهم می‌بینیدش.
+        </p>
+    </div>
+
+    <h2 id="s2" data-t="ch31-029">۲. ساختن ساختار جدول‌ها</h2>
+
+    <pre class="code"><code>SCHEMA = '''
+    CREATE TABLE IF NOT EXISTS students (
+        student_id INTEGER PRIMARY KEY AUTOINCREMENT,
+        first_name TEXT NOT NULL,
+        last_name  TEXT NOT NULL,
+        email      TEXT UNIQUE NOT NULL
+    );
+
+    CREATE TABLE IF NOT EXISTS courses (
+        course_id  INTEGER PRIMARY KEY AUTOINCREMENT,
+        title      TEXT NOT NULL,
+        teacher_id INTEGER,
+        credit     INTEGER DEFAULT 3,
+        FOREIGN KEY (teacher_id) REFERENCES teachers(teacher_id)
+            ON DELETE SET NULL ON UPDATE CASCADE
+    );
+
+    CREATE TABLE IF NOT EXISTS enrollments (
+        enrollment_id   INTEGER PRIMARY KEY AUTOINCREMENT,
+        student_id      INTEGER NOT NULL,
+        course_id       INTEGER NOT NULL,
+        grade           REAL,
+        enrollment_date TEXT DEFAULT (date('now')),
+        FOREIGN KEY (student_id) REFERENCES students(student_id)
+            ON DELETE CASCADE ON UPDATE CASCADE,
+        UNIQUE (student_id, course_id)
+    );
+'''
+
+
+def main() -&gt; None:
+    conn = sqlite3.connect('database.db')
+    conn.execute('PRAGMA foreign_keys = ON')
+    cursor = conn.cursor()
+
+    cursor.executescript(SCHEMA)
+
+    # Nothing is really written until commit() is called.
+    conn.commit()
+    conn.close()</code></pre>
+    <p class="code-caption" data-t="ch31-030">ساختار: نمونه 02_create_tables.py</p>
+
+    <p data-t="ch31-031">
+        <code>executescript</code> چند دستور جداشده با نقطه‌ویرگول را با هم
+        اجرا می‌کند و برای ساختن ساختار ایده‌آل است. برای پرس‌وجوهای عادی
+        <code>execute</code> را به کار ببرید. عبارت
+        <code>IF NOT EXISTS</code> باعث می‌شود اجرای دوباره برنامه خطا ندهد.
+    </p>
+
+    <h2 id="s3" data-t="ch31-032">۳. درج داده با پارامتر</h2>
+
+    <pre class="code"><code>'''NEVER build the SQL with an f-string or with '+': always use '?' parameters.
+The values are then sent apart from the query and can never become SQL code.
+'''
+
+# executemany() runs the same query once per tuple of the list.
+students_data = [
+    ('Ali', 'Rezaei', 'alireza@kadoosedu.ir'),
+    ('Maryam', 'Ahmadi', 'maryam@kadoosedu.ir'),
+    ('Sara', 'Karimi', 'sara@kadoosedu.ir'),
+]
+cursor.executemany(
+    'INSERT OR IGNORE INTO students (first_name, last_name, email) '
+    'VALUES (?, ?, ?)',
+    students_data,
+)
+conn.commit()
+
+# We must not guess the ids: we ask the database for them.
+# NOTE: the comma in ('Mohammadi',) is what makes it a TUPLE.
+cursor.execute('SELECT teacher_id FROM teachers WHERE last_name = ?',
+               ('Mohammadi',))
+teacher1 = cursor.fetchone()[0]
+
+# A single insert, and the id it produced.
+cursor.execute(
+    'INSERT OR IGNORE INTO students (first_name, last_name, email) '
+    'VALUES (?, ?, ?)',
+    ('Omid', 'Shabani', 'omid@kadoosedu.ir'),
+)
+print('The new student got the id', cursor.lastrowid)
+conn.commit()</code></pre>
+    <p class="code-caption" data-t="ch31-033">درج: نمونه 03_insert_data.py</p>
+
+    <h3 data-t="ch31-034">شرح مثال</h3>
+
+    <ul>
+        <li data-t="ch31-035">علامت سؤال جای مقدارهاست و مقدارها در یک <strong>تاپل</strong> به عنوان آرگومان دوم می‌آیند.</li>
+        <li data-t="ch31-036">دام کلاسیک: <code>('Mohammadi',)</code> با ویرگول انتهایی. بدون آن یک رشته ساده است نه تاپل، و خطا می‌گیرید. به خاطر دارید از فصل چهاردهم.</li>
+        <li data-t="ch31-037"><code>executemany</code> همان پرس‌وجو را برای هر تاپل لیست اجرا می‌کند و بسیار سریع‌تر از حلقه است.</li>
+        <li data-t="ch31-038"><code>lastrowid</code> شناسه‌ای را می‌دهد که پایگاه داده در همین مرحله تولید کرده است. برای درج والد و بعد فرزندانش حیاتی است.</li>
+        <li data-t="ch31-039"><code>INSERT OR IGNORE</code> اگر محدودیت یکتایی نقض شود، بی‌سروصدا رد می‌شود. برای داده نمونه خوب است، ولی در برنامه واقعی معمولاً می‌خواهید خطا را ببینید.</li>
+        <li data-t="ch31-040">شناسه‌ها را حدس نزنید. آنها را از پایگاه داده بپرسید، وگرنه کدتان به ترتیب درج وابسته می‌شود.</li>
+    </ul>
+
+    <h2 id="s4" data-t="ch31-041">۴. خواندن داده</h2>
+
+    <pre class="code"><code>'''
+    fetchone()   -&gt; one row, or None
+    fetchall()   -&gt; every remaining row, in a list
+    fetchmany(n) -&gt; n rows
+    looping over the cursor -&gt; one row at a time, without loading everything
+'''
+
+def show_table(table_name: str) -&gt; None:
+    '''Print the content of one table.
+
+    The table NAME cannot be a '?' parameter (parameters are only for values),
+    so this function must only ever be called with a name WE choose, never with
+    something typed by a user.
+    '''
+    conn = sqlite3.connect('database.db')
+    cursor = conn.cursor()
+
+    cursor.execute(f'SELECT * FROM {table_name}')
+
+    # cursor.description holds the column names.
+    columns = [column[0] for column in cursor.description]
+    print(' | '.join(columns))
+
+    for row in cursor:               # looping is the memory-friendly way
+        print(row)
+
+    conn.close()</code></pre>
+    <p class="code-caption" data-t="ch31-042">خواندن: نمونه 04_select_all.py</p>
+
+    <div class="warn">
+        <span class="box-title" data-t="ch31-043">پارامتر فقط برای مقدار است</span>
+        <p data-t="ch31-044">
+            علامت سؤال فقط جای <strong>مقدار</strong> می‌نشیند، نه جای نام
+            جدول یا نام ستون. برای آنها ناچارید از f-string استفاده کنید، و
+            دقیقاً به همین دلیل نام جدول <strong>هرگز</strong> نباید از کاربر
+            گرفته شود. اگر لازم شد، فقط از یک فهرست ثابت و مجاز انتخابش کنید.
+        </p>
+    </div>
+
+    <h2 id="s5" data-t="ch31-045">۵. تغییر و حذف</h2>
+
+    <pre class="code"><code>'''cursor.rowcount tells us how many rows were really affected - use it to know
+whether the WHERE matched anything.
+'''
+
+cursor.execute(
+    'UPDATE students SET email = ? WHERE email = ?',
+    ('new_alireza@kadoosedu.ir', 'alireza@kadoosedu.ir'),
+)
+print('rows updated:', cursor.rowcount)
+conn.commit()
+
+cursor.execute(
+    'DELETE FROM enrollments WHERE grade &lt; ?',
+    (16,),
+)
+print('rows deleted:', cursor.rowcount)
+conn.commit()</code></pre>
+    <p class="code-caption" data-t="ch31-046">تغییر و حذف: نمونه 05_update_delete.py</p>
+
+    <p data-t="ch31-047">
+        صفت <code>rowcount</code> می‌گوید چند سطر واقعاً تحت تأثیر قرار
+        گرفته‌اند. اگر صفر بود یعنی شرط شما با هیچ سطری جور در نیامده است، و
+        این معمولاً چیزی است که باید به کاربر بگویید.
+    </p>
+
+    <h2 id="s6" data-t="ch31-048">۶. پیوند از داخل پایتون</h2>
+
+    <pre class="code"><code>QUERY = '''
+    SELECT s.first_name || ' ' || s.last_name AS student,
+           c.title                            AS course,
+           e.grade                            AS grade
+    FROM enrollments e
+    JOIN students s ON e.student_id = s.student_id
+    JOIN courses  c ON e.course_id  = c.course_id
+    ORDER BY student, course
+'''</code></pre>
+    <p class="code-caption" data-t="ch31-049">پرس‌وجوی پیوندی: نمونه 06_join_query.py</p>
+
+    <p data-t="ch31-050">
+        نکته مهم این است که <strong>هیچ چیز تازه‌ای نیست</strong>. SQL دقیقاً
+        همان SQL فصل قبل است؛ فقط شکل اجرایش عوض شده. رشته سه‌گیومه‌ای، یک
+        پرس‌وجوی بلند را خوانا نگه می‌دارد.
+    </p>
+
+    <h2 id="s7" data-t="ch31-051">۷. پیدا کردن یک رکورد</h2>
+
+    <pre class="code"><code>'''fetchone() returns ONE row, or None when nothing matched.
+
+Forgetting to test for None is the most common bug of this session:
+"TypeError: 'NoneType' object is not subscriptable".
+'''
+
+def find_student(email: str) -&gt; tuple | None:
+    'Return the row of a student, or None.'
+    conn = sqlite3.connect('database.db')
+    cursor = conn.cursor()
+
+    cursor.execute('SELECT * FROM students WHERE email = ?', (email,))
+    student = cursor.fetchone()
+
+    conn.close()
+    return student
+
+
+def main() -&gt; None:
+    for email in ('zahra@kadoosedu.ir', 'nobody@kadoosedu.ir'):
+        student = find_student(email)
+
+        if student:
+            print('Student found:', student)
+        else:
+            print(f'No student with the email {email}.')</code></pre>
+    <p class="code-caption" data-t="ch31-052">جست‌وجوی یک رکورد: نمونه 08_find_one.py</p>
+
+    <p data-t="ch31-053">
+        این پرتکرارترین باگ کل فصل است: <code>fetchone()</code> اگر چیزی پیدا
+        نکند <code>None</code> می‌دهد، و بعد <code>student[0]</code> برنامه
+        را با <code>TypeError</code> می‌کشد. همیشه بررسی کنید.
+    </p>
+
+    <h2 id="s8" data-t="ch31-054">۸. تراکنش</h2>
+
+    <p data-t="ch31-055"><strong>تراکنش</strong> مجموعه‌ای از عملیات است که باید به صورت یک واحد انجام شوند؛ یا <strong>همه</strong> عملیات با موفقیت انجام می‌شوند یا <strong>هیچ‌کدام</strong> نباید اثر دائمی داشته باشند. مثال کلاسیک آن انتقال وجه است: اگر مبلغ از یک حساب کم شود اما به حساب مقصد اضافه نشود، یکپارچگی داده‌ها از بین می‌رود.</p>
+
+    <pre class="code"><code>try:
+    cursor.execute(
+        'INSERT INTO students (first_name, last_name, email) '
+        'VALUES (?, ?, ?)',
+        ('Sara', 'Hosseini', 'sara2@kadoosedu.ir'),
+    )
+    new_student_id = cursor.lastrowid
+
+    cursor.execute('SELECT course_id FROM courses WHERE title = ?',
+                   ('Python Programming',))
+    row = cursor.fetchone()
+    if row is None:
+        raise sqlite3.Error('the course does not exist')
+
+    cursor.execute(
+        'INSERT INTO enrollments (student_id, course_id, grade) '
+        'VALUES (?, ?, ?)',
+        (new_student_id, row[0], 20),
+    )
+
+    # commit() makes everything permanent, in one single step.
+    conn.commit()
+    print('Transaction done.')
+
+except sqlite3.Error as e:
+    # rollback() undoes everything since the last commit.
+    conn.rollback()
+    print('Rollback happened:', e)
+
+finally:
+    conn.close()</code></pre>
+    <p class="code-caption" data-t="ch31-056">تراکنش: نمونه 09_transaction.py</p>
+
+    <h3 data-t="ch31-057">شرح مثال</h3>
+
+    <ul>
+        <li data-t="ch31-058">ساختار همیشه یکی است: <code>try</code> با چند دستور و یک <code>commit</code> در انتها، <code>except</code> با <code>rollback</code>، و <code>finally</code> با <code>close</code>.</li>
+        <li data-t="ch31-059"><code>rollback()</code> همه چیز را به حالت آخرین <code>commit</code> برمی‌گرداند.</li>
+        <li data-t="ch31-060">نکته ظریف: <code>with sqlite3.connect(...)</code> در موفقیت commit و در خطا rollback می‌کند، ولی <strong>اتصال را نمی‌بندد</strong>. این برخلاف انتظار است و باید به خاطر داشته باشید.</li>
+        <li data-t="ch31-061">در فصل سی و پنجم می‌بینید که نبود تراکنش در نسخه اصلی برنامه کتابخانه، باعث می‌شد کتاب همزمان هم امانت داده شود و هم موجود بماند.</li>
+    </ul>
+
+    <h2 id="s9" data-t="ch31-062">۹. پشتیبان‌گیری</h2>
+
+    <pre class="code"><code>'''conn.backup() copies a database safely, even while it is being used -
+much better than copying the file with the operating system.
+'''
+
+def main() -&gt; None:
+    source = sqlite3.connect('database.db')
+    backup = sqlite3.connect('backup.db')
+
+    try:
+        source.backup(backup)
+        print('backup.db was written.')
+    finally:
+        # The connections are closed even if the backup failed.
+        backup.close()
+        source.close()</code></pre>
+    <p class="code-caption" data-t="ch31-063">پشتیبان‌گیری: نمونه 10_backup.py</p>
+
+    <p data-t="ch31-064">
+        کپی کردن فایل پایگاه داده با دستور سیستم‌عامل خطرناک است: اگر همان
+        لحظه برنامه‌ای در حال نوشتن باشد، کپی ناقص و خراب می‌شود. متد
+        <code>backup</code> این را درست انجام می‌دهد.
+    </p>
+
+    <h2 id="s10" data-t="ch31-065">۱۰. سطر به شکل دیکشنری</h2>
+
+    <pre class="code"><code>'''By default a row is a TUPLE, so we read it with row[0], row[1]...
+That is short but unreadable, and it breaks when a column is added.
+
+sqlite3.Row lets us read a row by COLUMN NAME.
+'''
+
+# Default: tuples.
+cursor.execute('SELECT student_id, first_name, email FROM students')
+for row in cursor.fetchall()[:3]:
+    print(row, '-&gt;', row[1])
+
+# With sqlite3.Row: access by name (and still by index).
+conn.row_factory = sqlite3.Row
+cursor = conn.cursor()
+cursor.execute('SELECT student_id, first_name, email FROM students')
+for row in cursor.fetchall()[:3]:
+    print(row['first_name'], row['email'], '| id =', row['student_id'])
+
+# A row can be turned into a real dictionary, ready for JSON.
+cursor.execute('SELECT * FROM students LIMIT 2')
+students = [dict(row) for row in cursor.fetchall()]
+print(students)</code></pre>
+    <p class="code-caption" data-t="ch31-066">row_factory: نمونه 12_row_factory.py</p>
+
+    <div class="tip">
+        <span class="box-title" data-t="ch31-067">همیشه row_factory را روشن کنید</span>
+        <p data-t="ch31-068">
+            خواندن <code>row[3]</code> شش ماه بعد هیچ معنایی ندارد، و اگر
+            کسی ستونی به جدول اضافه کند، کل کدتان بی‌سروصدا غلط می‌شود.
+            <code>row['email']</code> همیشه درست است. به‌علاوه با
+            <code>dict(row)</code> می‌توانید بلافاصله به JSON تبدیلش کنید.
+        </p>
+    </div>
+
+    <h2 id="s11" data-t="ch31-069">۱۱. تزریق SQL در عمل</h2>
+
+    <pre class="code"><code>def unsafe_search(cursor: sqlite3.Cursor, name: str) -&gt; list:
+    'NEVER DO THIS: the value is glued into the SQL text.'
+    query = f"SELECT * FROM students WHERE first_name = '{name}'"
+    print('  SQL sent:', query)
+    cursor.execute(query)
+    return cursor.fetchall()
+
+
+def safe_search(cursor: sqlite3.Cursor, name: str) -&gt; list:
+    'The right way: the value travels apart from the query.'
+    cursor.execute('SELECT * FROM students WHERE first_name = ?', (name,))
+    return cursor.fetchall()</code></pre>
+    <p class="code-caption" data-t="ch31-070">حمله و دفاع: نمونه 13_sql_injection.py</p>
+
+    <div class="try">
+        <span class="box-title" data-t="ch31-071">خودتان امتحان کنید</span>
+        <p data-t="ch31-072">
+            این برنامه را اجرا کنید و در پاسخ سؤال، عبارت
+            <code>' OR '1'='1</code> را تایپ کنید. نسخه ناامن
+            <strong>همه</strong> دانشجویان را برمی‌گرداند و نسخه امن هیچ‌کدام
+            را. یک بار دیدن این تفاوت، بهتر از ده صفحه توضیح است.
+        </p>
+    </div>
+
+    <pre class="code"><code>cursor.execute('... WHERE name = ?' % name)          # wrong
+cursor.execute(f'... WHERE name = {name}')           # wrong
+cursor.execute('... WHERE name = ?', (name,))        # right</code></pre>
+    <p class="code-caption" data-t="ch31-073">سه شکل، فقط یکی درست</p>
+
+    <h2 id="s12" data-t="ch31-074">۱۲. برنامه کامل</h2>
+
+    <pre class="code"><code>'''A complete little application on top of sqlite3.'''
+
+import sqlite3
+
+DB_NAME = 'students.db'
+
+SCHEMA = '''
+    CREATE TABLE IF NOT EXISTS students (
+        student_id INTEGER PRIMARY KEY AUTOINCREMENT,
+        first_name TEXT NOT NULL,
+        last_name  TEXT NOT NULL,
+        email      TEXT UNIQUE NOT NULL
+    );
+'''
+
+
+def get_connection() -&gt; sqlite3.Connection:
+    '''Return a ready-to-use connection.
+
+    Every function of the program goes through here, so the PRAGMA and the
+    row_factory are never forgotten.
+    '''
+    conn = sqlite3.connect(DB_NAME)
+    conn.execute('PRAGMA foreign_keys = ON')
+    conn.row_factory = sqlite3.Row
+    return conn
+
+
+def add_student(first_name: str, last_name: str, email: str) -&gt; bool:
+    'Insert one student. Return False when the email already exists.'
+    try:
+        with get_connection() as conn:
+            conn.execute(
+                'INSERT INTO students (first_name, last_name, email) '
+                'VALUES (?, ?, ?)',
+                (first_name, last_name, email),
+            )
+        return True
+    except sqlite3.IntegrityError:
+        # Raised by the UNIQUE constraint on the email.
+        return False
+
+
+def list_students() -&gt; list[sqlite3.Row]:
+    'Return every student, sorted by last name.'
+    conn = get_connection()
+    try:
+        return conn.execute(
+            'SELECT * FROM students ORDER BY last_name'
+        ).fetchall()
+    finally:
+        conn.close()</code></pre>
+    <p class="code-caption" data-t="ch31-075">برنامه کامل: نمونه 14_students_app.py</p>
+
+    <h3 data-t="ch31-076">الگوهایی که باید از این برنامه یاد بگیرید</h3>
+
+    <ul>
+        <li data-t="ch31-077">
+            <strong>تابع کمکی اتصال.</strong> همه توابع برنامه از یک جا اتصال
+            می‌گیرند، پس <code>PRAGMA</code> و <code>row_factory</code> هرگز
+            فراموش نمی‌شوند. این مهم‌ترین درس این فصل است.
+        </li>
+        <li data-t="ch31-078">
+            <strong>تابع‌ها بولی برمی‌گردانند، نه پیام.</strong>
+            <code>add_student</code> فقط می‌گوید موفق شد یا نه؛ تصمیم درباره
+            پیام با لایه رابط کاربر است. به همین دلیل همین توابع را در فصل سی
+            و پنجم می‌شود پشت یک رابط گرافیکی گذاشت.
+        </li>
+        <li data-t="ch31-079">
+            <strong>گرفتن <code>IntegrityError</code>.</strong> نقض محدودیت
+            یکتایی یک اتفاق <strong>عادی</strong> است، نه باگ. باید مدیریتش
+            کرد، نه اینکه برنامه بترکد.
+        </li>
+        <li data-t="ch31-080">
+            <strong><code>finally: conn.close()</code>.</strong> چون
+            <code>with</code> در sqlite3 اتصال را نمی‌بندد، بستنش را خودتان
+            تضمین کنید.
+        </li>
+    </ul>
+
+    <div class="folder-ref">
+        <span class="box-title" data-t="ch31-081">فایل‌های تمرینی این فصل</span>
+        <p data-t="ch31-082">
+            پوشه <code>S31-sqlite3-in-python</code> شامل نمونه‌های
+            <code>00_docstrings.py</code> تا
+            <code>14_students_app.py</code>. آنها را <strong>به
+            ترتیب</strong> اجرا کنید، چون هر کدام روی داده‌ای که قبلی ساخته
+            کار می‌کند.
+        </p>
+    </div>
+
+    <h2 data-t="ch31-083">خلاصه فصل</h2>
+
+    <div class="table-scroll">
+        <table>
+            <thead>
+                <tr><th data-t="ch31-084">ابزار</th><th data-t="ch31-085">وظیفه آن</th></tr>
+            </thead>
+            <tbody>
+                <tr><td><code>sqlite3.connect(path)</code></td><td data-t="ch31-086">اتصال. فایل نبود، می‌سازدش</td></tr>
+                <tr><td><code>PRAGMA foreign_keys = ON</code></td><td data-t="ch31-087">در هر اتصال لازم است</td></tr>
+                <tr><td><code>conn.cursor()</code></td><td data-t="ch31-088">ساختن مکان‌نما</td></tr>
+                <tr><td><code>executescript</code></td><td data-t="ch31-089">اجرای چند دستور، برای ساختار</td></tr>
+                <tr><td><code>execute(sql, params)</code></td><td data-t="ch31-090">اجرای یک پرس‌وجو با پارامتر</td></tr>
+                <tr><td><code>executemany</code></td><td data-t="ch31-091">اجرای یک پرس‌وجو برای چند تاپل</td></tr>
+                <tr><td><code>fetchone fetchall fetchmany</code></td><td data-t="ch31-092">گرفتن نتیجه</td></tr>
+                <tr><td><code>lastrowid</code></td><td data-t="ch31-093">شناسه سطری که در همین مرحله درج شد</td></tr>
+                <tr><td><code>rowcount</code></td><td data-t="ch31-094">چند سطر تحت تأثیر قرار گرفت</td></tr>
+                <tr><td data-t="ch31-095"><code>commit</code> و <code>rollback</code></td><td data-t="ch31-096">تثبیت یا برگرداندن تراکنش</td></tr>
+                <tr><td><code>row_factory = sqlite3.Row</code></td><td data-t="ch31-097">دسترسی به ستون با نام</td></tr>
+                <tr><td><code>conn.backup(other)</code></td><td data-t="ch31-098">پشتیبان امن</td></tr>
+                <tr><td><code>IntegrityError</code></td><td data-t="ch31-099">نقض محدودیت. باید مدیریت شود</td></tr>
+                <tr><td data-t="ch31-100">پارامتر <code>?</code></td><td data-t="ch31-101">تنها راه امن. برای مقدار، نه برای نام جدول</td></tr>
+            </tbody>
+        </table>
+    </div>
+
+    <div class="exercise">
+        <h3 data-t="ch31-102">تمرین‌های فصل سی و یک</h3>
+        <ol>
+            <li data-t="ch31-103">پایگاه داده <code>library.db</code> با جدول <code>books</code> بسازید: شناسه، عنوان، نویسنده، سال و موجود بودن.</li>
+            <li data-t="ch31-104">توابع <code>add_book()</code> و <code>list_books()</code> و <code>delete_book()</code> را بنویسید.</li>
+            <li data-t="ch31-105">تابع <code>search_books(text)</code> را بنویسید که با <code>LIKE</code> و پارامتر <code>?</code> در عنوان و نویسنده جست‌وجو کند.</li>
+            <li data-t="ch31-106">جدول‌های <code>members</code> و <code>borrowings</code> را با کلیدهای خارجی درست اضافه کنید.</li>
+            <li data-t="ch31-107">پرس‌وجویی بنویسید که هر کتاب امانت‌داده‌شده را همراه نام امانت‌گیرنده نشان دهد.</li>
+            <li data-t="ch31-108">تراکنشی بنویسید که کتابی را امانت دهد: هم رکورد امانت را درج کند و هم کتاب را ناموجود علامت بزند، یا هیچ‌کدام.</li>
+            <li data-t="ch31-109"><code>sqlite3.Row</code> را روشن کنید و توابع نمایش را با نام ستون‌ها بازنویسی کنید.</li>
+            <li data-t="ch31-110">تابع <code>backup()</code> بنویسید و پیش از هر حذف صدایش بزنید.</li>
+            <li data-t="ch31-111">با کد خودتان نشان دهید چرا <code>f'... WHERE title = {title}'</code> خطرناک است.</li>
+        </ol>
+    </div>
+
+    <div class="pager">
+        <a href="chapter-30.html">فصل قبل: پایگاه داده و SQL</a>
+        <a href="chapter-32.html">فصل بعد: ORM و SQLAlchemy</a>
+    </div>
+
+</main>
+
+</body>
+</html>

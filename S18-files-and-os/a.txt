@@ -1,0 +1,2 @@
+Hello, My name is Mr. Ahmadi. I'm your programming mentor.
+What's your name?

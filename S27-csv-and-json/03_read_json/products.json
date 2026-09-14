@@ -1,0 +1,92 @@
+[
+    {
+        "id": 101,
+        "name": "Intel Core i7-13700K",
+        "serial": "CN-13700K-9A3B",
+        "manufacturer": "Intel",
+        "production_date": "2024-03-12",
+        "tags": ["CPU", "13th Gen", "Overclockable", "LGA1700"],
+        "categories": ["Processor", "Desktop"]
+    },
+    {
+        "id": 102,
+        "name": "AMD Ryzen 7 7800X3D",
+        "serial": "US-7800X3D-C74F",
+        "manufacturer": "AMD",
+        "production_date": "2024-05-20",
+        "tags": ["CPU", "3D V-Cache", "Gaming", "AM5"],
+        "categories": ["Processor", "Desktop"]
+    },
+    {
+        "id": 201,
+        "name": "NVIDIA GeForce RTX 4070",
+        "serial": "TW-4070-112X",
+        "manufacturer": "NVIDIA",
+        "production_date": "2023-11-15",
+        "tags": ["GPU", "Ada Lovelace", "Ray Tracing", "DLSS 3"],
+        "categories": ["Graphics Card", "Gaming"]
+    },
+    {
+        "id": 202,
+        "name": "AMD Radeon RX 7800 XT",
+        "serial": "KR-7800XT-8E2D",
+        "manufacturer": "AMD",
+        "production_date": "2024-01-08",
+        "tags": ["GPU", "RDNA 3", "16GB VRAM"],
+        "categories": ["Graphics Card", "Gaming"]
+    },
+    {
+        "id": 301,
+        "name": "Corsair Vengeance 32GB DDR5",
+        "serial": "TW-32GD5-5600C",
+        "manufacturer": "Corsair",
+        "production_date": "2024-02-28",
+        "tags": ["RAM", "DDR5", "5600MHz", "32GB"],
+        "categories": ["Memory", "Desktop"]
+    },
+    {
+        "id": 401,
+        "name": "Samsung 990 Pro 2TB SSD",
+        "serial": "KR-990P2TB-4N5M",
+        "manufacturer": "Samsung",
+        "production_date": "2023-09-05",
+        "tags": ["SSD", "NVMe", "PCIe 4.0", "2TB"],
+        "categories": ["Storage", "Internal"]
+    },
+    {
+        "id": 501,
+        "name": "ASUS ROG STRIX B650-A",
+        "serial": "CN-B650-A-WF6G",
+        "manufacturer": "ASUS",
+        "production_date": "2024-04-10",
+        "tags": ["Motherboard", "AM5", "WiFi 6E", "ATX"],
+        "categories": ["Motherboard", "Desktop"]
+    },
+    {
+        "id": 601,
+        "name": "Corsair RM850x PSU",
+        "serial": "CN-RM850X-22KL",
+        "manufacturer": "Corsair",
+        "production_date": "2023-12-01",
+        "tags": ["PSU", "850W", "80+ Gold", "Modular"],
+        "categories": ["Power Supply", "Desktop"]
+    },
+    {
+        "id": 701,
+        "name": "Noctua NH-D15 Cooler",
+        "serial": "AT-NHD15-9M8P",
+        "manufacturer": "Noctua",
+        "production_date": "2024-06-18",
+        "tags": ["Cooler", "Air Cooling", "Dual Tower"],
+        "categories": ["Cooling", "Desktop"]
+    },
+    {
+        "id": 801,
+        "name": "Fractal Design Pop Air Case",
+        "serial": "SE-POPAIR-RGB3",
+        "manufacturer": "Fractal Design",
+        "production_date": "2024-07-25",
+        "tags": ["Case", "Mid Tower", "RGB", "Tempered Glass"],
+        "categories": ["Case", "Desktop"]
+    }
+]

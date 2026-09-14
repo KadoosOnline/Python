@@ -1,0 +1,39 @@
+# --- Python -----------------------------------------------------------
+__pycache__/
+*.py[cod]
+*.egg-info/
+.pytest_cache/
+
+# --- virtual environments ---------------------------------------------
+# NEVER commit these. The original project committed its whole .venv/:
+# hundreds of megabytes of files that every machine can rebuild in one
+# command from requirements.txt.
+.venv/
+venv/
+env/
+
+# --- the data of the running program ----------------------------------
+# A database is DATA, not source code. Committing it means every clone
+# carries somebody else's rows and every run shows up as a huge diff.
+*.db
+*.sqlite3
+data/
+
+# --- secrets ----------------------------------------------------------
+.env
+*.key
+
+# --- PyInstaller ------------------------------------------------------
+build/
+dist/
+*.spec
+
+# --- editors and operating systems ------------------------------------
+.vscode/
+.idea/
+.DS_Store
+Thumbs.db
+
+# --- Syncthing / Dropbox conflict copies ------------------------------
+# The original project contained app.sync-conflict-20260717-161647-...py
+*.sync-conflict-*

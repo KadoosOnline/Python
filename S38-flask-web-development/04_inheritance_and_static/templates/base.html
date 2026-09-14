@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    {# A block with a DEFAULT value: a child page may override the title. #}
+    <title>{% block title %}{{ site_name }}{% endblock %}</title>
+
+    {# url_for('static', ...) -- never write the path by hand. #}
+    <link rel="stylesheet"
+          href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+    <header>
+        <h1>{{ site_name }}</h1>
+        <nav>
+            <a href="{{ url_for('home') }}">Home</a>
+            <a href="{{ url_for('courses') }}">Courses</a>
+            <a href="{{ url_for('about') }}">About</a>
+        </nav>
+    </header>
+
+    <main>
+        {# The hole every child page fills. #}
+        {% block content %}{% endblock %}
+    </main>
+
+    <footer>
+        <p>{{ site_name }} &mdash; Rasht &mdash; {{ year }}</p>
+    </footer>
+</body>
+</html>

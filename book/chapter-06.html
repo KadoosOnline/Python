@@ -1,0 +1,464 @@
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="فصل شش: حلقه for، تابع range، پیمایش رشته، الگوی انباره و شمارنده در پایتون">
+    <title>فصل ۶: حلقه for</title>
+    <link rel="icon" href="logokm.png" type="image/png">
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<header class="book-bar">
+    <a class="name" href="index.html">برنامه‌نویسی پایتون</a>
+    <a href="index.html">فهرست مطالب</a>
+</header>
+
+<main class="paper">
+
+    <div class="chapter-head">
+        <span class="chapter-num">فصل ۶</span>
+        <h1 data-t="ch06-001">حلقه for</h1>
+        <p class="lead" data-t="ch06-002">
+            کامپیوتر در یک چیز از انسان خیلی بهتر است: تکرار کردن بدون خستگی و
+            بدون اشتباه. حلقه ابزاری است که این توانایی را در اختیار شما می‌گذارد.
+        </p>
+    </div>
+
+    <div class="mini-toc">
+        <span class="box-title" data-t="ch06-003">در این فصل می‌خوانید</span>
+        <ol>
+            <li data-t="ch06-004"><a href="#s1">چرا حلقه لازم است</a></li>
+            <li data-t="ch06-005"><a href="#s2">تابع range و شکل‌هایش</a></li>
+            <li data-t="ch06-006"><a href="#s3">پیمایش رشته</a></li>
+            <li data-t="ch06-007"><a href="#s4">الگوی انباره</a></li>
+            <li data-t="ch06-008"><a href="#s5">شرط داخل حلقه</a></li>
+            <li data-t="ch06-009"><a href="#s6">ورودی گرفتن داخل حلقه</a></li>
+            <li data-t="ch06-010"><a href="#s7">فاکتوریل</a></li>
+            <li data-t="ch06-011"><a href="#s8">شمارش معکوس</a></li>
+            <li data-t="ch06-012"><a href="#s9">انباره و شمارنده با هم</a></li>
+            <li data-t="ch06-013"><a href="#s10">ساختن جدول</a></li>
+            <li data-t="ch06-014"><a href="#s11">دام نام‌گذاری: sum و max و min</a></li>
+        </ol>
+    </div>
+
+    <h2 id="s1" data-t="ch06-015">۱. چرا حلقه لازم است</h2>
+
+    <p data-t="ch06-016">
+        فرض کنید بخواهید پنج بار یک پیام چاپ کنید. می‌شود پنج بار
+        <code>print</code> نوشت. حالا فرض کنید هزار بار. اینجاست که حلقه لازم
+        می‌شود.
+    </p>
+
+    <pre class="code"><code># Without a loop we would have to write print() five times.
+# 'for' repeats the indented block once for every value produced by range().
+for i in range(5):
+    print(i, 'Hello Kadoos!')
+
+print('---')
+
+# range(1, 5) starts at 1 and STOPS BEFORE 5 -&gt; 1, 2, 3, 4
+for i in range(1, 5):
+    print(i, 'Hello Kadoos!')</code></pre>
+    <p class="code-caption" data-t="ch06-017">اولین حلقه: نمونه 01_first_loop.py</p>
+
+    <pre class="out">0 Hello Kadoos!
+1 Hello Kadoos!
+2 Hello Kadoos!
+3 Hello Kadoos!
+4 Hello Kadoos!
+---
+1 Hello Kadoos!
+2 Hello Kadoos!
+3 Hello Kadoos!
+4 Hello Kadoos!</pre>
+
+    <h3 data-t="ch06-018">شرح مثال</h3>
+
+    <ul>
+        <li data-t="ch06-019">ساختار: کلمه <code>for</code>، یک نام متغیر، کلمه <code>in</code>، چیزی که باید رویش پیمایش شود، و دونقطه.</li>
+        <li data-t="ch06-020">متغیر <code>i</code> در هر دور، مقدار بعدی را می‌گیرد. نامش دلخواه است؛ <code>i</code> مخفف index است و قراردادی جهانی است، ولی اگر نام معنادارتری دارید بهتر است از آن استفاده کنید.</li>
+        <li data-t="ch06-021">بلوک تو رفته، بدنه حلقه است و به تعداد مقدارها تکرار می‌شود.</li>
+        <li data-t="ch06-022">مهم: <code>range(5)</code> از صفر شروع می‌کند و به پنج <strong>نمی‌رسد</strong>. یعنی ۰ و ۱ و ۲ و ۳ و ۴، که دقیقاً پنج عدد است.</li>
+    </ul>
+
+    <h2 id="s2" data-t="ch06-023">۲. تابع range و شکل‌هایش</h2>
+
+    <pre class="code"><code># range(stop)              -&gt; 0, 1, ..., stop-1
+for i in range(5):
+    print(i, end=' ')
+print()
+
+# range(start, stop)       -&gt; start, ..., stop-1
+for i in range(2, 6):
+    print(i, end=' ')
+print()
+
+# range(start, stop, step) -&gt; jumps of 'step'
+for i in range(0, 21, 5):
+    print(i, end=' ')
+print()
+
+# A negative step counts backwards.
+for i in range(10, 0, -2):
+    print(i, end=' ')
+print()
+
+# The 'stop' value is NEVER included - this is the most common beginner mistake.
+# To print 1..10 we need range(1, 11):
+for i in range(1, 11):
+    print(i, end=' ')
+print()</code></pre>
+    <p class="code-caption" data-t="ch06-024">شکل‌های range: نمونه 02_range_variants.py</p>
+
+    <pre class="out">0 1 2 3 4 
+2 3 4 5 
+0 5 10 15 20 
+10 8 6 4 2 
+1 2 3 4 5 6 7 8 9 10 </pre>
+
+    <div class="table-scroll">
+        <table>
+            <thead>
+                <tr><th data-t="ch06-025">شکل</th><th data-t="ch06-026">تولید می‌کند</th></tr>
+            </thead>
+            <tbody>
+                <tr><td><code>range(5)</code></td><td data-t="ch06-027">۰ تا ۴</td></tr>
+                <tr><td><code>range(2, 6)</code></td><td data-t="ch06-028">۲ تا ۵</td></tr>
+                <tr><td><code>range(0, 21, 5)</code></td><td data-t="ch06-029">۰ و ۵ و ۱۰ و ۱۵ و ۲۰</td></tr>
+                <tr><td><code>range(10, 0, -2)</code></td><td data-t="ch06-030">۱۰ و ۸ و ۶ و ۴ و ۲</td></tr>
+                <tr><td><code>range(1, 11)</code></td><td data-t="ch06-031">۱ تا ۱۰</td></tr>
+            </tbody>
+        </table>
+    </div>
+
+    <div class="warn">
+        <span class="box-title" data-t="ch06-032">خطای یکی کم یا یکی زیاد</span>
+        <p data-t="ch06-033">
+            عدد پایانی <code>range</code> <strong>هرگز</strong> تولید نمی‌شود.
+            برای چاپ ۱ تا ۱۰ باید بنویسید <code>range(1, 11)</code>. این خطا آن‌قدر
+            رایج است که در دنیا اسم مخصوص دارد: خطای «یکی کم، یکی زیاد». هر بار
+            که حلقه‌ای نوشتید، اولین چیزی که باید چک کنید همین است.
+        </p>
+    </div>
+
+    <p data-t="ch06-034">
+        در مثال بالا از <code>end=' '</code> استفاده شده تا اعداد کنار هم چاپ
+        شوند، و <code>print()</code> خالی بعد از حلقه، خط را می‌بندد. این همان
+        نکته فصل اول است که اینجا به کار آمد.
+    </p>
+
+    <h2 id="s3" data-t="ch06-035">۳. پیمایش رشته</h2>
+
+    <p data-t="ch06-036">
+        <code>for</code> فقط با <code>range</code> کار نمی‌کند. هر چیزی که
+        «مجموعه‌ای از اجزا» باشد را می‌شود پیمایش کرد، از جمله رشته.
+    </p>
+
+    <pre class="code"><code># A 'for' loop can walk directly through the characters of a string.
+name = 'Kadoos'
+
+for char in name:
+    print(char, end=' ')
+print()
+
+# Counting the vowels of a sentence.
+sentence = input('Enter a sentence: ')
+vowels = 0
+
+for char in sentence.lower():
+    if char in 'aeiou':
+        vowels += 1
+
+print('Number of vowels:', vowels)</code></pre>
+    <p class="code-caption" data-t="ch06-037">پیمایش رشته: نمونه 03_loop_over_string.py</p>
+
+    <pre class="out">K a d o o s 
+Enter a sentence: Hello Kadoos
+Number of vowels: 5</pre>
+
+    <h3 data-t="ch06-038">شرح مثال</h3>
+
+    <ul>
+        <li data-t="ch06-039">در هر دور، <code>char</code> یک کاراکتر از رشته می‌گیرد. ضرورتی ندارد با اندیس سر و کله بزنید.</li>
+        <li data-t="ch06-040"><code>char in 'aeiou'</code> می‌پرسد آیا این کاراکتر یکی از حروف صدادار است. عملگر <code>in</code> را در فصل سوم دیدیم.</li>
+        <li data-t="ch06-041"><code>lower()</code> باعث می‌شود حروف بزرگ هم شمرده شوند.</li>
+        <li data-t="ch06-042">متغیر <code>vowels</code> یک <strong>شمارنده</strong> است: از صفر شروع می‌شود و هر بار که شرط برقرار شد یکی زیاد می‌شود.</li>
+    </ul>
+
+    <h2 id="s4" data-t="ch06-043">۴. الگوی انباره</h2>
+
+    <p data-t="ch06-044">
+        این مهم‌ترین الگوی این فصل است و در تمام دوره به کارتان می‌آید. سه قدم
+        دارد: متغیری بسازید و صفر بگذارید، داخل حلقه چیزی به آن اضافه کنید، بعد
+        از حلقه از آن استفاده کنید.
+    </p>
+
+    <pre class="code"><code># The accumulator pattern:
+#   1) start with a variable set to 0
+#   2) add something to it on every turn of the loop
+#   3) use it after the loop
+total = 0
+
+for i in range(10001):      # 0, 1, 2, ..., 10000
+    total = total + i
+    # the short form is:  total += i
+
+print(total)</code></pre>
+    <p class="code-caption" data-t="ch06-045">جمع اعداد تا ده هزار: نمونه 04_sum_to_n.py</p>
+
+    <pre class="out">50005000</pre>
+
+    <div class="warn">
+        <span class="box-title" data-t="ch06-046">جای print خیلی مهم است</span>
+        <p data-t="ch06-047">
+            <code>print</code> بیرون حلقه است، پس یک بار و در پایان اجرا می‌شود.
+            اگر آن را چهار فاصله تو ببرید، داخل حلقه می‌رود و ده هزار خط چاپ
+            می‌کند. تفاوت یک برنامه درست و یک برنامه به‌درد‌نخور، گاهی فقط چهار
+            فاصله است.
+        </p>
+    </div>
+
+    <h2 id="s5" data-t="ch06-048">۵. شرط داخل حلقه</h2>
+
+    <p data-t="ch06-049">
+        ترکیب <code>if</code> و <code>for</code> به شما اجازه می‌دهد فقط بعضی از
+        مقدارها را حساب کنید.
+    </p>
+
+    <pre class="code"><code># An 'if' inside a loop lets us accumulate only some of the values.
+total = 0
+
+for i in range(10001):
+    if i % 2 == 0:
+        total += i
+
+print('Sum of the even numbers from 0 to 10000:', total)
+
+# The same result without an 'if', by making range() jump two by two:
+total = 0
+for i in range(0, 10001, 2):
+    total += i
+print('Same result with a step of 2:', total)</code></pre>
+    <p class="code-caption" data-t="ch06-050">جمع اعداد زوج: نمونه 05_sum_of_evens.py</p>
+
+    <h3 data-t="ch06-051">شرح مثال</h3>
+
+    <ul>
+        <li data-t="ch06-052">در روش اول، حلقه ده هزار بار می‌چرخد و نیمی از دورها بی‌فایده‌اند.</li>
+        <li data-t="ch06-053">در روش دوم، خود <code>range</code> دو تا دو تا می‌پرد و حلقه نصف دورها را می‌زند. نتیجه یکی است ولی روش دوم هم سریع‌تر است و هم گویاتر.</li>
+        <li data-t="ch06-054">درس کلی: پیش از اینکه شرط بگذارید، ببینید می‌شود اصلاً مقدارهای نامربوط را تولید نکرد.</li>
+    </ul>
+
+    <h2 id="s6" data-t="ch06-055">۶. ورودی گرفتن داخل حلقه</h2>
+
+    <pre class="code"><code># The loop can also contain an input(): here we read exactly five numbers.
+total = 0
+
+for i in range(5):
+    user_input = input(f'Enter number {i + 1} of 5: ')
+    number = float(user_input)
+    total += number
+
+print('Sum:', total)</code></pre>
+    <p class="code-caption" data-t="ch06-056">خواندن پنج عدد: نمونه 06_sum_user_numbers.py</p>
+
+    <p data-t="ch06-057">
+        نکته ظریف: در پیام از <code>i + 1</code> استفاده شده است. چون
+        <code>i</code> از صفر شروع می‌شود ولی آدم‌ها از یک می‌شمارند. اگر
+        <code>i</code> خالی را چاپ کنید، کاربر پیام «عدد صفر از پنج» می‌بیند که
+        عجیب است.
+    </p>
+
+    <h2 id="s7" data-t="ch06-058">۷. فاکتوریل</h2>
+
+    <pre class="code"><code># The factorial of n is 1 * 2 * 3 * ... * n
+# For a product the accumulator must start at 1, not at 0.
+user_input = input('Enter a number: ')
+number = int(user_input)
+
+factorial = 1
+
+for i in range(1, number + 1):
+    factorial = factorial * i
+
+print(f'{number}! = {factorial}')</code></pre>
+    <p class="code-caption" data-t="ch06-059">فاکتوریل: نمونه 07_factorial.py</p>
+
+    <pre class="out">Enter a number: 5
+5! = 120</pre>
+
+    <div class="tip">
+        <span class="box-title" data-t="ch06-060">چرا انباره ضرب از یک شروع می‌شود</span>
+        <p data-t="ch06-061">
+            اگر <code>factorial</code> را صفر بگذارید، هر ضربی در صفر، صفر
+            می‌شود و جواب همیشه صفر در می‌آید. برای <strong>جمع</strong> باید از
+            صفر شروع کنید و برای <strong>ضرب</strong> از یک. عدد شروع باید عنصر
+            بی‌اثر آن عمل باشد.
+        </p>
+    </div>
+
+    <p data-t="ch06-062">
+        به <code>number + 1</code> در <code>range</code> دقت کنید: چون عدد
+        پایانی شامل نمی‌شود، برای اینکه خود <code>number</code> هم در ضرب شرکت
+        کند باید یکی بیشتر بنویسیم.
+    </p>
+
+    <h2 id="s8" data-t="ch06-063">۸. شمارش معکوس</h2>
+
+    <pre class="code"><code># Counting backwards with a negative step.
+user_input = input('Start the countdown from: ')
+start = int(user_input)
+
+for i in range(start, 0, -1):
+    print(i)
+
+print('Lift off!')</code></pre>
+    <p class="code-caption" data-t="ch06-064">شمارش معکوس: نمونه 08_countdown.py</p>
+
+    <pre class="out">Start the countdown from: 3
+3
+2
+1
+Lift off!</pre>
+
+    <p data-t="ch06-065">
+        گام منفی یعنی از عدد بزرگ به کوچک. عدد پایانی صفر است و شامل نمی‌شود،
+        پس حلقه روی یک تمام می‌شود که همان چیزی است که می‌خواهیم.
+    </p>
+
+    <h2 id="s9" data-t="ch06-066">۹. انباره و شمارنده با هم</h2>
+
+    <pre class="code"><code># Two accumulators at the same time: a total and a counter.
+user_input = input('How many numbers do you want to enter? ')
+count = int(user_input)
+
+total = 0
+
+for i in range(count):
+    number = float(input(f'Number {i + 1}: '))
+    total += number
+
+# Dividing by zero must be avoided when the user answers 0.
+if count &gt; 0:
+    print('Average:', total / count)
+else:
+    print('No number was entered.')</code></pre>
+    <p class="code-caption" data-t="ch06-067">میانگین n عدد: نمونه 09_average_of_n.py</p>
+
+    <div class="warn">
+        <span class="box-title" data-t="ch06-068">باگی که در نسخه اصلی بود</span>
+        <p data-t="ch06-069">
+            اگر کاربر در جواب «چند عدد وارد می‌کنید» صفر بزند، حلقه اصلاً اجرا
+            نمی‌شود و بعد <code>total / count</code> یعنی تقسیم بر صفر، و برنامه
+            خراب می‌شود. شرط <code>if count &gt; 0</code> جلوی آن را می‌گیرد. هر
+            جا میانگین می‌گیرید، به این حالت فکر کنید.
+        </p>
+    </div>
+
+    <h2 id="s10" data-t="ch06-070">۱۰. ساختن جدول</h2>
+
+    <pre class="code"><code># Building a small table with a loop. The \t escape keeps the columns aligned.
+print('n\tn^2\tn^3')
+
+for n in range(1, 11):
+    print(f'{n}\t{n ** 2}\t{n ** 3}')</code></pre>
+    <p class="code-caption" data-t="ch06-071">جدول توان: نمونه 10_power_table.py</p>
+
+    <pre class="out">n	n^2	n^3
+1	1	1
+2	4	8
+3	9	27
+4	16	64
+5	25	125</pre>
+
+    <p data-t="ch06-072">
+        دنباله <code>\t</code> از فصل سوم اینجا ستون‌ها را مرتب نگه می‌دارد. اگر
+        عددها خیلی بزرگ شوند تب کافی نیست و باید از قالب‌بندی عرض ثابت
+        f-string استفاده کنید، مثل <code>{n:5}</code>.
+    </p>
+
+    <h2 id="s11" data-t="ch06-073">۱۱. دام نام‌گذاری: sum و max و min</h2>
+
+    <p data-t="ch06-074">
+        در نسخه اصلی فایل‌های این جلسه، انباره‌ها نام <code>sum</code> داشتند.
+        برنامه کار می‌کرد، ولی یک دام پنهان داشت که ارزش دارد یک بار برای همیشه
+        ببینیدش.
+    </p>
+
+    <pre class="code"><code># Python already has a built-in function called sum().
+print(sum([1, 2, 3]))     # 6
+
+# If we use 'sum' as a variable name, the function is gone:
+sum = 0
+for i in range(5):
+    sum += i
+
+print(sum)                # 10  -&gt; this still works
+
+# But now the function no longer exists:
+# print(sum([1, 2, 3]))   -&gt; TypeError: 'int' object is not callable</code></pre>
+    <p class="code-caption" data-t="ch06-075">چرا متغیر را sum صدا نمی‌زنیم</p>
+
+    <p data-t="ch06-076">
+        همین ماجرا برای <code>max</code> و <code>min</code> و <code>list</code>
+        و <code>str</code> و <code>input</code> هم صادق است. نام‌های جایگزین
+        ساده‌اند: <code>total</code> به جای <code>sum</code>،
+        <code>biggest</code> به جای <code>max</code>، <code>smallest</code> به
+        جای <code>min</code>. در فصل دهم دوباره به این موضوع برمی‌گردیم، چون
+        آنجا واقعاً به آن توابع نیاز داریم.
+    </p>
+
+    <div class="folder-ref">
+        <span class="box-title" data-t="ch06-077">فایل‌های تمرینی این فصل</span>
+        <p data-t="ch06-078">
+            پوشه <code>S06-for-loops</code> شامل نمونه‌های
+            <code>01_first_loop.py</code> تا <code>10_power_table.py</code>.
+        </p>
+    </div>
+
+    <h2 data-t="ch06-079">خلاصه فصل</h2>
+
+    <div class="table-scroll">
+        <table>
+            <thead>
+                <tr><th data-t="ch06-080">ابزار</th><th data-t="ch06-081">وظیفه آن</th></tr>
+            </thead>
+            <tbody>
+                <tr><td><code>for i in range(n):</code></td><td data-t="ch06-082">تکرار n بار، از ۰ تا n منهای یک</td></tr>
+                <tr><td><code>range(a, b)</code></td><td data-t="ch06-083">از a تا b منهای یک</td></tr>
+                <tr><td><code>range(a, b, s)</code></td><td data-t="ch06-084">با گام s. گام منفی یعنی معکوس</td></tr>
+                <tr><td><code>for c in text:</code></td><td data-t="ch06-085">پیمایش کاراکترهای یک رشته</td></tr>
+                <tr><td data-t="ch06-086">انباره</td><td data-t="ch06-087">متغیری که پیش از حلقه صفر (یا یک) می‌شود و داخل حلقه رشد می‌کند</td></tr>
+                <tr><td data-t="ch06-088">شمارنده</td><td data-t="ch06-089">انباره‌ای که هر بار فقط یکی زیاد می‌شود</td></tr>
+                <tr><td data-t="ch06-090">جای <code>print</code></td><td data-t="ch06-091">داخل حلقه یعنی هر دور، بیرون حلقه یعنی یک بار</td></tr>
+                <tr><td data-t="ch06-092">نام‌های ممنوع</td><td data-t="ch06-093"><code>sum</code> <code>max</code> <code>min</code> <code>list</code> و مانند این موارد</td></tr>
+            </tbody>
+        </table>
+    </div>
+
+    <div class="exercise">
+        <h3 data-t="ch06-094">تمرین‌های فصل شش</h3>
+        <ol>
+            <li data-t="ch06-095">اعداد ۱ تا ۱۰۰ را چاپ کنید.</li>
+            <li data-t="ch06-096">مضرب‌های ۳ بین ۱ تا ۱۰۰ را چاپ کنید. یک بار با <code>if</code> و یک بار با گام <code>range</code>.</li>
+            <li data-t="ch06-097">عدد <code>n</code> را بگیرید و مجموع اعداد ۱ تا <code>n</code> را چاپ کنید.</li>
+            <li data-t="ch06-098">عدد <code>n</code> را بگیرید و جدول ضربش را از <code>n × 1</code> تا <code>n × 10</code> چاپ کنید.</li>
+            <li data-t="ch06-099">یک کلمه بگیرید و هر کاراکترش را در یک خط جدا چاپ کنید.</li>
+            <li data-t="ch06-100">ده عدد بگیرید و بگویید چند تایشان منفی بودند.</li>
+            <li data-t="ch06-101">یک عدد بگیرید و فاکتوریلش را چاپ کنید.</li>
+            <li data-t="ch06-102">پانزده عدد اول دنباله فیبوناچی را چاپ کنید. هر عدد مجموع دو عدد قبلی است.</li>
+            <li data-t="ch06-103">یک جمله بگیرید و بشمارید چند فاصله دارد.</li>
+        </ol>
+    </div>
+
+    <div class="pager">
+        <a href="chapter-05.html">فصل قبل: elif و شرط‌های تودرتو</a>
+        <a href="chapter-07.html">فصل بعد: حلقه‌های تودرتو و الگوها</a>
+    </div>
+
+</main>
+
+</body>
+</html>

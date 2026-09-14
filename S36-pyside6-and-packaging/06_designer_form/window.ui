@@ -1,0 +1,65 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
+ <class>Form</class>
+ <widget class="QWidget" name="Form">
+  <property name="geometry">
+   <rect><x>0</x><y>0</y><width>460</width><height>260</height></rect>
+  </property>
+  <property name="windowTitle">
+   <string>Kadoos - greeting</string>
+  </property>
+  <layout class="QVBoxLayout" name="mainLayout">
+   <item>
+    <layout class="QFormLayout" name="formLayout">
+     <item row="0" column="0">
+      <widget class="QLabel" name="labelName">
+       <property name="text"><string>Name:</string></property>
+      </widget>
+     </item>
+     <item row="0" column="1">
+      <widget class="QLineEdit" name="editName">
+       <property name="placeholderText"><string>your name</string></property>
+      </widget>
+     </item>
+     <item row="1" column="0">
+      <widget class="QLabel" name="labelCity">
+       <property name="text"><string>City:</string></property>
+      </widget>
+     </item>
+     <item row="1" column="1">
+      <widget class="QComboBox" name="comboCity">
+       <item><property name="text"><string>Rasht</string></property></item>
+       <item><property name="text"><string>Lahijan</string></property></item>
+       <item><property name="text"><string>Bandar Anzali</string></property></item>
+       <item><property name="text"><string>Tabriz</string></property></item>
+      </widget>
+     </item>
+    </layout>
+   </item>
+   <item>
+    <widget class="QPushButton" name="btnHello">
+     <property name="text"><string>Say hello</string></property>
+    </widget>
+   </item>
+   <item>
+    <widget class="QLabel" name="labelHello">
+     <property name="font">
+      <font><pointsize>14</pointsize></font>
+     </property>
+     <property name="text"><string/></property>
+     <property name="alignment"><set>Qt::AlignCenter</set></property>
+    </widget>
+   </item>
+   <item>
+    <spacer name="verticalSpacer">
+     <property name="orientation"><enum>Qt::Vertical</enum></property>
+     <property name="sizeHint" stdset="0">
+      <size><width>20</width><height>40</height></size>
+     </property>
+    </spacer>
+   </item>
+  </layout>
+ </widget>
+ <resources/>
+ <connections/>
+</ui>

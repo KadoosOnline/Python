@@ -1,0 +1,844 @@
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="فصل سی و شش: Qt در پایتون با PySide6، سیگنال و اسلات، چیدمان‌ها، Qt Designer و ساخت فایل اجرایی با PyInstaller">
+    <title>فصل ۳۶: PySide6 و ساخت فایل اجرایی</title>
+    <link rel="icon" href="logokm.png" type="image/png">
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<header class="book-bar">
+    <a class="name" href="index.html">برنامه‌نویسی پایتون</a>
+    <a href="index.html">فهرست مطالب</a>
+</header>
+
+<main class="paper">
+
+    <div class="chapter-head">
+        <span class="chapter-num">فصل ۳۶</span>
+        <h1 data-t="ch36-001">PySide6 و ساخت فایل اجرایی</h1>
+        <p class="lead" data-t="ch36-002">
+            با دومین ابزار بزرگ رابط گرافیکی آشنا می‌شویم: همان چیزی که
+            برنامه‌های دسکتاپ حرفه‌ای واقعاً با آن نوشته می‌شوند. پنجره را با
+            ماوس در Qt Designer طراحی می‌کنیم، و در پایان برنامه پایتون را به
+            یک فایل تبدیل می‌کنیم که روی کامپیوتری بدون پایتون هم اجرا شود.
+        </p>
+    </div>
+
+    <div class="mini-toc">
+        <span class="box-title" data-t="ch36-003">در این فصل می‌خوانید</span>
+        <ol>
+            <li data-t="ch36-004"><a href="#s1">Qt، و PySide6 یا PyQt6</a></li>
+            <li data-t="ch36-005"><a href="#s2">چهار قدم هر برنامه Qt</a></li>
+            <li data-t="ch36-006"><a href="#s3">سیگنال و اسلات</a></li>
+            <li data-t="ch36-007"><a href="#s4">ویجت‌ها و چیدمان‌ها</a></li>
+            <li data-t="ch36-008"><a href="#s5">دیالوگ‌ها و closeEvent</a></li>
+            <li data-t="ch36-009"><a href="#s6">Qt Designer و فایل ui</a></li>
+            <li data-t="ch36-010"><a href="#s7">ماشین‌حساب اصلاح‌شده</a></li>
+            <li data-t="ch36-011"><a href="#s8">کامپایل کردن فایل ui</a></li>
+            <li data-t="ch36-012"><a href="#s9">PyInstaller: اولین فایل اجرایی</a></li>
+            <li data-t="ch36-013"><a href="#s10">آیکون</a></li>
+            <li data-t="ch36-014"><a href="#s11">دام‌های برنامه منجمد</a></li>
+            <li data-t="ch36-015"><a href="#s12">فایل spec</a></li>
+        </ol>
+    </div>
+
+    <h2 id="s1" data-t="ch36-016">۱. Qt، و PySide6 یا PyQt6</h2>
+
+    <p data-t="ch36-017">
+        Qt یک کتابخانه بزرگ ++C برای برنامه‌های دسکتاپ است و
+        <strong>دو</strong> پل ارتباطی با پایتون دارد. هر دو تقریباً یکسان‌اند
+        و تفاوت اصلی در مجوز است.
+    </p>
+
+    <div class="table-scroll">
+        <table>
+            <thead>
+                <tr><th></th><th>PySide6</th><th>PyQt6</th></tr>
+            </thead>
+            <tbody>
+                <tr><td data-t="ch36-018">سازنده</td><td data-t="ch36-019">شرکت Qt (رسمی)</td><td>Riverbank Computing</td></tr>
+                <tr><td data-t="ch36-020">مجوز</td><td data-t="ch36-021">LGPL، رایگان حتی برای برنامه تجاری بسته</td><td data-t="ch36-022">GPL یا مجوز پولی</td></tr>
+                <tr><td data-t="ch36-023">وارد کردن</td><td dir="ltr"><code>from PySide6.QtWidgets import ...</code></td><td dir="ltr"><code>from PyQt6.QtWidgets import ...</code></td></tr>
+                <tr><td data-t="ch36-024">طراح</td><td><code>pyside6-designer</code></td><td data-t="ch36-025">جداگانه نصب می‌شود</td></tr>
+                <tr><td data-t="ch36-026">کامپایلر ui</td><td><code>pyside6-uic</code></td><td><code>pyuic6</code></td></tr>
+                <tr><td data-t="ch36-027">سیگنال شخصی</td><td data-t="ch36-028"><code>Signal</code> و <code>Slot</code></td><td data-t="ch36-029"><code>pyqtSignal</code> و <code>pyqtSlot</code></td></tr>
+            </tbody>
+        </table>
+    </div>
+
+    <p data-t="ch36-030">
+        ما به خاطر مجوز، <strong>PySide6</strong> را انتخاب می‌کنیم. هر مثال
+        این فصل با عوض کردن خطوط <code>import</code> به PyQt6 تبدیل می‌شود.
+    </p>
+
+    <pre class="out">python -m venv .venv
+.venv\Scripts\activate          # Windows
+source .venv/bin/activate       # Linux / macOS
+pip install -r requirements.txt</pre>
+
+    <div class="note">
+        <span class="box-title" data-t="ch36-031">Qt در برابر tkinter</span>
+        <p data-t="ch36-032">
+            tkinter جزو خود پایتون است، نصب نمی‌خواهد و برای برنامه‌های کوچک
+            عالی است. Qt باید نصب شود و حجیم است، ولی ویجت‌های بسیار بیشتری
+            دارد، ظاهرش حرفه‌ای‌تر است، طراح گرافیکی دارد، و روی همه
+            سیستم‌عامل‌ها یکسان به نظر می‌رسد. برای یک ابزار کوچک tkinter، و
+            برای یک محصول واقعی Qt.
+        </p>
+    </div>
+
+    <h2 id="s2" data-t="ch36-033">۲. چهار قدم هر برنامه Qt</h2>
+
+    <pre class="code"><code>import sys
+
+from PySide6.QtCore import Qt
+from PySide6.QtWidgets import QApplication, QLabel, QVBoxLayout, QWidget
+
+
+class HelloWindow(QWidget):
+    '''In Qt you make your own window by inheriting from a widget class.'''
+
+    def __init__(self) -&gt; None:
+        super().__init__()
+        self.setWindowTitle('Kadoos - first Qt window')
+        self.resize(420, 220)
+
+        title = QLabel('Welcome to Kadoos Institute!')
+        # A stylesheet: Qt understands a subset of CSS.
+        title.setStyleSheet('font-size: 20px; font-weight: bold;')
+        title.setAlignment(Qt.AlignmentFlag.AlignCenter)
+
+        subtitle = QLabel('This window is built with PySide6.')
+        subtitle.setAlignment(Qt.AlignmentFlag.AlignCenter)
+
+        # A layout places the widgets for you and follows the window when it
+        # is resized. Never position widgets by hand with move()/setGeometry().
+        layout = QVBoxLayout()
+        layout.addWidget(title)
+        layout.addWidget(subtitle)
+        self.setLayout(layout)
+
+
+def main() -&gt; None:
+    app = QApplication(sys.argv)
+    window = HelloWindow()
+    window.show()
+    sys.exit(app.exec())</code></pre>
+    <p class="code-caption" data-t="ch36-034">اولین پنجره: نمونه 01_hello_window/app.py</p>
+
+    <h3 data-t="ch36-035">شرح مثال</h3>
+
+    <ul>
+        <li data-t="ch36-036">هر برنامه Qt همین چهار قدم را دارد: ساختن <code>QApplication</code> (دقیقاً یکی در هر برنامه)، ساختن ویجت‌ها، <code>show()</code>، و <code>app.exec()</code> که حلقه رویداد است، معادل <code>mainloop</code> در tkinter.</li>
+        <li data-t="ch36-037">ویجت‌ها در Qt تا وقتی <code>show()</code> صدا زده نشود <strong>پنهان</strong> هستند. این برخلاف tkinter است.</li>
+        <li data-t="ch36-038">پنجره خودتان را با <strong>ارث بردن</strong> از <code>QWidget</code> می‌سازید. کلاس، این بار اختیاری نیست بلکه روش استاندارد Qt است.</li>
+        <li data-t="ch36-039">Qt زیرمجموعه‌ای از CSS را می‌فهمد: <code>setStyleSheet</code>. هر چه در دوره HTML و CSS یاد گرفته‌اید اینجا به کار می‌آید.</li>
+        <li data-t="ch36-040">در Qt <strong>هرگز</strong> ویجت را با مختصات پیکسلی نچینید. چیدمان‌ها این کار را می‌کنند و با تغییر اندازه پنجره همراهی می‌کنند.</li>
+    </ul>
+
+    <h2 id="s3" data-t="ch36-041">۳. سیگنال و اسلات</h2>
+
+    <p data-t="ch36-042">
+        در tkinter می‌نوشتیم <code>command=my_function</code>. در Qt هر ویجت
+        <strong>سیگنال</strong> منتشر می‌کند و شما سیگنال را به یک تابع (که Qt
+        به آن <strong>اسلات</strong> می‌گوید) <strong>وصل</strong> می‌کنید.
+        این دقیقاً الگوی ناظر فصل سی و سوم است.
+    </p>
+
+    <pre class="code"><code>class CounterWindow(QWidget):
+    '''A counter and a live greeting.'''
+
+    def __init__(self) -&gt; None:
+        super().__init__()
+        self.count = 0
+
+        self.count_label = QLabel('0')
+        plus = QPushButton('+')
+        minus = QPushButton('-')
+        reset = QPushButton('Reset')
+
+        # `lambda:` swallows the `checked` argument that clicked sends.
+        plus.clicked.connect(lambda: self.change(+1))
+        minus.clicked.connect(lambda: self.change(-1))
+        reset.clicked.connect(self.reset)
+
+        buttons = QHBoxLayout()
+        buttons.addWidget(minus)
+        buttons.addWidget(reset)
+        buttons.addWidget(plus)
+
+        self.name_edit = QLineEdit()
+        self.name_edit.setPlaceholderText('type your name...')
+        self.greeting = QLabel('Hello!')
+        # textChanged sends the new text to the slot.
+        self.name_edit.textChanged.connect(self.on_name_changed)
+
+        layout = QVBoxLayout()
+        layout.addWidget(self.count_label)
+        layout.addLayout(buttons)          # a layout can hold another layout
+        layout.addWidget(self.name_edit)
+        layout.addWidget(self.greeting)
+        self.setLayout(layout)
+
+    def change(self, step: int) -&gt; None:
+        self.count += step
+        self.count_label.setText(str(self.count))
+
+    def on_name_changed(self, text: str) -&gt; None:
+        name = text.strip()
+        self.greeting.setText(f'Hello {name}!' if name else 'Hello!')</code></pre>
+    <p class="code-caption" data-t="ch36-043">سیگنال و اسلات: نمونه 02_signals_and_slots/app.py</p>
+
+    <div class="table-scroll">
+        <table>
+            <thead>
+                <tr><th data-t="ch36-044">سیگنال</th><th data-t="ch36-045">کی منتشر می‌شود</th><th data-t="ch36-046">چه می‌فرستد</th></tr>
+            </thead>
+            <tbody>
+                <tr><td><code>button.clicked</code></td><td data-t="ch36-047">دکمه فشرده شد</td><td data-t="ch36-048">یک بولی <code>checked</code></td></tr>
+                <tr><td><code>lineEdit.textChanged</code></td><td data-t="ch36-049">متن عوض شد</td><td data-t="ch36-050">متن تازه</td></tr>
+                <tr><td><code>lineEdit.returnPressed</code></td><td data-t="ch36-051">کلید Enter</td><td data-t="ch36-052">چیزی نمی‌فرستد</td></tr>
+                <tr><td><code>slider.valueChanged</code></td><td data-t="ch36-053">مقدار عوض شد</td><td data-t="ch36-054">عدد تازه</td></tr>
+                <tr><td><code>comboBox.currentTextChanged</code></td><td data-t="ch36-055">انتخاب عوض شد</td><td data-t="ch36-056">متن انتخاب‌شده</td></tr>
+            </tbody>
+        </table>
+    </div>
+
+    <h3 data-t="ch36-057">شرح مثال</h3>
+
+    <ul>
+        <li data-t="ch36-058"><code>connect</code> هم مثل <code>command</code> تابع را <strong>بدون پرانتز</strong> می‌گیرد.</li>
+        <li data-t="ch36-059">یک سیگنال می‌تواند به چند اسلات وصل شود، و یک اسلات می‌تواند به چند سیگنال خدمت کند. این انعطاف، بزرگ‌ترین برتری Qt بر tkinter است.</li>
+        <li data-t="ch36-060">سیگنالی که مقدار حمل می‌کند، آن را به اسلات می‌دهد. برای همین <code>on_name_changed</code> پارامتر <code>text</code> دارد.</li>
+        <li data-t="ch36-061">دام ظریف: <code>clicked</code> در عمل یک بولی <code>checked</code> می‌فرستد. اگر اسلات شما پارامتر ندارد، با <code>lambda</code> آن را ببلعید یا خودتان پارامتر بگذارید.</li>
+        <li data-t="ch36-062">یک چیدمان می‌تواند چیدمان دیگری را در خود بگیرد: <code>addLayout</code>. این‌طور ساختارهای پیچیده می‌سازید.</li>
+    </ul>
+
+    <h2 id="s4" data-t="ch36-063">۴. ویجت‌ها و چیدمان‌ها</h2>
+
+    <div class="table-scroll">
+        <table>
+            <thead>
+                <tr><th data-t="ch36-064">ویجت</th><th data-t="ch36-065">وظیفه آن</th><th data-t="ch36-066">خواندن مقدار</th></tr>
+            </thead>
+            <tbody>
+                <tr><td><code>QLabel</code></td><td data-t="ch36-067">متن یا تصویر</td><td>-</td></tr>
+                <tr><td><code>QLineEdit</code></td><td data-t="ch36-068">یک خط متن</td><td><code>.text()</code></td></tr>
+                <tr><td><code>QTextEdit</code></td><td data-t="ch36-069">چند خط متن</td><td><code>.toPlainText()</code></td></tr>
+                <tr><td><code>QPushButton</code></td><td data-t="ch36-070">دکمه</td><td>-</td></tr>
+                <tr><td><code>QCheckBox</code></td><td data-t="ch36-071">جعبه تیک</td><td><code>.isChecked()</code></td></tr>
+                <tr><td><code>QComboBox</code></td><td data-t="ch36-072">فهرست بازشو</td><td><code>.currentText()</code></td></tr>
+                <tr><td><code>QSpinBox</code></td><td data-t="ch36-073">عدد صحیح</td><td data-t="ch36-074"><code>.value()</code> که واقعاً <code>int</code> است</td></tr>
+                <tr><td><code>QListWidget</code></td><td data-t="ch36-075">فهرست</td><td><code>.currentItem()</code></td></tr>
+            </tbody>
+        </table>
+    </div>
+
+    <div class="table-scroll">
+        <table>
+            <thead>
+                <tr><th data-t="ch36-076">چیدمان</th><th data-t="ch36-077">وظیفه آن</th></tr>
+            </thead>
+            <tbody>
+                <tr><td><code>QVBoxLayout</code></td><td data-t="ch36-078">یکی زیر دیگری</td></tr>
+                <tr><td><code>QHBoxLayout</code></td><td data-t="ch36-079">یکی کنار دیگری</td></tr>
+                <tr><td><code>QGridLayout</code></td><td data-t="ch36-080">سطر و ستون، مثل grid در tkinter</td></tr>
+                <tr><td><code>QFormLayout</code></td><td data-t="ch36-081">جفت «برچسب: فیلد»، ابزار درست فرم‌ها</td></tr>
+                <tr><td><code>addStretch()</code></td><td data-t="ch36-082">فضای خالی کشسان، برای هل دادن ویجت‌ها</td></tr>
+            </tbody>
+        </table>
+    </div>
+
+    <pre class="code"><code>class RegistrationForm(QWidget):
+    '''A course registration form built with QFormLayout.'''
+
+    def __init__(self) -&gt; None:
+        super().__init__()
+        self.name_edit = QLineEdit()
+        self.course_box = QComboBox()
+        self.course_box.addItems(PRICES)          # the keys of the dict
+
+        self.sessions_box = QSpinBox()
+        self.sessions_box.setRange(1, 20)
+        self.sessions_box.setValue(20)
+
+        self.student_box = QCheckBox('I am a student (20 % off)')
+
+        form = QFormLayout()
+        form.addRow('Full name:', self.name_edit)
+        form.addRow('Course:', self.course_box)
+        form.addRow('Sessions:', self.sessions_box)
+        form.addRow('', self.student_box)
+
+        buttons = QHBoxLayout()
+        buttons.addStretch()               # push the buttons to the right
+        buttons.addWidget(clear)
+        buttons.addWidget(compute)
+
+    def compute(self) -&gt; None:
+        name = self.name_edit.text().strip()
+        if not name:
+            self.result.setText('Please type your name first.')
+            return
+
+        course = self.course_box.currentText()
+        sessions = self.sessions_box.value()          # already an int
+        price = PRICES[course] * sessions // 20
+        if self.student_box.isChecked():
+            price = int(price * 0.8)
+
+        self.result.setText(f'{name}: {course}, {sessions} sessions '
+                            f'-&gt; {price:,} toman')</code></pre>
+    <p class="code-caption" data-t="ch36-083">فرم ثبت‌نام: نمونه 03_widgets_and_layouts/app.py</p>
+
+    <p data-t="ch36-084">
+        تفاوت ریز ولی مهمی را ببینید: <code>QSpinBox.value()</code> یک
+        <code>int</code> واقعی می‌دهد، برخلاف
+        <code>Spinbox.get()</code> در tkinter که رشته می‌داد. خود ویجت هم هر
+        چیزی جز عدد را نمی‌پذیرد. Qt در این موارد خیلی کارتان را راحت‌تر
+        می‌کند.
+    </p>
+
+    <h2 id="s5" data-t="ch36-085">۵. دیالوگ‌ها و closeEvent</h2>
+
+    <pre class="code"><code>    def ask_question(self) -&gt; None:
+        answer = QMessageBox.question(self, 'Kadoos', 'Do you like Python?')
+        # Always compare against the StandardButton values.
+        liked = answer == QMessageBox.StandardButton.Yes
+        self.answer_label.setText('You answered: ' + ('yes' if liked else 'no'))
+
+    def open_file(self) -&gt; None:
+        # getOpenFileName returns (path, filter) -- never forget the tuple.
+        path, _filter = QFileDialog.getOpenFileName(
+            self, 'Open', '', 'Text files (*.txt);;All files (*)')
+        if not path:                       # Cancel
+            return
+        self.answer_label.setText(f'You chose: {path}')
+
+    def closeEvent(self, event) -&gt; None:
+        '''Qt calls this when the user clicks the X button.'''
+        answer = QMessageBox.question(self, 'Exit', 'Really close the program?')
+        if answer == QMessageBox.StandardButton.Yes:
+            event.accept()                 # let the window close
+        else:
+            event.ignore()                 # keep it open</code></pre>
+    <p class="code-caption" data-t="ch36-086">دیالوگ‌ها: نمونه 04_message_boxes/app.py</p>
+
+    <h3 data-t="ch36-087">شرح مثال</h3>
+
+    <ul>
+        <li data-t="ch36-088">چهار دیالوگ استاندارد: <code>information</code>، <code>warning</code>، <code>critical</code> و <code>question</code>.</li>
+        <li data-t="ch36-089"><code>question</code> برخلاف tkinter بولی برنمی‌گرداند، بلکه می‌گوید کدام دکمه فشرده شده است. پس همیشه با <code>QMessageBox.StandardButton.Yes</code> مقایسه‌اش کنید.</li>
+        <li data-t="ch36-090"><code>QFileDialog.getOpenFileName</code> یک <strong>تاپل</strong> می‌دهد: مسیر و فیلتر انتخاب‌شده. فراموش کردن تاپل، اولین اشتباه کلاسیک همه است. مسیر در صورت انصراف، رشته خالی است.</li>
+        <li data-t="ch36-091"><code>closeEvent</code> معادل Qt برای <code>protocol('WM_DELETE_WINDOW', ...)</code> است. توجه کنید که این یک متد با نام از پیش تعیین‌شده است؛ Qt خودش صدایش می‌زند.</li>
+        <li data-t="ch36-092"><code>event.accept()</code> اجازه بستن می‌دهد و <code>event.ignore()</code> جلویش را می‌گیرد.</li>
+    </ul>
+
+    <h2 id="s6" data-t="ch36-093">۶. Qt Designer و فایل ui</h2>
+
+    <p data-t="ch36-094">
+        Qt Designer برنامه‌ای است که در آن ویجت‌ها را با ماوس روی پنجره
+        می‌کشید و نتیجه را در یک فایل <code>.ui</code> ذخیره می‌کنید. آن فایل
+        <strong>XML ساده</strong> است و می‌توانید در ویرایشگر متن بازش کنید و
+        بخوانید. این همان XML فصل بیست و هشتم است.
+    </p>
+
+    <pre class="out">pyside6-designer</pre>
+
+    <pre class="code"><code>def load_ui(name: str) -&gt; QWidget:
+    '''Load a .ui file that sits next to this script.'''
+    # `with_name` keeps the folder of THIS file, so the program works no
+    # matter which directory you run it from.
+    path = Path(__file__).with_name(name)
+    window = QUiLoader().load(str(path))
+    if window is None:
+        # A typo in the file name, or invalid XML.
+        raise RuntimeError(f'Cannot load {path}')
+    return window
+
+
+def main() -&gt; None:
+    app = QApplication(sys.argv)
+    window = load_ui('window.ui')
+
+    # findChild(type, objectName) -&gt; the widget, or None if the name is wrong.
+    title = window.findChild(QLabel, 'labelTitle')
+    button = window.findChild(QPushButton, 'btnClose')
+    if title is None or button is None:
+        raise RuntimeError('An objectName does not match window.ui')
+
+    title.setText('Welcome to Kadoos Institute!')
+    button.clicked.connect(window.close)
+
+    window.show()
+    sys.exit(app.exec())</code></pre>
+    <p class="code-caption" data-t="ch36-095">بارگذاری در زمان اجرا: نمونه 05_designer_first_ui/app.py</p>
+
+    <h3 data-t="ch36-096">دو قانون طراحی در Designer</h3>
+
+    <ul>
+        <li data-t="ch36-097">به هر ویجتی که از پایتون به آن دست می‌زنید، یک <strong>objectName</strong> روشن بدهید: <code>labelTitle</code>، <code>btnClose</code>، <code>editName</code>. همین نام است که <code>findChild</code> دنبالش جست‌وجو می‌کند.</li>
+        <li data-t="ch36-098">
+            ویجت‌ها را <strong>حتماً</strong> در یک چیدمان بگذارید: راست کلیک
+            روی فرم، سپس «Lay out». بدون چیدمان، ویجت‌ها همان موقعیت پیکسلی
+            را نگه می‌دارند و با تغییر اندازه پنجره یا با فونت متفاوت کاربر،
+            ظاهر برنامه خراب می‌شود.
+        </li>
+    </ul>
+
+    <div class="warn">
+        <span class="box-title" data-t="ch36-099">findChild ممکن است None بدهد</span>
+        <p data-t="ch36-100">
+            اگر نام را اشتباه بنویسید، <code>findChild</code> بدون هیچ خطایی
+            <code>None</code> برمی‌گرداند و برنامه خیلی بعدتر و دور از محل
+            اشتباه می‌ترکد. همیشه بلافاصله بررسی کنید. نسخه اصلی این درس دقیقاً
+            همین بررسی را نداشت.
+        </p>
+    </div>
+
+    <h2 id="s7" data-t="ch36-101">۷. ماشین‌حساب اصلاح‌شده</h2>
+
+    <p data-t="ch36-102">
+        ماشین‌حساب اصلی این درس چهار مشکل داشت که هر چهار تا ارزش دیدن دارند:
+        چهار تابع هشت‌خطی که فقط در <strong>یک کاراکتر</strong> فرق داشتند،
+        <code>float(edit.text())</code> بدون هیچ محافظی، تقسیم بر صفر، و
+        متغیری به نام <code>sum</code> که تابع درونی پایتون را پنهان می‌کرد.
+    </p>
+
+    <pre class="code"><code>import operator
+from typing import Callable
+
+# The four operations, as data instead of as four copies of the same function.
+OPERATIONS: dict[str, Callable[[float, float], float]] = {
+    'btnAdd': operator.add,
+    'btnSub': operator.sub,
+    'btnMul': operator.mul,
+    'btnDiv': operator.truediv,
+}
+
+
+class Calculator:
+    '''A two-number calculator driven by calc.ui.'''
+
+    def __init__(self) -&gt; None:
+        path = Path(__file__).with_name('calc.ui')
+        self.window: QWidget = QUiLoader().load(str(path))
+        ...
+        for name, function in OPERATIONS.items():
+            button = self._find(QPushButton, name)
+            # `f=function` freezes the current value; without it every button
+            # would use the LAST operation of the loop.
+            button.clicked.connect(lambda checked=False, f=function:
+                                   self.calculate(f))
+
+    def read_numbers(self) -&gt; tuple[float, float] | None:
+        '''Read both fields, or show why they cannot be read.'''
+        try:
+            first = float(self.edit1.text().strip())
+            second = float(self.edit2.text().strip())
+        except ValueError:
+            # Empty field, a letter, two dots... one message for all of them.
+            self.show_error('Please type two numbers.')
+            return None
+        return first, second
+
+    def calculate(self, function: Callable[[float, float], float]) -&gt; None:
+        numbers = self.read_numbers()
+        if numbers is None:
+            return
+        try:
+            answer = function(*numbers)
+        except ZeroDivisionError:
+            self.show_error('Cannot divide by zero.')
+            return
+        self.result.setText(f'{answer:.2f}')</code></pre>
+    <p class="code-caption" data-t="ch36-103">ماشین‌حساب: نمونه 07_designer_calculator/app.py</p>
+
+    <h3 data-t="ch36-104">شرح مثال</h3>
+
+    <ul>
+        <li data-t="ch36-105">کلید حل مسئله، ماژول <code>operator</code> است: <code>operator.add</code> <strong>همان</strong> عملگر <code>+</code> پایتون است به شکل یک تابع معمولی. پس عملیات به یک <strong>مقدار</strong> تبدیل می‌شود که می‌شود در دیکشنری گذاشتش و پاسش داد.</li>
+        <li data-t="ch36-106">چهار تابع تکراری به یک متد و یک دیکشنری تبدیل شدند. این همان درس الگوی کارخانه فصل سی و سوم است.</li>
+        <li data-t="ch36-107">باز هم <strong>اتصال دیرهنگام</strong>: <code>f=function</code> در لامبدا. بدون آن، هر چهار دکمه آخرین عملیات حلقه را انجام می‌دهند.</li>
+        <li data-t="ch36-108">در یک فایل <code>.exe</code>، خطای مدیریت‌نشده یعنی «دکمه را می‌زنم و هیچ اتفاقی نمی‌افتد»، چون ردیابی خطا به کنسولی می‌رود که کاربر اصلاً نمی‌بیند. اعتبارسنجی در برنامه بسته‌بندی‌شده حیاتی است.</li>
+    </ul>
+
+    <h2 id="s8" data-t="ch36-109">۸. کامپایل کردن فایل ui</h2>
+
+    <p data-t="ch36-110">
+        راه دوم استفاده از فایل <code>.ui</code> این است که یک بار آن را به
+        کلاس پایتون <strong>کامپایل</strong> کنیم.
+    </p>
+
+    <pre class="out">pyside6-uic window.ui -o ui_window.py       # PyQt6: pyuic6</pre>
+
+    <pre class="code"><code>from PySide6.QtWidgets import QApplication, QWidget
+
+from ui_window import Ui_Form
+
+
+class TodoWindow(QWidget, Ui_Form):
+    '''A to-do list. The widgets come from the generated Ui_Form.'''
+
+    def __init__(self) -&gt; None:
+        super().__init__()
+        self.setupUi(self)          # builds every widget on `self`
+
+        self.btnAdd.clicked.connect(self.add_task)
+        self.editTask.returnPressed.connect(self.add_task)
+        self.btnRemove.clicked.connect(self.remove_task)
+        self.btnClear.clicked.connect(self.clear_tasks)
+
+        self.update_count()
+
+    def add_task(self) -&gt; None:
+        text = self.editTask.text().strip()
+        if not text:
+            return
+        self.listTasks.addItem(text)
+        self.editTask.clear()
+        self.update_count()
+
+    def remove_task(self) -&gt; None:
+        row = self.listTasks.currentRow()    # -1 when nothing is selected
+        if row &lt; 0:
+            return
+        # takeItem removes the row and gives the item back; we drop it.
+        self.listTasks.takeItem(row)
+        self.update_count()</code></pre>
+    <p class="code-caption" data-t="ch36-111">نسخه کامپایل‌شده: نمونه 08_compile_ui_with_uic/app.py</p>
+
+    <div class="table-scroll">
+        <table>
+            <thead>
+                <tr><th data-t="ch36-112">QUiLoader در زمان اجرا</th><th data-t="ch36-113">pyside6-uic کامپایل‌شده</th></tr>
+            </thead>
+            <tbody>
+                <tr><td data-t="ch36-114">بعد از تغییر طرح، کاری ضرورتی ندارد</td><td data-t="ch36-115">بعد از هر تغییر باید دوباره uic بزنید</td></tr>
+                <tr><td data-t="ch36-116">ویجت با نام و در زمان اجرا پیدا می‌شود</td><td data-t="ch36-117">ویجت‌ها صفت واقعی شیء هستند</td></tr>
+                <tr><td data-t="ch36-118">تکمیل خودکار ندارد، غلط املایی در زمان اجرا معلوم می‌شود</td><td data-t="ch36-119">ویرایشگر کامل می‌کند و اشتباه را می‌گیرد</td></tr>
+                <tr><td data-t="ch36-120">فایل ui باید همراه برنامه ارسال شود</td><td data-t="ch36-121">فقط فایل‌های py، پس بسته‌بندی ساده‌تر است</td></tr>
+            </tbody>
+        </table>
+    </div>
+
+    <div class="warn">
+        <span class="box-title" data-t="ch36-122">هرگز فایل تولیدشده را دستی ویرایش نکنید</span>
+        <p data-t="ch36-123">
+            اجرای بعدی <code>pyside6-uic</code> فایل
+            <code>ui_window.py</code> را کامل بازنویسی می‌کند و همه تغییرهای
+            دستی‌تان از بین می‌رود. کد خودتان در فایل جداگانه می‌ماند. البته
+            یک بار داخل فایل تولیدشده را <strong>بخوانید</strong>: هیچ جادویی
+            در کار نیست، دقیقاً همان کدی است که در بخش‌های اول این فصل دستی
+            نوشتیم.
+        </p>
+    </div>
+
+    <h2 id="s9" data-t="ch36-124">۹. PyInstaller: اولین فایل اجرایی</h2>
+
+    <p data-t="ch36-125">
+        PyInstaller پایتون را به کد ماشین <strong>کامپایل نمی‌کند</strong>.
+        بلکه سه چیز را کنار هم بسته‌بندی می‌کند: فایل‌های شما، خود مفسر
+        پایتون، و همه کتابخانه‌هایی که وارد کرده‌اید. نتیجه روی کامپیوتری که
+        اصلاً پایتون ندارد اجرا می‌شود، و این تمام هدف ماجراست.
+    </p>
+
+    <pre class="out">pip install pyinstaller
+pyinstaller --onefile app.py</pre>
+
+    <div class="table-scroll">
+        <table>
+            <thead>
+                <tr><th data-t="ch36-126">مسیر</th><th data-t="ch36-127">چیست</th></tr>
+            </thead>
+            <tbody>
+                <tr><td><code>dist/app.exe</code></td><td data-t="ch36-128">فایلی که به دیگران می‌دهید</td></tr>
+                <tr><td><code>build/</code></td><td data-t="ch36-129">فایل‌های موقت، قابل حذف</td></tr>
+                <tr><td><code>app.spec</code></td><td data-t="ch36-130">دستور پخت ساخت</td></tr>
+            </tbody>
+        </table>
+    </div>
+
+    <div class="table-scroll">
+        <table>
+            <thead>
+                <tr><th data-t="ch36-131">گزینه</th><th data-t="ch36-132">وظیفه آن</th></tr>
+            </thead>
+            <tbody>
+                <tr><td><code>--onefile</code></td><td data-t="ch36-133">یک فایل واحد</td></tr>
+                <tr><td data-t="ch36-134"><code>--onedir</code> (پیش‌فرض)</td><td data-t="ch36-135">یک پوشه شامل exe و کلی dll</td></tr>
+                <tr><td><code>--name kadoos</code></td><td data-t="ch36-136">نام خروجی</td></tr>
+                <tr><td><code>--icon=app.ico</code></td><td data-t="ch36-137">آیکون فایل</td></tr>
+                <tr><td><code>--windowed</code></td><td data-t="ch36-138">بدون پنجره سیاه کنسول</td></tr>
+                <tr><td><code>--add-data</code></td><td data-t="ch36-139">همراه بردن یک فایل داده</td></tr>
+                <tr><td><code>--clean</code></td><td data-t="ch36-140">دور ریختن حافظه نهان پیش از ساخت</td></tr>
+            </tbody>
+        </table>
+    </div>
+
+    <h3 data-t="ch36-141">نکته‌های عملی</h3>
+
+    <ul>
+        <li data-t="ch36-142">چون مفسر داخل فایل است، حجم خروجی بزرگ است: ده تا چهل مگابایت عادی است و با PySide6 به شصت تا نود مگابایت می‌رسد.</li>
+        <li data-t="ch36-143">خروجی فقط روی همان سیستم‌عاملی که ساخته شده اجرا می‌شود. ساخت روی ویندوز یعنی <code>.exe</code> ویندوزی. <strong>نمی‌توانید</strong> با PyInstaller از لینوکس، خروجی ویندوزی بسازید.</li>
+        <li data-t="ch36-144"><code>--onefile</code> ارسالش راحت است ولی هر بار خودش را در یک پوشه موقت باز می‌کند، پس کندتر راه می‌افتد. برای ابزار کوچک <code>--onefile</code>، برای برنامه بزرگ <code>--onedir</code>.</li>
+        <li data-t="ch36-145">اگر آنتی‌ویروس ویندوز شکایت کرد، معمولاً هشدار کاذب است: شکل خودبازشونده مشکوک به نظر می‌رسد و فایل امضا ندارد. ساخت با <code>--onedir</code> معمولاً حلش می‌کند.</li>
+    </ul>
+
+    <h2 id="s10" data-t="ch36-146">۱۰. آیکون</h2>
+
+    <pre class="out">pyinstaller --onefile --icon=app.ico app.py</pre>
+
+    <p data-t="ch36-147">
+        آیکون ویندوز نه PNG است و نه JPEG. یک فایل <code>.ico</code> ظرفی است
+        که <strong>یک تصویر را در چند اندازه</strong> نگه می‌دارد، تا ویندوز
+        برای میزکار و نوار وظیفه و فهرست فایل‌ها اندازه مناسب را بردارد.
+    </p>
+
+    <pre class="code"><code>from PIL import Image
+
+image = Image.open('logo.png')
+image.save('app.ico', sizes=[(16, 16), (32, 32), (48, 48), (256, 256)])</code></pre>
+    <p class="code-caption" data-t="ch36-148">ساخت ico با Pillow، از فصل بیست و هشتم</p>
+
+    <h3 data-t="ch36-149">دو نکته که همه را گیج می‌کند</h3>
+
+    <ul>
+        <li data-t="ch36-150"><strong>آیکون عوض نمی‌شود!</strong> تقصیر شما نیست: ویندوز آیکون‌ها را در حافظه نهان نگه می‌دارد. فایل را تغییر نام بدهید یا به پوشه دیگری کپی کنید.</li>
+        <li data-t="ch36-151"><strong>آیکون پنجره چیز دیگری است.</strong> گزینه <code>--icon</code> آیکون <em>فایل</em> را تعیین می‌کند. آیکونی که هنگام اجرا در نوار عنوان دیده می‌شود در کد تنظیم می‌شود: <code>app.setWindowIcon(QIcon(...))</code> و در tkinter <code>root.iconbitmap('app.ico')</code>.</li>
+    </ul>
+
+    <h2 id="s11" data-t="ch36-152">۱۱. دام‌های برنامه منجمد</h2>
+
+    <pre class="out">pyinstaller --onefile --windowed --icon=app.ico --add-data "app.ico;." app.py</pre>
+
+    <p data-t="ch36-153">
+        جداکننده در <code>--add-data</code> روی <strong>ویندوز</strong>
+        نقطه‌ویرگول و روی <strong>لینوکس و مک</strong> دونقطه است. این تفاوت
+        کوچک، ساعت‌ها وقت مردم را گرفته است.
+    </p>
+
+    <p data-t="ch36-154">
+        وقتی یک برنامه <code>--onefile</code> اجرا می‌شود، خودش را در یک پوشه
+        <strong>موقت</strong> باز می‌کند و بعد از پایان پاکش می‌کند. پایتون آن
+        وقت این‌ها را می‌بیند:
+    </p>
+
+    <div class="table-scroll">
+        <table>
+            <thead>
+                <tr><th data-t="ch36-155">چیز</th><th data-t="ch36-156">مقدارش در برنامه منجمد</th></tr>
+            </thead>
+            <tbody>
+                <tr><td><code>sys.frozen</code></td><td data-t="ch36-157"><code>True</code>؛ این صفت در حالت عادی اصلاً وجود ندارد</td></tr>
+                <tr><td><code>sys._MEIPASS</code></td><td data-t="ch36-158">پوشه موقت</td></tr>
+                <tr><td><code>__file__</code></td><td data-t="ch36-159">مسیری <strong>داخل</strong> همان پوشه موقت</td></tr>
+                <tr><td><code>sys.executable</code></td><td data-t="ch36-160">خود فایل exe، که جایش دائمی است</td></tr>
+            </tbody>
+        </table>
+    </div>
+
+    <pre class="code"><code>'''The rule in one line:
+    resource_path() for what you READ and ship,
+    data_path() for what you WRITE.
+'''
+
+import sys
+from pathlib import Path
+
+
+def is_frozen() -&gt; bool:
+    '''True when we are running inside a PyInstaller executable.'''
+    return getattr(sys, 'frozen', False)
+
+
+def resource_path(name: str) -&gt; Path:
+    '''Where to READ a file that was shipped with the program.'''
+    if is_frozen():
+        # PyInstaller unpacks --add-data files into sys._MEIPASS.
+        base = Path(sys._MEIPASS)          # type: ignore[attr-defined]
+    else:
+        base = Path(__file__).parent
+    return base / name
+
+
+def data_path(name: str) -&gt; Path:
+    '''Where to WRITE a file so that it survives the next run.'''
+    if is_frozen():
+        # sys.executable is the .exe itself; its folder is permanent.
+        base = Path(sys.executable).parent
+    else:
+        base = Path(__file__).parent
+    return base / name</code></pre>
+    <p class="code-caption" data-t="ch36-161">دو مسیر لازم هر برنامه منجمد: نمونه 11_pyinstaller_windowed/paths.py</p>
+
+    <h3 data-t="ch36-162">چهار دام</h3>
+
+    <ul>
+        <li data-t="ch36-163">
+            <strong>با python اجرا می‌شود ولی exe فایلش را پیدا نمی‌کند.</strong>
+            <code>Path(__file__).parent / 'logo.png'</code> در حالت توسعه کار
+            می‌کند و در exe شکست می‌خورد، چون فایل اصلاً داخل بسته کپی نشده
+            است. با <code>--add-data</code> بفرستیدش و با
+            <code>resource_path()</code> پیدایش کنید.
+        </li>
+        <li data-t="ch36-164">
+            <strong>پایگاه داده‌ام هر بار خالی است.</strong> همان علت، اثری
+            بدتر: اگر کنار <code>__file__</code> بنویسید، در پوشه موقت
+            می‌نویسید و همه چیز با بسته شدن برنامه از بین می‌رود. برای نوشتن،
+            <code>data_path()</code>.
+        </li>
+        <li data-t="ch36-165">
+            <strong>exe اصلاً هیچ کاری نمی‌کند.</strong> با
+            <code>--windowed</code> کنسولی وجود ندارد: <code>print</code> به
+            جایی نمی‌رود و خرابی کاملاً بی‌صداست. یک بار <strong>بدون</strong>
+            <code>--windowed</code> بسازید و از ترمینال اجرا کنید تا ردیابی
+            خطا را ببینید، یا از همان اول با <code>logging</code> فصل نوزدهم
+            یک فایل گزارش بنویسید.
+        </li>
+        <li data-t="ch36-166">
+            <strong>خروجی خیلی حجیم است.</strong> راه‌حل‌ها:
+            <code>--onedir</code>، یک محیط مجازی تمیز تا فقط چیزهایی که واقعاً
+            وارد کرده‌اید بسته‌بندی شوند، و <code>--exclude-module</code>.
+        </li>
+    </ul>
+
+    <h2 id="s12" data-t="ch36-167">۱۲. فایل spec</h2>
+
+    <p data-t="ch36-168">
+        تایپ کردن دوباره و دوباره یک خط فرمان بلند، خسته‌کننده است. PyInstaller
+        یک <strong>دستور پخت</strong> می‌نویسد: فایل <code>.spec</code>، که
+        خودش <strong>کد پایتون ساده</strong> است و می‌توانید بخوانید و
+        ویرایشش کنید.
+    </p>
+
+    <pre class="out"># 1. write the recipe (without building anything)
+pyi-makespec --onefile --windowed --icon=app.ico app.py
+
+# 2. build from the recipe -- notice: the .spec, not the .py
+pyinstaller app.spec</pre>
+
+    <pre class="code"><code>a = Analysis(
+    ['app.py'],                 # the entry point
+    pathex=[],
+    binaries=[],
+    datas=[('words.txt', '.')], # &lt;- the data files: (source, destination)
+    hiddenimports=[],           # &lt;- imports PyInstaller could not find
+    excludes=['tkinter'],       # &lt;- modules to leave out, to shrink the build
+    ...
+)
+
+exe = EXE(
+    ...
+    name='kadoos',              # the name of the result
+    console=False,              # False = --windowed
+    icon='app.ico',
+)</code></pre>
+    <p class="code-caption" data-t="ch36-169">درون فایل spec: نمونه 12_pyinstaller_spec</p>
+
+    <div class="table-scroll">
+        <table>
+            <thead>
+                <tr><th data-t="ch36-170">خط</th><th data-t="ch36-171">برای چه</th></tr>
+            </thead>
+            <tbody>
+                <tr><td><code>datas</code></td><td data-t="ch36-172">فرستادن تصویر، فایل ui، قالب پایگاه داده</td></tr>
+                <tr><td><code>hiddenimports</code></td><td data-t="ch36-173">ماژولی که فقط از راه <code>importlib</code> وارد می‌شود</td></tr>
+                <tr><td><code>excludes</code></td><td data-t="ch36-174">حذف چیزهایی که به کار نمی‌آیند، برای کوچک شدن خروجی</td></tr>
+            </tbody>
+        </table>
+    </div>
+
+    <div class="warn">
+        <span class="box-title" data-t="ch36-175">دو نکته درباره spec</span>
+        <p data-t="ch36-176">
+            وقتی از روی <code>.spec</code> می‌سازید، گزینه‌های خط فرمان مثل
+            <code>--onefile</code> <strong>نادیده گرفته می‌شوند</strong>؛
+            دستور پخت تصمیم می‌گیرد. فایل را ویرایش کنید، نه فرمان را.
+            دوم اینکه در <code>datas</code> از <strong>تاپل</strong> استفاده
+            می‌شود و آن ماجرای نقطه‌ویرگول و دونقطه فقط مال خط فرمان است.
+        </p>
+    </div>
+
+    <p data-t="ch36-177">
+        نکته آخر درباره <strong>وارد کردن‌های پنهان</strong>: PyInstaller
+        وارد کردن‌ها را با <strong>خواندن کد</strong> پیدا می‌کند. پس
+        <code>importlib.import_module(name)</code> برایش نامرئی است و برنامه
+        فقط <strong>داخل exe</strong> با <code>ModuleNotFoundError</code>
+        شکست می‌خورد. راه حل <code>--hidden-import</code> یا فهرست
+        <code>hiddenimports</code> است.
+    </p>
+
+    <div class="folder-ref">
+        <span class="box-title" data-t="ch36-178">فایل‌های تمرینی این فصل</span>
+        <p data-t="ch36-179">
+            پوشه <code>S36-pyside6-and-packaging</code> شامل دوازده پوشه است.
+            نمونه‌های ۰۹ تا ۱۲ هر کدام <code>README.md</code> جداگانه‌ای با
+            فرمان‌های دقیق دارند. پیش از شروع، محیط مجازی بسازید و
+            <code>pip install -r requirements.txt</code> بزنید. Qt Designer را
+            با <code>pyside6-designer</code> باز کنید.
+        </p>
+    </div>
+
+    <h2 data-t="ch36-180">خلاصه فصل</h2>
+
+    <div class="table-scroll">
+        <table>
+            <thead>
+                <tr><th data-t="ch36-181">ابزار</th><th data-t="ch36-182">وظیفه آن</th></tr>
+            </thead>
+            <tbody>
+                <tr><td><code>QApplication(sys.argv)</code></td><td data-t="ch36-183">یکی در هر برنامه</td></tr>
+                <tr><td><code>window.show()</code></td><td data-t="ch36-184">ویجت‌ها تا صدا نزنید پنهان‌اند</td></tr>
+                <tr><td><code>app.exec()</code></td><td data-t="ch36-185">حلقه رویداد Qt</td></tr>
+                <tr><td><code>signal.connect(slot)</code></td><td data-t="ch36-186">اتصال رویداد به تابع، بدون پرانتز</td></tr>
+                <tr><td data-t="ch36-187"><code>QVBoxLayout</code> و خانواده‌اش</td><td data-t="ch36-188">چیدمان. هرگز مختصات پیکسلی ندهید</td></tr>
+                <tr><td><code>setStyleSheet</code></td><td data-t="ch36-189">زیرمجموعه‌ای از CSS</td></tr>
+                <tr><td><code>QMessageBox.question</code></td><td data-t="ch36-190">دکمه فشرده‌شده را برمی‌گرداند</td></tr>
+                <tr><td><code>QFileDialog.getOpenFileName</code></td><td data-t="ch36-191">یک <strong>تاپل</strong> برمی‌گرداند</td></tr>
+                <tr><td><code>closeEvent</code></td><td data-t="ch36-192">گرفتن دکمه بستن پنجره</td></tr>
+                <tr><td><code>QUiLoader().load(path)</code></td><td data-t="ch36-193">بارگذاری ui در زمان اجرا</td></tr>
+                <tr><td><code>pyside6-uic</code></td><td data-t="ch36-194">کامپایل ui به کلاس پایتون</td></tr>
+                <tr><td><code>findChild(type, name)</code></td><td data-t="ch36-195">ممکن است <code>None</code> بدهد. بررسی کنید</td></tr>
+                <tr><td><code>pyinstaller --onefile</code></td><td data-t="ch36-196">ساخت یک فایل اجرایی</td></tr>
+                <tr><td><code>--windowed</code></td><td data-t="ch36-197">حذف کنسول، برای هر برنامه گرافیکی</td></tr>
+                <tr><td><code>--add-data</code></td><td data-t="ch36-198">همراه بردن فایل داده</td></tr>
+                <tr><td data-t="ch36-199"><code>sys.frozen</code> و <code>sys._MEIPASS</code></td><td data-t="ch36-200">تشخیص و مکان‌یابی در برنامه منجمد</td></tr>
+                <tr><td data-t="ch36-201"><code>resource_path</code> و <code>data_path</code></td><td data-t="ch36-202">یکی برای خواندن، یکی برای نوشتن</td></tr>
+            </tbody>
+        </table>
+    </div>
+
+    <div class="exercise">
+        <h3 data-t="ch36-203">تمرین‌های فصل سی و شش</h3>
+        <ol>
+            <li data-t="ch36-204">مبدل دمای فصل سی و چهارم را با PySide6 بازنویسی کنید.</li>
+            <li data-t="ch36-205">یک <code>QSlider</code> به نمونه دوم اضافه کنید و <code>valueChanged</code> آن را هم به یک برچسب و هم به رنگ پس‌زمینه پنجره وصل کنید: یک سیگنال، دو اسلات.</li>
+            <li data-t="ch36-206">به فرم ثبت‌نام، دو دکمه رادیویی داخل یک <code>QButtonGroup</code> اضافه کنید و انتخاب را در نتیجه بیاورید.</li>
+            <li data-t="ch36-207">فرم رمز عبور بسازید: دو <code>QLineEdit</code> با حالت رمز، و برچسبی که زنده بگوید آیا دو رمز یکی هستند.</li>
+            <li data-t="ch36-208">با <code>QMainWindow</code> و <code>QAction</code> به یکی از نمونه‌ها نوار منو اضافه کنید.</li>
+            <li data-t="ch36-209">پنجره ورود را در Designer بکشید و با <code>QUiLoader</code> به وظیفه آن بیندازید.</li>
+            <li data-t="ch36-210">همان فایل ui را با <code>pyside6-uic</code> کامپایل کنید و به روش دوم راهش بیندازید. کدام را ترجیح دادید و چرا؟</li>
+            <li data-t="ch36-211">به ماشین‌حساب، دکمه درصد و دکمه جذر اضافه کنید، بدون نوشتن متد تازه برای هر کدام.</li>
+            <li data-t="ch36-212">ماشین‌حساب را به یک فایل اجرایی با آیکون و بدون کنسول تبدیل کنید. مواظب باشید فایل ui هم باید همراهش برود.</li>
+            <li data-t="ch36-213">برنامه مدیریت کتابخانه فصل سی و پنجم را به exe تبدیل کنید و مطمئن شوید <code>library.db</code> کنار فایل اجرایی نوشته می‌شود و داده‌ها بعد از بستن برنامه باقی می‌مانند.</li>
+            <li data-t="ch36-214">عمداً یک ساخت را خراب کنید: <code>--add-data</code> را بردارید، exe را اجرا کنید و پیام را بخوانید. بعد یک فایل گزارش اضافه کنید که همین خرابی را حتی در حالت پنجره‌ای ثبت کند.</li>
+            <li data-t="ch36-215">حجم و زمان راه‌اندازی <code>--onefile</code> و <code>--onedir</code> را برای یک برنامه مقایسه کنید.</li>
+            <li data-t="ch36-216">چرا PyInstaller نمی‌تواند روی لینوکس، فایل اجرایی ویندوز بسازد؟</li>
+            <li data-t="ch36-217">چرا برنامه‌ای که پایگاه داده‌اش را کنار <code>__file__</code> می‌نویسد در حالت توسعه درست است و بعد از منجمد شدن غلط؟</li>
+        </ol>
+    </div>
+
+    <div class="pager">
+        <a href="chapter-35.html">فصل قبل: tkinter پیشرفته</a>
+        <a href="chapter-37.html">فصل بعد: همروندی، نخ‌ها و asyncio</a>
+    </div>
+
+</main>
+
+</body>
+</html>

@@ -1,0 +1,537 @@
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="فصل هجده: باز کردن و خواندن و نوشتن فایل، دستور with، حالت‌های r و w و a و x، انکدینگ، ماژول os و pathlib">
+    <title>فصل ۱۸: فایل‌ها و سیستم‌عامل</title>
+    <link rel="icon" href="logokm.png" type="image/png">
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<header class="book-bar">
+    <a class="name" href="index.html">برنامه‌نویسی پایتون</a>
+    <a href="index.html">فهرست مطالب</a>
+</header>
+
+<main class="paper">
+
+    <div class="chapter-head">
+        <span class="chapter-num">فصل ۱۸</span>
+        <h1 data-t="ch18-001">فایل‌ها و سیستم‌عامل</h1>
+        <p class="lead" data-t="ch18-002">
+            تا اینجا هر برنامه‌ای که نوشتیم، با بسته شدن همه چیزش را فراموش
+            می‌کرد. با فایل، داده‌های برنامه <strong>ماندگار</strong> می‌شوند.
+            این اولین قدم به سمت برنامه‌های واقعی است.
+        </p>
+    </div>
+
+    <div class="mini-toc">
+        <span class="box-title" data-t="ch18-003">در این فصل می‌خوانید</span>
+        <ol>
+            <li data-t="ch18-004"><a href="#s1">باز کردن و بستن فایل</a></li>
+            <li data-t="ch18-005"><a href="#s2">دستور with</a></li>
+            <li data-t="ch18-006"><a href="#s3">روش‌های خواندن</a></li>
+            <li data-t="ch18-007"><a href="#s4">پیمایش خط به خط</a></li>
+            <li data-t="ch18-008"><a href="#s5">مشکل کاراکتر خط جدید</a></li>
+            <li data-t="ch18-009"><a href="#s6">نوشتن در فایل</a></li>
+            <li data-t="ch18-010"><a href="#s7">افزودن به انتهای فایل</a></li>
+            <li data-t="ch18-011"><a href="#s8">حالت ساخت امن</a></li>
+            <li data-t="ch18-012"><a href="#s9">انکدینگ و متن فارسی</a></li>
+            <li data-t="ch18-013"><a href="#s10">ماژول os</a></li>
+            <li data-t="ch18-014"><a href="#s11">ماژول pathlib</a></li>
+            <li data-t="ch18-015"><a href="#s12">برنامه دفترچه یادداشت</a></li>
+        </ol>
+    </div>
+
+    <h2 id="s1" data-t="ch18-016">۱. باز کردن و بستن فایل</h2>
+
+    <pre class="code"><code># open() gives us a "file object". The default mode is 'r' (read).
+# The path is relative to the folder the program is started from.
+f = open('a.txt', encoding='utf-8')
+# An absolute path works too:
+# f = open('D:\\myprojects\\a.txt', encoding='utf-8')
+
+content = f.read()      # read() returns the WHOLE file as one string
+print(content)
+
+f.close()               # the file must be closed - if we forget, data can be lost</code></pre>
+    <p class="code-caption" data-t="ch18-017">شکل ابتدایی: نمونه 01_read_whole_file.py</p>
+
+    <h3 data-t="ch18-018">شرح مثال</h3>
+
+    <ul>
+        <li data-t="ch18-019"><code>open</code> یک <strong>شیء فایل</strong> می‌دهد که با آن می‌شود خواند یا نوشت.</li>
+        <li data-t="ch18-020">مسیر نسبی، نسبت به پوشه‌ای است که برنامه از آن <strong>اجرا</strong> شده، نه پوشه‌ای که فایل برنامه در آن است. این تفاوت باعث سردرگمی زیادی می‌شود.</li>
+        <li data-t="ch18-021">در مسیر ویندوز باید بک‌اسلش‌ها را دوتایی بنویسید یا از رشته خام <code>r'...'</code> استفاده کنید. به خاطر دارید از فصل سوم.</li>
+        <li data-t="ch18-022">بستن فایل <strong>اجباری</strong> است. اگر ننویسید، ممکن است داده‌ای که نوشته‌اید روی دیسک ذخیره نشود.</li>
+    </ul>
+
+    <h2 id="s2" data-t="ch18-023">۲. دستور with</h2>
+
+    <p data-t="ch18-024">
+        فراموش کردن <code>close</code> آن‌قدر رایج است که پایتون راه بهتری دارد.
+        از این به بعد <strong>همیشه</strong> از این شکل استفاده کنید.
+    </p>
+
+    <pre class="code"><code># 'with' closes the file automatically, even if an error happens inside.
+# This is the only form you should use.
+with open('a.txt', encoding='utf-8') as f:
+    content = f.read()
+    print(content)
+
+# Here the file is already closed.
+print('closed?', f.closed)</code></pre>
+    <p class="code-caption" data-t="ch18-025">دستور with: نمونه 02_with_statement.py</p>
+
+    <div class="tip">
+        <span class="box-title" data-t="ch18-026">چرا with بهتر است</span>
+        <p data-t="ch18-027">
+            فایل به طور خودکار بسته می‌شود، حتی اگر وسط بلوک خطایی رخ دهد یا
+            <code>return</code> اجرا شود. با <code>close</code> دستی، یک خطا
+            کافی است تا فایل باز بماند. در فصل بیست و چهارم می‌بینید که
+            <code>with</code> فقط برای فایل نیست و می‌شود برای هر چیزی که «باز
+            و بسته» می‌شود ساختش، مثل اتصال به پایگاه داده.
+        </p>
+    </div>
+
+    <h2 id="s3" data-t="ch18-028">۳. روش‌های خواندن</h2>
+
+    <pre class="code"><code># read(n) reads at most n characters instead of the whole file.
+with open('a.txt', encoding='utf-8') as f:
+    print(f.read(5))     # 'Hello'
+    print(f.read(3))     # the reading continues where it stopped</code></pre>
+    <p class="code-caption" data-t="ch18-029">خواندن چند کاراکتر: نمونه 03_read_n_chars.py</p>
+
+    <pre class="code"><code># readline() reads ONE line, including the '\n' at its end.
+with open('a.txt', encoding='utf-8') as f:
+    print(f.readline())
+    print(f.readline())
+
+# That is why the output looks double spaced: the line already ends with '\n'
+# and print() adds another one. end='' fixes it.
+print('--- without the extra blank line ---')
+with open('a.txt', encoding='utf-8') as f:
+    print(f.readline(), end='')
+    print(f.readline(), end='')</code></pre>
+    <p class="code-caption" data-t="ch18-030">خواندن خط به خط: نمونه 04_readline.py</p>
+
+    <div class="table-scroll">
+        <table>
+            <thead>
+                <tr><th data-t="ch18-031">روش</th><th data-t="ch18-032">برمی‌گرداند</th><th data-t="ch18-033">مناسب</th></tr>
+            </thead>
+            <tbody>
+                <tr><td><code>read()</code></td><td data-t="ch18-034">کل فایل، یک رشته</td><td data-t="ch18-035">فایل کوچک</td></tr>
+                <tr><td><code>read(n)</code></td><td data-t="ch18-036">حداکثر n کاراکتر</td><td data-t="ch18-037">خواندن تکه‌تکه</td></tr>
+                <tr><td><code>readline()</code></td><td data-t="ch18-038">یک خط، همراه <code>\n</code></td><td data-t="ch18-039">وقتی ساختار فایل مشخص است</td></tr>
+                <tr><td><code>readlines()</code></td><td data-t="ch18-040">لیستی از همه خط‌ها</td><td data-t="ch18-041">فایل کوچک</td></tr>
+                <tr><td><code>for line in f</code></td><td data-t="ch18-042">خط به خط</td><td data-t="ch18-043"><strong>بهترین روش</strong>، هر اندازه فایل</td></tr>
+            </tbody>
+        </table>
+    </div>
+
+    <p data-t="ch18-044">
+        نکته مهم: فایل یک <strong>مکان‌نما</strong> دارد. هر بار که می‌خوانید،
+        مکان‌نما جلو می‌رود. برای همین <code>f.read(3)</code> دوم، از جایی که
+        اولی رها کرده ادامه می‌دهد.
+    </p>
+
+    <h2 id="s4" data-t="ch18-045">۴. پیمایش خط به خط</h2>
+
+    <pre class="code"><code># Looping directly over the file gives its lines one by one.
+# This is the best way: it never loads the whole file into memory.
+with open('numbers.txt', encoding='utf-8') as file:
+    for line in file:
+        print(line, end='')
+
+print()
+
+# readlines() puts every line into a list (only for small files).
+with open('numbers.txt', encoding='utf-8') as file:
+    lines = file.readlines()
+
+print(lines)
+print('number of lines:', len(lines))</code></pre>
+    <p class="code-caption" data-t="ch18-046">پیمایش فایل: نمونه 05_loop_over_lines.py</p>
+
+    <p data-t="ch18-047">
+        پیمایش مستقیم بهترین روش است، چون کل فایل را در حافظه نمی‌ریزد. برای
+        فایلی با یک گیگابایت حجم، <code>read()</code> برنامه را از کار
+        می‌اندازد ولی حلقه بی‌مشکل کار می‌کند.
+    </p>
+
+    <h2 id="s5" data-t="ch18-048">۵. مشکل کاراکتر خط جدید</h2>
+
+    <pre class="code"><code># Every line read from a file ends with '\n'. strip() removes it
+# (together with the spaces at both ends).
+with open('numbers.txt', encoding='utf-8') as file:
+    for line in file:
+        clean = line.strip()
+        if clean == '':          # skip the empty lines
+            continue
+        number = int(clean)
+        print(number, number * 2)</code></pre>
+    <p class="code-caption" data-t="ch18-049">پاک کردن خط جدید: نمونه 06_strip_lines.py</p>
+
+    <div class="warn">
+        <span class="box-title" data-t="ch18-050">مهم‌ترین دام کار با فایل</span>
+        <p data-t="ch18-051">
+            هر خطی که از فایل می‌خوانید، کاراکتر <code>\n</code> در انتهایش
+            دارد. پس <code>'ali\n'</code> با <code>'ali'</code>
+            <strong>برابر نیست</strong> و مقایسه‌تان همیشه نادرست می‌شود. راه
+            حل، همیشه <code>strip()</code> است. این دقیقاً یکی از باگ‌هایی بود
+            که در فایل‌های اصلی این دوره وجود داشت.
+        </p>
+    </div>
+
+    <p data-t="ch18-052">رد کردن خط‌های خالی هم لازم است: بیشتر فایل‌های متنی با یک خط خالی تمام می‌شوند و <code>int('')</code> خطا ایجاد می‌کند.</p>
+
+    <h2 id="s6" data-t="ch18-053">۶. نوشتن در فایل</h2>
+
+    <pre class="code"><code># Mode 'w' creates the file, and ERASES it completely when it already exists.
+with open('h.txt', 'w', encoding='utf-8') as f:
+    f.write('It deletes the existing file!\n')
+    f.write('Second line.\n')          # write() does NOT add '\n' by itself
+
+# writelines() writes a list of strings (still without adding '\n').
+lines = ['Ali\n', 'Sara\n', 'Reza\n']
+with open('names.txt', 'w', encoding='utf-8') as f:
+    f.writelines(lines)</code></pre>
+    <p class="code-caption" data-t="ch18-054">نوشتن: نمونه 07_write_file.py</p>
+
+    <div class="warn">
+        <span class="box-title" data-t="ch18-055">حالت w بی‌رحم است</span>
+        <p data-t="ch18-056">
+            باز کردن فایل با حالت <code>'w'</code> محتوای قبلی‌اش را
+            <strong>کاملاً پاک می‌کند</strong>، بدون هیچ سؤال و هشداری. اگر
+            اشتباهی نام فایل مهمی را بنویسید، از دستش داده‌اید. پیش از هر
+            <code>open(..., 'w')</code> یک بار نام فایل را دوباره بخوانید.
+        </p>
+    </div>
+
+    <p data-t="ch18-057">
+        دو نکته دیگر: <code>write</code> برخلاف <code>print</code> خودش خط جدید
+        اضافه نمی‌کند، پس اگر <code>\n</code> ننویسید همه چیز پشت سر هم روی یک
+        خط می‌چسبد. و <code>writelines</code> هم با وجود نامش، بین خط‌ها چیزی
+        اضافه نمی‌کند.
+    </p>
+
+    <h2 id="s7" data-t="ch18-058">۷. افزودن به انتهای فایل</h2>
+
+    <pre class="code"><code># Mode 'a' adds to the END of the file and never erases anything.
+# Run this program several times and watch the file grow.
+with open('g.txt', 'a', encoding='utf-8') as f:
+    f.write('This is a text file!\n')
+
+with open('g.txt', encoding='utf-8') as f:
+    print(f.read())</code></pre>
+    <p class="code-caption" data-t="ch18-059">افزودن: نمونه 08_append_file.py</p>
+
+    <div class="table-scroll">
+        <table>
+            <thead>
+                <tr><th data-t="ch18-060">حالت</th><th data-t="ch18-061">اگر فایل نباشد</th><th data-t="ch18-062">اگر باشد</th><th data-t="ch18-063">کاربرد</th></tr>
+            </thead>
+            <tbody>
+                <tr><td><code>'r'</code></td><td data-t="ch18-064">خطا</td><td data-t="ch18-065">می‌خواند</td><td data-t="ch18-066">خواندن. پیش‌فرض</td></tr>
+                <tr><td><code>'w'</code></td><td data-t="ch18-067">می‌سازد</td><td data-t="ch18-068"><strong>پاک می‌کند</strong></td><td data-t="ch18-069">نوشتن از نو</td></tr>
+                <tr><td><code>'a'</code></td><td data-t="ch18-070">می‌سازد</td><td data-t="ch18-071">به آخرش اضافه می‌کند</td><td data-t="ch18-072">گزارش و لاگ</td></tr>
+                <tr><td><code>'x'</code></td><td data-t="ch18-073">می‌سازد</td><td data-t="ch18-074">خطا</td><td data-t="ch18-075">ساخت امن</td></tr>
+            </tbody>
+        </table>
+    </div>
+
+    <h2 id="s8" data-t="ch18-076">۸. حالت ساخت امن</h2>
+
+    <pre class="code"><code># Mode 'x' creates the file, but raises FileExistsError when it already exists.
+# It is the safe way of saying "I do not want to overwrite anything".
+try:
+    with open('i.txt', 'x', encoding='utf-8') as f:
+        f.write('Created for the first time.\n')
+    print('The file was created.')
+except FileExistsError:
+    print('The file already exists - nothing was touched.')</code></pre>
+    <p class="code-caption" data-t="ch18-077">حالت x: نمونه 09_create_only.py</p>
+
+    <p data-t="ch18-078">
+        حالت <code>'x'</code> راه صریح گفتن «نمی‌خواهم چیزی را خراب کنم» است.
+        ساختار <code>try</code> اینجا آمده تا خطا برنامه را از کار نیندازد؛
+        فصل بعد کاملاً درباره همین است.
+    </p>
+
+    <h2 id="s9" data-t="ch18-079">۹. انکدینگ و متن فارسی</h2>
+
+    <pre class="code"><code># Text files store bytes; the ENCODING says how those bytes become characters.
+# Without encoding='utf-8', Persian text can be unreadable on Windows.
+persian = 'سلام، به موسسه کادوس خوش آمدید'
+
+with open('persian.txt', 'w', encoding='utf-8') as f:
+    f.write(persian + '\n')
+
+with open('persian.txt', encoding='utf-8') as f:
+    print(f.read())
+
+# Always pass encoding='utf-8' when you open a text file, for reading
+# and for writing.</code></pre>
+    <p class="code-caption" data-t="ch18-080">انکدینگ: نمونه 10_encoding.py</p>
+
+    <div class="warn">
+        <span class="box-title" data-t="ch18-081">قانونی که هرگز نباید بشکنید</span>
+        <p data-t="ch18-082">
+            <strong>همیشه</strong> <code>encoding='utf-8'</code> بنویسید. اگر
+            ننویسید، پایتون از انکدینگ پیش‌فرض سیستم استفاده می‌کند که در
+            ویندوز فارسی معمولاً UTF-8 نیست. نتیجه، متن به‌هم‌ریخته یا خطای
+            <code>UnicodeDecodeError</code> است. بدتر اینکه برنامه روی
+            کامپیوتر شما کار می‌کند و روی کامپیوتر دیگری خراب می‌شود. در همه
+            کدهای اصلاح‌شده این دوره، این پارامتر اضافه شده است.
+        </p>
+    </div>
+
+    <h2 id="s10" data-t="ch18-083">۱۰. ماژول os</h2>
+
+    <pre class="code"><code>import os
+
+# Does a file exist?
+print(os.path.exists('a.txt'))
+
+# Delete a file - but only after checking, otherwise FileNotFoundError.
+if os.path.exists('to_delete.txt'):
+    os.remove('to_delete.txt')
+else:
+    print('to_delete.txt does not exist')
+
+# Where am I?
+print('current folder:', os.getcwd())
+
+# What is in this folder?
+print(os.listdir('.'))
+
+# Building a path that works on Windows, Linux and macOS.
+path = os.path.join('data', 'students', 'list.txt')
+print(path)
+
+# Splitting a path.
+print(os.path.basename(path))     # list.txt
+print(os.path.dirname(path))      # data/students
+print(os.path.splitext('app.py')) # ('app', '.py')
+
+# Creating and removing folders.
+os.makedirs('demo_folder', exist_ok=True)   # exist_ok avoids an error
+print(os.path.isdir('demo_folder'))
+os.rmdir('demo_folder')                     # only works on an EMPTY folder
+
+# Size of a file, in bytes.
+print(os.path.getsize('a.txt'))</code></pre>
+    <p class="code-caption" data-t="ch18-084">ماژول os: نمونه 11_os_module.py</p>
+
+    <h3 data-t="ch18-085">شرح مثال</h3>
+
+    <ul>
+        <li data-t="ch18-086"><code>os.path.exists</code> مهم‌ترینشان است. پیش از باز کردن هر فایلی که مطمئن نیستید هست، بررسی‌اش کنید.</li>
+        <li data-t="ch18-087"><code>os.path.join</code> مسیر می‌سازد و خودش می‌داند در ویندوز باید بک‌اسلش بگذارد و در لینوکس اسلش. هرگز مسیر را با <code>+</code> نچسبانید.</li>
+        <li data-t="ch18-088"><code>makedirs(..., exist_ok=True)</code> پوشه را می‌سازد و اگر از قبل باشد ساکت می‌ماند. بدون آن پارامتر، خطا می‌گیرید.</li>
+        <li data-t="ch18-089"><code>rmdir</code> فقط پوشه خالی را پاک می‌کند. برای پوشه پر باید از <code>shutil.rmtree</code> استفاده کنید، که خطرناک است و باید با احتیاط به کار برود.</li>
+    </ul>
+
+    <h2 id="s11" data-t="ch18-090">۱۱. ماژول pathlib</h2>
+
+    <p data-t="ch18-091">
+        <code>pathlib</code> جانشین مدرن بیشتر کارهای <code>os.path</code> است.
+        به جای رشته، با یک <strong>شیء مسیر</strong> کار می‌کنید که خودش همه
+        کارها را بلد است.
+    </p>
+
+    <pre class="code"><code># pathlib is the modern replacement for most of os.path.
+# A Path object knows how to do almost everything by itself.
+from pathlib import Path
+
+path = Path('a.txt')
+
+print(path.exists())
+print(path.name)          # a.txt
+print(path.stem)          # a
+print(path.suffix)        # .txt
+print(path.resolve())     # the absolute path
+
+# Reading and writing in one line.
+content = path.read_text(encoding='utf-8')
+print(content)
+
+Path('hello.txt').write_text('Written with pathlib\n', encoding='utf-8')
+
+# '/' builds a path - much nicer than os.path.join.
+data_folder = Path('demo_data')
+data_folder.mkdir(exist_ok=True)
+(data_folder / 'note.txt').write_text('a note\n', encoding='utf-8')
+
+# Listing the .txt files of the current folder.
+for txt_file in Path('.').glob('*.txt'):
+    print(txt_file.name, txt_file.stat().st_size, 'bytes')</code></pre>
+    <p class="code-caption" data-t="ch18-092">ماژول pathlib: نمونه 12_pathlib.py</p>
+
+    <div class="table-scroll">
+        <table>
+            <thead>
+                <tr><th data-t="ch18-093">با os</th><th data-t="ch18-094">با pathlib</th></tr>
+            </thead>
+            <tbody>
+                <tr><td><code>os.path.exists(p)</code></td><td><code>Path(p).exists()</code></td></tr>
+                <tr><td><code>os.path.join(a, b)</code></td><td><code>Path(a) / b</code></td></tr>
+                <tr><td><code>os.path.basename(p)</code></td><td><code>Path(p).name</code></td></tr>
+                <tr><td><code>os.makedirs(p, exist_ok=True)</code></td><td><code>Path(p).mkdir(exist_ok=True)</code></td></tr>
+                <tr><td data-t="ch18-095">باز کردن و خواندن با <code>with</code></td><td><code>Path(p).read_text(encoding='utf-8')</code></td></tr>
+            </tbody>
+        </table>
+    </div>
+
+    <p data-t="ch18-096">
+        استفاده از عملگر تقسیم برای ساختن مسیر در نگاه اول عجیب است ولی خیلی
+        زود به آن عادت می‌کنید. تابع <code>glob('*.txt')</code> هم همه فایل‌های
+        با آن الگو را پیدا می‌کند.
+    </p>
+
+    <h2 id="s12" data-t="ch18-097">۱۲. برنامه دفترچه یادداشت</h2>
+
+    <p data-t="ch18-098">
+        برنامه کاملی که همه چیز این فصل و فصل‌های قبل را کنار هم می‌گذارد: منو،
+        حلقه، تابع، لیست و فایل.
+    </p>
+
+    <pre class="code"><code>'''A complete little program: a note book stored in a text file.'''
+
+import os
+
+NOTES_FILE = 'notes.txt'
+
+
+def load_notes() -&gt; list[str]:
+    'Return the notes stored in the file (an empty list when there is none).'
+    if not os.path.exists(NOTES_FILE):
+        return []
+
+    with open(NOTES_FILE, encoding='utf-8') as f:
+        return [line.strip() for line in f if line.strip() != '']
+
+
+def save_notes(notes: list[str]) -&gt; None:
+    'Write the whole list back to the file.'
+    with open(NOTES_FILE, 'w', encoding='utf-8') as f:
+        for note in notes:
+            f.write(note + '\n')
+
+
+def show_notes(notes: list[str]) -&gt; None:
+    'Print the notes with their number.'
+    if len(notes) == 0:
+        print('(no note yet)')
+        return
+    for index, note in enumerate(notes, start=1):
+        print(f'{index}. {note}')
+
+
+def main() -&gt; None:
+    notes = load_notes()
+
+    while True:
+        print('\n1) Show the notes')
+        print('2) Add a note')
+        print('3) Delete a note')
+        print('0) Exit')
+
+        choice = input('Your choice: ')
+
+        if choice == '1':
+            show_notes(notes)
+        elif choice == '2':
+            text = input('The note: ')
+            if text.strip() != '':
+                notes.append(text.strip())
+                save_notes(notes)
+                print('Saved.')
+        elif choice == '3':
+            show_notes(notes)
+            number = input('Number of the note to delete: ')
+            if number.isdigit() and 1 &lt;= int(number) &lt;= len(notes):
+                removed = notes.pop(int(number) - 1)
+                save_notes(notes)
+                print('Deleted:', removed)
+            else:
+                print('Wrong number.')
+        elif choice == '0':
+            print('Goodbye!')
+            break
+        else:
+            print('Unknown option.')
+
+
+if __name__ == '__main__':
+    main()</code></pre>
+    <p class="code-caption" data-t="ch18-099">دفترچه یادداشت: نمونه 17_notes_app.py</p>
+
+    <h3 data-t="ch18-100">شرح مثال</h3>
+
+    <ul>
+        <li data-t="ch18-101">ساختار برنامه سه لایه است: <strong>بارگذاری</strong> از فایل، کار روی <strong>لیست در حافظه</strong>، و <strong>ذخیره</strong> دوباره. این الگو در برنامه‌های بزرگ هم همین است.</li>
+        <li data-t="ch18-102">بعد از هر تغییر بلافاصله ذخیره می‌شود، پس اگر برنامه ناگهان بسته شود چیزی از دست نمی‌رود.</li>
+        <li data-t="ch18-103">اعتبارسنجی شماره یادداشت با <code>isdigit()</code> و بررسی بازه انجام شده است. بدون آن، تایپ یک حرف برنامه را خراب می‌کرد.</li>
+        <li data-t="ch18-104">تابع <code>enumerate(notes, start=1)</code> هم شماره و هم مقدار را می‌دهد و شمارش را از یک شروع می‌کند، چون کاربر از یک می‌شمارد. در فصل بیست و پنجم کاملش را می‌بینید.</li>
+        <li data-t="ch18-105">آن خط داخل <code>load_notes</code> یک <strong>درک لیستی</strong> است که هم <code>strip</code> می‌کند و هم خط‌های خالی را می‌اندازد. باز هم فصل بیست و پنجم.</li>
+    </ul>
+
+    <div class="folder-ref">
+        <span class="box-title" data-t="ch18-106">فایل‌های تمرینی این فصل</span>
+        <p data-t="ch18-107">
+            پوشه <code>S18-files-and-os</code> شامل نمونه‌های
+            <code>01_read_whole_file.py</code> تا <code>17_notes_app.py</code>،
+            به‌علاوه فایل‌های داده <code>a.txt</code> و
+            <code>numbers.txt</code> و <code>friends.txt</code>.
+        </p>
+    </div>
+
+    <h2 data-t="ch18-108">خلاصه فصل</h2>
+
+    <div class="table-scroll">
+        <table>
+            <thead>
+                <tr><th data-t="ch18-109">ابزار</th><th data-t="ch18-110">وظیفه آن</th></tr>
+            </thead>
+            <tbody>
+                <tr><td><code>with open(...) as f:</code></td><td data-t="ch18-111">تنها شکل درست باز کردن فایل</td></tr>
+                <tr><td><code>'r' 'w' 'a' 'x'</code></td><td data-t="ch18-112">خواندن، نوشتن از نو، افزودن، ساخت امن</td></tr>
+                <tr><td><code>encoding='utf-8'</code></td><td data-t="ch18-113">همیشه بنویسیدش، مخصوصاً برای فارسی</td></tr>
+                <tr><td><code>for line in f</code></td><td data-t="ch18-114">بهترین راه خواندن، بدون پر کردن حافظه</td></tr>
+                <tr><td><code>line.strip()</code></td><td data-t="ch18-115">پاک کردن <code>\n</code> انتهای هر خط</td></tr>
+                <tr><td><code>f.write(text + '\n')</code></td><td data-t="ch18-116">نوشتن. خودش خط جدید اضافه نمی‌کند</td></tr>
+                <tr><td><code>os.path.exists</code></td><td data-t="ch18-117">بررسی وجود پیش از باز کردن</td></tr>
+                <tr><td><code>os.path.join</code></td><td data-t="ch18-118">ساختن مسیر مستقل از سیستم‌عامل</td></tr>
+                <tr><td><code>Path(p) / 'x'</code></td><td data-t="ch18-119">همان کار، به شکل مدرن</td></tr>
+                <tr><td><code>Path(p).read_text()</code></td><td data-t="ch18-120">خواندن کل فایل در یک خط</td></tr>
+            </tbody>
+        </table>
+    </div>
+
+    <div class="exercise">
+        <h3 data-t="ch18-121">تمرین‌های فصل هجده</h3>
+        <ol>
+            <li data-t="ch18-122">برنامه‌ای بنویسید که محتوای یک فایل را در فایل دیگری کپی کند.</li>
+            <li data-t="ch18-123">بشمارید یک فایل متنی چند خط، چند کلمه و چند کاراکتر دارد.</li>
+            <li data-t="ch18-124"><code>numbers.txt</code> را بخوانید و فایل تازه‌ای بسازید که فقط اعداد مثبتش را دارد.</li>
+            <li data-t="ch18-125">برنامه‌ای بنویسید که هر بار اجرا شود، یک خط با تاریخ و ساعت به فایل گزارش اضافه کند.</li>
+            <li data-t="ch18-126">فهرستی از نام‌ها را از فایل بخوانید و الفبایی مرتب چاپشان کنید.</li>
+            <li data-t="ch18-127">برنامه‌ای بنویسید که نام یک پوشه را بگیرد و همه فایل‌های <code>py.</code> داخلش را چاپ کند.</li>
+            <li data-t="ch18-128">یک مدیر رمز ساده بنویسید که رمزها را به شکل <code>site:password</code> در هر خط فایل نگه دارد.</li>
+            <li data-t="ch18-129">برنامه دفترچه یادداشت را طوری کامل کنید که بتواند داخل یادداشت‌ها جست‌وجو هم بکند.</li>
+        </ol>
+    </div>
+
+    <div class="pager">
+        <a href="chapter-17.html">فصل قبل: ماژول‌ها و بسته‌ها</a>
+        <a href="chapter-19.html">فصل بعد: خطاها و استثناها</a>
+    </div>
+
+</main>
+
+</body>
+</html>

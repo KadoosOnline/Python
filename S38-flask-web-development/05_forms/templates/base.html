@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>{% block title %}Registration{% endblock %}</title>
+    <style>
+        body { font-family: Tahoma, Arial, sans-serif; max-width: 640px;
+               margin: 30px auto; line-height: 1.7; color: #222; }
+        label { display: block; margin-top: 12px; font-weight: bold; }
+        input, select { padding: 6px; width: 100%; }
+        button { margin-top: 16px; padding: 8px 20px; }
+        .flash { padding: 10px; border-radius: 6px; margin: 8px 0; }
+        .flash.error { background: #ffe3e3; border: 1px solid #ffa8a8; }
+        .flash.success { background: #e3ffe8; border: 1px solid #8ce49b; }
+        table { border-collapse: collapse; width: 100%; margin-top: 12px; }
+        th, td { border: 1px solid #ddd; padding: 8px; text-align: left; }
+    </style>
+</head>
+<body>
+    {# get_flashed_messages() empties the list as it reads it, so a message
+       is shown exactly once. `with_categories` gives us ('error', text). #}
+    {% with messages = get_flashed_messages(with_categories=true) %}
+        {% for category, text in messages %}
+            <div class="flash {{ category }}">{{ text }}</div>
+        {% endfor %}
+    {% endwith %}
+
+    {% block content %}{% endblock %}
+</body>
+</html>

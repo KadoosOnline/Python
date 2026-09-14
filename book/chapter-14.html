@@ -1,0 +1,565 @@
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="فصل چهارده: دیکشنری، تاپل و مجموعه در پایتون، متدهایشان و اینکه هر کدام کجا به کار می‌آیند">
+    <title>فصل ۱۴: دیکشنری، تاپل و مجموعه</title>
+    <link rel="icon" href="logokm.png" type="image/png">
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<header class="book-bar">
+    <a class="name" href="index.html">برنامه‌نویسی پایتون</a>
+    <a href="index.html">فهرست مطالب</a>
+</header>
+
+<main class="paper">
+
+    <div class="chapter-head">
+        <span class="chapter-num">فصل ۱۴</span>
+        <h1 data-t="ch14-001">دیکشنری، تاپل و مجموعه</h1>
+        <p class="lead" data-t="ch14-002">
+            لیست تنها ظرف پایتون نیست. سه ظرف دیگر هم هست که هر کدام برای کار
+            خاصی ساخته شده‌اند. انتخاب ظرف درست، نصف حل مسئله است.
+        </p>
+    </div>
+
+    <div class="mini-toc">
+        <span class="box-title" data-t="ch14-003">در این فصل می‌خوانید</span>
+        <ol>
+            <li data-t="ch14-004"><a href="#s1">دیکشنری چیست</a></li>
+            <li data-t="ch14-005"><a href="#s2">تغییر دادن دیکشنری</a></li>
+            <li data-t="ch14-006"><a href="#s3">متد get و خطای کلید</a></li>
+            <li data-t="ch14-007"><a href="#s4">پیمایش دیکشنری</a></li>
+            <li data-t="ch14-008"><a href="#s5">ساختن دیکشنری از متغیرها</a></li>
+            <li data-t="ch14-009"><a href="#s6">شمارش با دیکشنری</a></li>
+            <li data-t="ch14-010"><a href="#s7">تاپل</a></li>
+            <li data-t="ch14-011"><a href="#s8">باز کردن تاپل</a></li>
+            <li data-t="ch14-012"><a href="#s9">مجموعه</a></li>
+            <li data-t="ch14-013"><a href="#s10">عملیات مجموعه‌ای</a></li>
+            <li data-t="ch14-014"><a href="#s11">کدام ظرف را انتخاب کنیم</a></li>
+        </ol>
+    </div>
+
+    <h2 id="s1" data-t="ch14-015">۱. دیکشنری چیست</h2>
+
+    <p data-t="ch14-016">
+        در لیست، هر عضو با <strong>شماره</strong> پیدا می‌شود. در دیکشنری، هر
+        مقدار با یک <strong>کلید</strong> پیدا می‌شود. درست مثل فرهنگ لغت که
+        معنی را با کلمه پیدا می‌کنید، نه با شماره صفحه.
+    </p>
+
+    <pre class="code"><code># A dictionary stores pairs of "key: value".
+# The key is how we find the value again - there are no positions here.
+def main() -&gt; None:
+    student = {
+        'name': 'alireza',
+        'age': 20,
+        'email': 'alireza@kadoosedu.ir',
+    }
+
+    print(student)
+    print(student['age'])       # reading by key
+    print(student['email'])
+    print(student['name'])
+
+    print(len(student))         # number of pairs -&gt; 3
+    print('age' in student)     # 'in' looks at the KEYS -&gt; True
+
+if __name__ == '__main__':
+    main()</code></pre>
+    <p class="code-caption" data-t="ch14-017">مبانی دیکشنری: نمونه 01_dict_basics.py</p>
+
+    <pre class="out">{'name': 'alireza', 'age': 20, 'email': 'alireza@kadoosedu.ir'}
+20
+alireza@kadoosedu.ir
+alireza
+3
+True</pre>
+
+    <h3 data-t="ch14-018">شرح مثال</h3>
+
+    <ul>
+        <li data-t="ch14-019">دیکشنری با آکولاد نوشته می‌شود و هر جفت به شکل <code>کلید: مقدار</code> است.</li>
+        <li data-t="ch14-020">خواندن با کروشه انجام می‌شود، ولی داخل کروشه به جای شماره، کلید می‌گذارید.</li>
+        <li data-t="ch14-021">کلیدها معمولاً رشته‌اند ولی می‌توانند عدد یا تاپل هم باشند. کلید باید <strong>تغییرناپذیر</strong> باشد، پس لیست نمی‌تواند کلید باشد.</li>
+        <li data-t="ch14-022">عملگر <code>in</code> روی دیکشنری، <strong>کلیدها</strong> را بررسی می‌کند، نه مقدارها.</li>
+        <li data-t="ch14-023">مقایسه با لیست: اگر بخواهید سن دانشجو را در لیست نگه دارید، باید به خاطر داشته باشید که سن عضو شماره یک است. با دیکشنری فقط می‌نویسید <code>student['age']</code> و شش ماه بعد هم می‌فهمید.</li>
+    </ul>
+
+    <h2 id="s2" data-t="ch14-024">۲. تغییر دادن دیکشنری</h2>
+
+    <pre class="code"><code># A dictionary is mutable: keys can be added, changed and removed.
+def main() -&gt; None:
+    student = {'name': 'Ali', 'age': 20}
+
+    student['age'] = 21              # change an existing key
+    student['city'] = 'Rasht'        # a key that does not exist is CREATED
+    print(student)
+
+    student.update({'age': 22, 'email': 'ali@kadoosedu.ir'})
+    print(student)
+
+    removed = student.pop('email')   # remove and return the value
+    print('removed:', removed)
+
+    del student['city']              # remove without returning
+    print(student)
+
+    student.clear()
+    print(student)                   # {}
+
+if __name__ == '__main__':
+    main()</code></pre>
+    <p class="code-caption" data-t="ch14-025">تغییر دیکشنری: نمونه 02_dict_modify.py</p>
+
+    <p data-t="ch14-026">نکته کلیدی: نوشتن روی کلیدی که وجود ندارد، آن را <strong>می‌سازد</strong>. این با لیست فرق دارد که در آن <code>lst[10] = 5</code> روی لیست کوتاه خطا ایجاد می‌کند. همین ویژگی، دیکشنری را برای ساختن تدریجی داده عالی می‌کند.</p>
+
+    <h2 id="s3" data-t="ch14-027">۳. متد get و خطای کلید</h2>
+
+    <pre class="code"><code># Reading a key that does not exist with [] raises a KeyError.
+def main() -&gt; None:
+    student = {'name': 'Ali', 'age': 20}
+
+    # print(student['city'])   -&gt;  KeyError: 'city'
+
+    # get() returns None instead of crashing ...
+    print(student.get('city'))              # None
+
+    # ... or a default value that we choose.
+    print(student.get('city', 'unknown'))   # 'unknown'
+
+    # The safe pattern with 'in':
+    if 'city' in student:
+        print(student['city'])
+    else:
+        print('the key "city" does not exist')
+
+    # setdefault() reads the key, and creates it when it is missing.
+    print(student.setdefault('city', 'Rasht'))
+    print(student)
+
+if __name__ == '__main__':
+    main()</code></pre>
+    <p class="code-caption" data-t="ch14-028">خواندن امن: نمونه 03_dict_get.py</p>
+
+    <div class="table-scroll">
+        <table>
+            <thead>
+                <tr><th data-t="ch14-029">روش</th><th data-t="ch14-030">وقتی کلید نباشد</th></tr>
+            </thead>
+            <tbody>
+                <tr><td><code>d['x']</code></td><td data-t="ch14-031">خطای <code>KeyError</code> و توقف برنامه</td></tr>
+                <tr><td><code>d.get('x')</code></td><td data-t="ch14-032"><code>None</code> برمی‌گرداند</td></tr>
+                <tr><td><code>d.get('x', 0)</code></td><td data-t="ch14-033">مقدار پیش‌فرض شما را برمی‌گرداند</td></tr>
+                <tr><td><code>d.setdefault('x', 0)</code></td><td data-t="ch14-034">کلید را با مقدار پیش‌فرض می‌سازد</td></tr>
+            </tbody>
+        </table>
+    </div>
+
+    <p data-t="ch14-035">
+        وقتی داده از کاربر یا از فایل می‌آید، هرگز مطمئن نیستید که کلید وجود
+        دارد. عادت کنید در چنین جاهایی <code>get</code> بنویسید.
+    </p>
+
+    <h2 id="s4" data-t="ch14-036">۴. پیمایش دیکشنری</h2>
+
+    <pre class="code"><code>def main() -&gt; None:
+    student = {
+        'name': 'alireza',
+        'age': 20,
+        'email': 'alireza@kadoosedu.ir',
+    }
+
+    # Looping over a dictionary gives the KEYS.
+    for key in student:
+        print(key, ':', student[key])
+
+    print('---')
+
+    # The three views:
+    print(list(student.keys()))     # ['name', 'age', 'email']
+    print(list(student.values()))   # ['alireza', 20, 'alireza@kadoosedu.ir']
+    print(list(student.items()))    # [('name', 'alireza'), ...]
+
+    print('---')
+
+    # items() gives the key and the value together - the usual way.
+    for key, value in student.items():
+        print(f'{key} -&gt; {value}')
+
+if __name__ == '__main__':
+    main()</code></pre>
+    <p class="code-caption" data-t="ch14-037">پیمایش: نمونه 04_dict_loops.py</p>
+
+    <h3 data-t="ch14-038">شرح مثال</h3>
+
+    <ul>
+        <li data-t="ch14-039">پیمایش ساده دیکشنری، <strong>کلیدها</strong> را می‌دهد.</li>
+        <li data-t="ch14-040"><code>keys()</code> کلیدها، <code>values()</code> مقدارها و <code>items()</code> جفت‌ها را می‌دهد.</li>
+        <li data-t="ch14-041">روش استاندارد و پایتونی، همان <code>for key, value in d.items()</code> است. آن دو متغیر، همان باز کردن تاپلی است که چند بخش بعد می‌بینید.</li>
+        <li data-t="ch14-042">از پایتون ۳٫۷ به بعد، دیکشنری ترتیب درج را حفظ می‌کند. یعنی همان ترتیبی که کلیدها را اضافه کرده‌اید، در پیمایش هم دیده می‌شود.</li>
+    </ul>
+
+    <h2 id="s5" data-t="ch14-043">۵. ساختن دیکشنری از متغیرها</h2>
+
+    <pre class="code"><code># Keys and values can come from variables.
+def main() -&gt; None:
+    key1 = 'name'
+    key2 = 'age'
+    key3 = 'city'
+
+    value1 = 'Ali'
+    value2 = 25
+    value3 = 'Rasht'
+
+    person = {
+        key1: value1,
+        key2: value2,
+        key3: value3,
+    }
+
+    print(person)
+
+    # dict() with keyword arguments is another way of building one.
+    other = dict(name='Sara', age=19, city='Rasht')
+    print(other)
+
+if __name__ == '__main__':
+    main()</code></pre>
+    <p class="code-caption" data-t="ch14-044">ساختن از متغیر: نمونه 05_dict_from_variables.py</p>
+
+    <h2 id="s6" data-t="ch14-045">۶. شمارش با دیکشنری</h2>
+
+    <p data-t="ch14-046">
+        این کاربردی‌ترین کار دیکشنری است: کلید همان چیزی است که می‌شماریم و
+        مقدار، تعداد دفعاتش.
+    </p>
+
+    <pre class="code"><code># Counting is the killer application of dictionaries:
+# the key is the thing we count, the value is how many times we saw it.
+def main() -&gt; None:
+    sentence = input('Enter a sentence: ')
+
+    counts: dict[str, int] = {}
+
+    for char in sentence:
+        if char == ' ':
+            continue
+        if char in counts:
+            counts[char] += 1
+        else:
+            counts[char] = 1
+
+    for char, count in counts.items():
+        print(f'{char}: {count}')
+
+    # The same loop written with get(), which removes the if/else:
+    counts2: dict[str, int] = {}
+    for char in sentence.replace(' ', ''):
+        counts2[char] = counts2.get(char, 0) + 1
+
+    print(counts2)
+
+if __name__ == '__main__':
+    main()</code></pre>
+    <p class="code-caption" data-t="ch14-047">شمارنده: نمونه 06_dict_counter.py</p>
+
+    <pre class="out">Enter a sentence: hello
+{'h': 1, 'e': 1, 'l': 2, 'o': 1}</pre>
+
+    <h3 data-t="ch14-048">شرح مثال</h3>
+
+    <ul>
+        <li data-t="ch14-049">منطق ساده است: اگر کلید هست یکی زیاد کن، اگر نیست با مقدار یک بسازش.</li>
+        <li data-t="ch14-050">نسخه دوم همان کار را با <code>get</code> و در یک خط انجام می‌دهد: <code>counts[c] = counts.get(c, 0) + 1</code>. این اصطلاح را حفظ کنید، چون بارها لازمتان می‌شود.</li>
+        <li data-t="ch14-051">در فصل بعد ابزار <code>Counter</code> را می‌بینید که همین کار را در یک خط و بدون حلقه انجام می‌دهد.</li>
+    </ul>
+
+    <h2 id="s7" data-t="ch14-052">۷. تاپل</h2>
+
+    <p data-t="ch14-053">
+        تاپل مثل لیست است، با یک تفاوت بزرگ: پس از ساخته شدن
+        <strong>هرگز</strong> تغییر نمی‌کند.
+    </p>
+
+    <pre class="code"><code># A tuple is like a list, but it can NEVER be changed after it is created.
+def main() -&gt; None:
+    my_tuple = (1, 'Hello', 2, 3, True, 3, 3, 4)
+
+    print(my_tuple)
+    print(my_tuple[1])         # indexing works
+    print(my_tuple[2:5])       # slicing works
+    print(len(my_tuple))
+    print(my_tuple.count(3))   # 3 appears three times
+    print(my_tuple.index(2))
+
+    # my_tuple[0] = 100    -&gt;  TypeError: 'tuple' object does not support
+    #                          item assignment
+
+    # A tuple with a single item needs a comma!
+    one = (5,)
+    not_a_tuple = (5)
+    print(type(one), type(not_a_tuple))
+
+    # The parentheses are optional.
+    point = 3, 4
+    print(point, type(point))
+
+    # Why tuples? They are safe (nobody can modify them by mistake),
+    # slightly faster, and they can be used as dictionary keys.
+    distances = {(0, 0): 'origin', (3, 4): 'point A'}
+    print(distances[(3, 4)])
+
+if __name__ == '__main__':
+    main()</code></pre>
+    <p class="code-caption" data-t="ch14-054">تاپل: نمونه 07_tuple_basics.py</p>
+
+    <div class="warn">
+        <span class="box-title" data-t="ch14-055">تاپل تک‌عضوی حتماً ویرگول می‌خواهد</span>
+        <p data-t="ch14-056">
+            <code>(5)</code> یک تاپل نیست، فقط عدد ۵ داخل پرانتز است.
+            <code>(5,)</code> تاپل است. آن ویرگول عجیب، تنها چیزی است که این دو
+            را از هم جدا می‌کند و منبع باگ‌های گیج‌کننده است.
+        </p>
+    </div>
+
+    <p data-t="ch14-057">سه دلیل وجود تاپل:</p>
+
+    <ul>
+        <li data-t="ch14-058"><strong>امنیت.</strong> داده‌ای که نباید عوض شود، در تاپل بگذارید تا هیچ‌کس اشتباهی تغییرش ندهد.</li>
+        <li data-t="ch14-059"><strong>کلید دیکشنری.</strong> فقط چیزهای تغییرناپذیر می‌توانند کلید باشند، پس تاپل می‌تواند و لیست نمی‌تواند.</li>
+        <li data-t="ch14-060"><strong>برگرداندن چند مقدار.</strong> که موضوع بخش بعد است.</li>
+    </ul>
+
+    <h2 id="s8" data-t="ch14-061">۸. باز کردن تاپل</h2>
+
+    <pre class="code"><code>def min_max(numbers: list[int]) -&gt; tuple[int, int]:
+    'Return the smallest and the biggest number - two values in one tuple.'
+    return min(numbers), max(numbers)
+
+def main() -&gt; None:
+    my_list = [3, 77, -6, 14, 31]
+
+    # Unpacking: the two returned values land in two variables.
+    low, high = min_max(my_list)
+    print(f'Min: {low}, Max: {high}')
+
+    # Unpacking works on any sequence.
+    a, b, c = (1, 2, 3)
+    print(a, b, c)
+
+    x, y, z = [10, 20, 30]
+    print(x, y, z)
+
+    # The classic swap - no temporary variable needed.
+    x, y = y, x
+    print(x, y)
+
+    # '*' collects "the rest".
+    first, *others = [1, 2, 3, 4, 5]
+    print(first, others)
+
+if __name__ == '__main__':
+    main()</code></pre>
+    <p class="code-caption" data-t="ch14-062">باز کردن: نمونه 08_tuple_unpacking.py</p>
+
+    <h3 data-t="ch14-063">شرح مثال</h3>
+
+    <ul>
+        <li data-t="ch14-064">تابع <code>min_max</code> دو مقدار برمی‌گرداند. در عمل یک تاپل برمی‌گرداند، ولی چون پرانتز اختیاری است، به نظر می‌رسد دو چیز است.</li>
+        <li data-t="ch14-065"><strong>باز کردن</strong> یعنی اعضای یک دنباله را در چند متغیر بریزیم. تعداد متغیرها باید دقیقاً با تعداد اعضا برابر باشد، وگرنه خطا می‌گیرید.</li>
+        <li data-t="ch14-066">جابه‌جا کردن دو متغیر در پایتون یک خط است: <code>x, y = y, x</code>. در زبان‌های دیگر به متغیر موقت نیاز دارید.</li>
+        <li data-t="ch14-067">ستاره «بقیه» را جمع می‌کند: <code>first, *others = [1,2,3,4,5]</code> یعنی اولی جدا و بقیه در یک لیست.</li>
+        <li data-t="ch14-068">در فصل بیست و پنجم این ابزار را کامل‌تر می‌بینیم.</li>
+    </ul>
+
+    <h2 id="s9" data-t="ch14-069">۹. مجموعه</h2>
+
+    <p data-t="ch14-070">
+        مجموعه ظرفی است که <strong>عضو تکراری</strong> ندارد و
+        <strong>ترتیب</strong> هم ندارد.
+    </p>
+
+    <pre class="code"><code># A set holds only UNIQUE values, and it has no order.
+def main() -&gt; None:
+    my_set = {1, 1, 5, 3, 3, 3, 3, 7, 7}
+    print(my_set)                  # {1, 3, 5, 7} - the duplicates are gone
+
+    for item in my_set:
+        print(item, end=' ')
+    print()
+
+    my_set.add(10)                 # add one item
+    my_set.discard(1)              # remove, and stay silent when it is missing
+    # my_set.remove(99)            # remove, but raise KeyError when missing
+    print(my_set)
+
+    print(5 in my_set)             # membership test - very fast on a set
+
+    # The most common use: removing the duplicates of a list.
+    numbers = [1, 2, 3, 3, 4, 5, 5, 5]
+    unique = list(set(numbers))
+    print(unique)
+
+    # Careful: a set has no order, so sort it if the order matters.
+    print(sorted(set(numbers)))
+
+    # An empty set must be created with set(); {} is an empty DICTIONARY.
+    empty_set = set()
+    empty_dict = {}
+    print(type(empty_set), type(empty_dict))
+
+if __name__ == '__main__':
+    main()</code></pre>
+    <p class="code-caption" data-t="ch14-071">مجموعه: نمونه 09_set_basics.py</p>
+
+    <h3 data-t="ch14-072">شرح مثال</h3>
+
+    <ul>
+        <li data-t="ch14-073">تکراری‌ها به طور خودکار حذف می‌شوند. پرکاربردترین کاربرد مجموعه همین است: <code>list(set(numbers))</code>.</li>
+        <li data-t="ch14-074">مجموعه ترتیب ندارد، پس نمی‌شود اندیس گرفت. اگر ترتیب مهم است، خروجی را <code>sorted</code> کنید.</li>
+        <li data-t="ch14-075">بررسی عضویت با <code>in</code> روی مجموعه <strong>بسیار</strong> سریع‌تر از لیست است. برای لیست میلیونی، این تفاوت بین چند دقیقه و چند میلی‌ثانیه است.</li>
+        <li data-t="ch14-076"><code>discard</code> اگر عضو نباشد ساکت می‌ماند، <code>remove</code> خطا ایجاد می‌کند.</li>
+        <li data-t="ch14-077">دام: <code>{}</code> دیکشنری خالی است، نه مجموعه خالی. برای مجموعه خالی باید <code>set()</code> بنویسید.</li>
+    </ul>
+
+    <h2 id="s10" data-t="ch14-078">۱۰. عملیات مجموعه‌ای</h2>
+
+    <pre class="code"><code># Sets support the operations of mathematical set theory.
+def main() -&gt; None:
+    python_students = {'Ali', 'Sara', 'Reza', 'Maryam'}
+    linux_students = {'Reza', 'Maryam', 'Omid'}
+
+    print('union       :', python_students | linux_students)
+    print('intersection:', python_students &amp; linux_students)
+    print('difference  :', python_students - linux_students)
+    print('symmetric   :', python_students ^ linux_students)
+
+    # The same operations have method names too.
+    print(python_students.union(linux_students))
+    print(python_students.intersection(linux_students))
+    print(python_students.difference(linux_students))
+
+    print(linux_students.issubset(python_students))   # False
+
+if __name__ == '__main__':
+    main()</code></pre>
+    <p class="code-caption" data-t="ch14-079">عملیات مجموعه‌ای: نمونه 10_set_operations.py</p>
+
+    <div class="table-scroll">
+        <table>
+            <thead>
+                <tr><th data-t="ch14-080">عملگر</th><th data-t="ch14-081">نام</th><th data-t="ch14-082">یعنی</th></tr>
+            </thead>
+            <tbody>
+                <tr><td><code>|</code></td><td data-t="ch14-083">اجتماع</td><td data-t="ch14-084">هر که در یکی از دو مجموعه هست</td></tr>
+                <tr><td><code>&amp;</code></td><td data-t="ch14-085">اشتراک</td><td data-t="ch14-086">فقط کسانی که در هر دو هستند</td></tr>
+                <tr><td><code>-</code></td><td data-t="ch14-087">تفاضل</td><td data-t="ch14-088">کسانی که در اولی هستند و در دومی نیستند</td></tr>
+                <tr><td><code>^</code></td><td data-t="ch14-089">تفاضل متقارن</td><td data-t="ch14-090">کسانی که فقط در یکی هستند</td></tr>
+            </tbody>
+        </table>
+    </div>
+
+    <p data-t="ch14-091">
+        این عملیات‌ها در کار واقعی خیلی به کار می‌آیند: «کدام کاربرها هر دو دوره
+        را ثبت‌نام کرده‌اند»، «کدام فایل‌ها در پوشه اول هستند و در دومی نیستند».
+        نوشتنشان با حلقه ده خط طول می‌کشد و با مجموعه یک خط.
+    </p>
+
+    <h2 id="s11" data-t="ch14-092">۱۱. کدام ظرف را انتخاب کنیم</h2>
+
+    <pre class="code"><code>'''Which container should I use?
+
+    list  [ ]   ordered, changeable, duplicates allowed
+                -&gt; a sequence of things you will add to and loop over
+    tuple ( )   ordered, NOT changeable, duplicates allowed
+                -&gt; a fixed record, several return values, a dictionary key
+    set   { }   NOT ordered, changeable, NO duplicates
+                -&gt; membership tests, removing duplicates
+    dict  {k:v} keys -&gt; values
+                -&gt; when every item has a name / an identifier
+'''
+
+def main() -&gt; None:
+    scores_list = [20, 18, 20, 15]                 # order matters
+    student_record = ('Ali', 'Rezaei', 2005)       # fixed, never changes
+    subjects = {'math', 'physics', 'math'}         # duplicates disappear
+    student = {'name': 'Ali', 'score': 20}         # named fields
+
+    print(scores_list, student_record, subjects, student)
+
+if __name__ == '__main__':
+    main()</code></pre>
+    <p class="code-caption" data-t="ch14-093">مقایسه: نمونه 11_which_container.py</p>
+
+    <div class="table-scroll">
+        <table>
+            <thead>
+                <tr><th data-t="ch14-094">ظرف</th><th data-t="ch14-095">نشانه</th><th data-t="ch14-096">مرتب</th><th data-t="ch14-097">تغییرپذیر</th><th data-t="ch14-098">تکراری</th><th data-t="ch14-099">کجا</th></tr>
+            </thead>
+            <tbody>
+                <tr><td data-t="ch14-100">لیست</td><td><code>[ ]</code></td><td data-t="ch14-101">بله</td><td data-t="ch14-102">بله</td><td data-t="ch14-103">بله</td><td data-t="ch14-104">دنباله‌ای که به آن اضافه می‌کنید</td></tr>
+                <tr><td data-t="ch14-105">تاپل</td><td><code>( )</code></td><td data-t="ch14-106">بله</td><td data-t="ch14-107">خیر</td><td data-t="ch14-108">بله</td><td data-t="ch14-109">رکورد ثابت، چند خروجی تابع</td></tr>
+                <tr><td data-t="ch14-110">مجموعه</td><td><code>{ }</code></td><td data-t="ch14-111">خیر</td><td data-t="ch14-112">بله</td><td data-t="ch14-113">خیر</td><td data-t="ch14-114">حذف تکراری، بررسی عضویت</td></tr>
+                <tr><td data-t="ch14-115">دیکشنری</td><td><code>{k: v}</code></td><td data-t="ch14-116">بله</td><td data-t="ch14-117">بله</td><td data-t="ch14-118">کلید یکتا</td><td data-t="ch14-119">وقتی هر داده یک نام دارد</td></tr>
+            </tbody>
+        </table>
+    </div>
+
+    <div class="folder-ref">
+        <span class="box-title" data-t="ch14-120">فایل‌های تمرینی این فصل</span>
+        <p data-t="ch14-121">
+            پوشه <code>S14-dict-tuple-set</code> شامل نمونه‌های
+            <code>01_dict_basics.py</code> تا <code>11_which_container.py</code>.
+        </p>
+    </div>
+
+    <h2 data-t="ch14-122">خلاصه فصل</h2>
+
+    <div class="table-scroll">
+        <table>
+            <thead>
+                <tr><th data-t="ch14-123">ابزار</th><th data-t="ch14-124">وظیفه آن</th></tr>
+            </thead>
+            <tbody>
+                <tr><td><code>{'k': v}</code></td><td data-t="ch14-125">ساختن دیکشنری</td></tr>
+                <tr><td><code>d['k']</code></td><td data-t="ch14-126">خواندن با کلید. اگر نباشد خطا</td></tr>
+                <tr><td><code>d.get('k', default)</code></td><td data-t="ch14-127">خواندن امن با مقدار پیش‌فرض</td></tr>
+                <tr><td><code>d.items()</code></td><td data-t="ch14-128">کلید و مقدار با هم، برای حلقه</td></tr>
+                <tr><td><code>d[k] = d.get(k, 0) + 1</code></td><td data-t="ch14-129">اصطلاح استاندارد شمارش</td></tr>
+                <tr><td><code>(a, b)</code></td><td data-t="ch14-130">تاپل. تغییرناپذیر. تک‌عضوی: <code>(a,)</code></td></tr>
+                <tr><td><code>a, b = func()</code></td><td data-t="ch14-131">باز کردن چند خروجی</td></tr>
+                <tr><td><code>x, y = y, x</code></td><td data-t="ch14-132">جابه‌جایی در یک خط</td></tr>
+                <tr><td><code>set(lst)</code></td><td data-t="ch14-133">حذف تکراری‌ها</td></tr>
+                <tr><td><code>&amp; | - ^</code></td><td data-t="ch14-134">اشتراک، اجتماع، تفاضل، تفاضل متقارن</td></tr>
+                <tr><td data-t="ch14-135"><code>set()</code> در برابر <code>{}</code></td><td data-t="ch14-136">اولی مجموعه خالی، دومی دیکشنری خالی</td></tr>
+            </tbody>
+        </table>
+    </div>
+
+    <div class="exercise">
+        <h3 data-t="ch14-137">تمرین‌های فصل چهارده</h3>
+        <ol>
+            <li data-t="ch14-138">دیکشنری یک دانشجو بسازید (نام، سن، شهر) و کلید به کلید چاپش کنید.</li>
+            <li data-t="ch14-139">یک جمله بگیرید و بشمارید هر <strong>کلمه</strong> چند بار تکرار شده است.</li>
+            <li data-t="ch14-140">یک دفترچه تلفن بسازید: افزودن مخاطب، جست‌وجو، حذف و نمایش همه.</li>
+            <li data-t="ch14-141">دو لیست عدد بگیرید و با مجموعه، عددهایی که در هر دو هستند را چاپ کنید.</li>
+            <li data-t="ch14-142">یک جمله بگیرید و مجموعه حروف متمایزش را مرتب‌شده چاپ کنید.</li>
+            <li data-t="ch14-143">تابع <code>min_max_avg(numbers)</code> را بنویسید که سه مقدار را در یک تاپل برگرداند.</li>
+            <li data-t="ch14-144">دیکشنری <code>{درس: نمره}</code> بسازید و درسی که بهترین نمره را دارد چاپ کنید.</li>
+            <li data-t="ch14-145">توضیح دهید فرق <code>{}</code> با <code>set()</code> چیست.</li>
+        </ol>
+    </div>
+
+    <div class="pager">
+        <a href="chapter-13.html">فصل قبل: توابع پیشرفته</a>
+        <a href="chapter-15.html">فصل بعد: ساختارهای داده تودرتو</a>
+    </div>
+
+</main>
+
+</body>
+</html>

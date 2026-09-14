@@ -1,0 +1,19 @@
+{% extends 'base.html' %}
+
+{% block title %}{{ author.name }}{% endblock %}
+
+{% block content %}
+    <h2>{{ author.name }}</h2>
+    <ul>
+        {% for book in author.books %}
+            <li>
+                <strong>{{ book.title }}</strong>
+                {% if book.summary %}
+                    <div class="summary">{{ book.summary }}</div>
+                {% endif %}
+            </li>
+        {% else %}
+            <li>No books recorded.</li>
+        {% endfor %}
+    </ul>
+{% endblock %}

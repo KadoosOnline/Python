@@ -1,0 +1,5 @@
+Which keyword defines a function in Python?|def|class|func|define
+What does len('Kadoos') return?|6|5|7|error
+Which type is the result of input()?|str|int|float|bool
+Which operator gives the remainder?|%|//|**|/
+Which one is NOT a Python container?|array|list|tuple|set

@@ -1,0 +1,600 @@
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="فصل سه: رشته‌ها در پایتون، گیومه‌ها، دنباله‌های فرار، اندیس و برش، متدهای رشته، f-string و تغییرناپذیری">
+    <title>فصل ۳: رشته‌ها</title>
+    <link rel="icon" href="logokm.png" type="image/png">
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<header class="book-bar">
+    <a class="name" href="index.html">برنامه‌نویسی پایتون</a>
+    <a href="index.html">فهرست مطالب</a>
+</header>
+
+<main class="paper">
+
+    <div class="chapter-head">
+        <span class="chapter-num">فصل ۳</span>
+        <h1 data-t="ch03-001">رشته‌ها</h1>
+        <p class="lead" data-t="ch03-002">
+            بیشتر داده‌هایی که یک برنامه با آنها سر و کار دارد متن است: نام، آدرس،
+            پیام، محتوای فایل. این فصل درباره این است که چطور متن را اندازه
+            بگیریم، ببُریم، عوض کنیم و از تکه‌هایش پیام بسازیم.
+        </p>
+    </div>
+
+    <div class="mini-toc">
+        <span class="box-title" data-t="ch03-003">در این فصل می‌خوانید</span>
+        <ol>
+            <li data-t="ch03-004"><a href="#s1">سه شکل نوشتن رشته</a></li>
+            <li data-t="ch03-005"><a href="#s2">دنباله‌های فرار</a></li>
+            <li data-t="ch03-006"><a href="#s3">طول رشته</a></li>
+            <li data-t="ch03-007"><a href="#s4">اندیس</a></li>
+            <li data-t="ch03-008"><a href="#s5">برش</a></li>
+            <li data-t="ch03-009"><a href="#s6">چسباندن و تکرار</a></li>
+            <li data-t="ch03-010"><a href="#s7">متدهای رشته</a></li>
+            <li data-t="ch03-011"><a href="#s8">جست‌وجو در رشته</a></li>
+            <li><a href="#s9">f-string</a></li>
+            <li data-t="ch03-012"><a href="#s10">قالب‌بندی با f-string</a></li>
+            <li data-t="ch03-013"><a href="#s11">رشته تغییرناپذیر است</a></li>
+            <li data-t="ch03-014"><a href="#s12">برنامه: حروف اول نام</a></li>
+        </ol>
+    </div>
+
+    <h2 id="s1" data-t="ch03-015">۱. سه شکل نوشتن رشته</h2>
+
+    <p data-t="ch03-016">
+        <strong>رشته</strong> یعنی متن. سه راه برای نوشتنش وجود دارد و هر کدام
+        جای خودش را دارد.
+    </p>
+
+    <pre class="code"><code># Single quotes and double quotes do exactly the same thing.
+a = 'Kadoos'
+b = "Kadoos"
+print(a, b)
+
+# Use one kind of quote when the text contains the other kind.
+print("I'm a student")
+print('He said "hello"')
+
+# Triple quotes keep the line breaks exactly as they are written.
+text = '''Hello,
+This is a multi-line text.
+Goodbye!'''
+print(text)</code></pre>
+    <p class="code-caption" data-t="ch03-017">سه نوع گیومه: نمونه 01_quotes.py</p>
+
+    <pre class="out">Kadoos Kadoos
+I'm a student
+He said "hello"
+Hello,
+This is a multi-line text.
+Goodbye!</pre>
+
+    <h3 data-t="ch03-018">شرح مثال</h3>
+
+    <ul>
+        <li data-t="ch03-019">تک‌گیومه و جفت‌گیومه هیچ فرقی با هم ندارند. فقط باید هماهنگ باشند.</li>
+        <li data-t="ch03-020">ترفند مهم: اگر متن خودش تک‌گیومه دارد، دورش جفت‌گیومه بگذارید و برعکس. این‌طور ضرورتی ندارد کاراکتر فرار به کار ببرید.</li>
+        <li data-t="ch03-021">سه‌گیومه برای متن چندخطی است. هر جا اینتر بزنید، در خروجی هم همان‌جا خط عوض می‌شود.</li>
+    </ul>
+
+    <h2 id="s2" data-t="ch03-022">۲. دنباله‌های فرار</h2>
+
+    <p data-t="ch03-023">بعضی کاراکترها را نمی‌شود مستقیم در متن نوشت. مثلاً «رفتن به خط بعد» یک کاراکتر است ولی شکل چاپی ندارد. برای این موارد از <strong>بک‌اسلش</strong> استفاده می‌کنیم: بک‌اسلش به پایتون می‌گوید که حرف بعدی معنی خاصی دارد.</p>
+
+    <pre class="code"><code># A backslash starts an "escape sequence": a special character written with
+# ordinary letters.
+print('Hello\nKadoos!')     # \n  -&gt; new line
+print('1\t2\t3')            # \t  -&gt; tab
+print('I\'m a student')     # \'  -&gt; a single quote inside single quotes
+print("\"\"\"")             # \"  -&gt; a double quote inside double quotes
+print('C:\\windows')        # \\  -&gt; one real backslash
+
+# A raw string (r'...') switches escaping off - very handy for Windows paths.
+print(r'C:\windows\system32')</code></pre>
+    <p class="code-caption" data-t="ch03-024">دنباله‌های فرار: نمونه 02_escape_sequences.py</p>
+
+    <pre class="out">Hello
+Kadoos!
+1	2	3
+I'm a student
+"""
+C:\windows
+C:\windows\system32</pre>
+
+    <div class="table-scroll">
+        <table>
+            <thead>
+                <tr><th data-t="ch03-025">دنباله</th><th data-t="ch03-026">معنی</th></tr>
+            </thead>
+            <tbody>
+                <tr><td><code>\n</code></td><td data-t="ch03-027">خط جدید</td></tr>
+                <tr><td><code>\t</code></td><td data-t="ch03-028">یک تب</td></tr>
+                <tr><td><code>\'</code></td><td data-t="ch03-029">تک‌گیومه واقعی</td></tr>
+                <tr><td><code>\"</code></td><td data-t="ch03-030">جفت‌گیومه واقعی</td></tr>
+                <tr><td><code>\\</code></td><td data-t="ch03-031">یک بک‌اسلش واقعی</td></tr>
+                <tr><td><code>r'...'</code></td><td data-t="ch03-032">رشته خام: بک‌اسلش‌ها معنی خاص ندارند</td></tr>
+            </tbody>
+        </table>
+    </div>
+
+    <div class="tip">
+        <span class="box-title" data-t="ch03-033">رشته خام کجا لازم می‌شود</span>
+        <p data-t="ch03-034">
+            مسیرهای ویندوز پر از بک‌اسلش هستند. اگر بنویسید
+            <code>'C:\new\table'</code>، پایتون <code>\n</code> و <code>\t</code>
+            را کاراکتر خاص می‌بیند و مسیر خراب می‌شود. با گذاشتن حرف
+            <code>r</code> پیش از گیومه، این مشکل کاملاً حل می‌شود. در فصل هجدهم
+            که با فایل کار می‌کنیم دوباره به این می‌رسیم.
+        </p>
+    </div>
+
+    <h2 id="s3" data-t="ch03-035">۳. طول رشته</h2>
+
+    <p data-t="ch03-036">
+        تابع <code>len</code> می‌گوید یک رشته چند کاراکتر دارد. فاصله و علائم هم
+        کاراکتر حساب می‌شوند.
+    </p>
+
+    <pre class="code"><code># len() returns how many characters a string contains.
+name = 'Alireza'
+
+length = len(name)
+print(length)      # 7
+
+# It works on the empty string too.
+print(len(''))     # 0</code></pre>
+    <p class="code-caption" data-t="ch03-037">طول رشته: نمونه 03_length.py</p>
+
+    <p data-t="ch03-038">
+        <code>''</code> یعنی <strong>رشته خالی</strong>: رشته‌ای که هیچ کاراکتری
+        ندارد و طولش صفر است. بعداً می‌بینید که رشته خالی برای شروع یک انباره
+        متنی خیلی به کار می‌آید.
+    </p>
+
+    <h2 id="s4" data-t="ch03-039">۴. اندیس</h2>
+
+    <p data-t="ch03-040">
+        رشته یک دنباله از کاراکترهاست و هر کاراکتر یک شماره دارد. مهم‌ترین نکته
+        این است که <strong>شمارش از صفر شروع می‌شود</strong>، نه از یک.
+    </p>
+
+    <pre class="code"><code># Every character has a position (an index). Counting starts at 0.
+#
+#   K  a  d  o  o  s
+#   0  1  2  3  4  5      &lt;- positive indexes
+#  -6 -5 -4 -3 -2 -1      &lt;- negative indexes (from the end)
+
+name = 'Kadoos'
+
+print(name[0])    # 'K'  -&gt; the first character
+print(name[2])    # 'd'
+print(name[-1])   # 's'  -&gt; the last character
+print(name[-2])   # 'o'
+
+# An index that does not exist raises an IndexError:
+# print(name[10])  -&gt;  IndexError: string index out of range</code></pre>
+    <p class="code-caption" data-t="ch03-041">اندیس مثبت و منفی: نمونه 04_indexing.py</p>
+
+    <pre class="out">K
+d
+s
+o</pre>
+
+    <h3 data-t="ch03-042">شرح مثال</h3>
+
+    <ul>
+        <li data-t="ch03-043">کاراکتر اول <code>name[0]</code> است، نه <code>name[1]</code>. این را چند بار در ذهنتان تکرار کنید، چون منبع بسیاری از خطاهای هفته اول است.</li>
+        <li data-t="ch03-044">اندیس منفی از انتها می‌شمارد. <code>name[-1]</code> همیشه آخرین کاراکتر است، بدون اینکه لازم باشد طول رشته را بدانید.</li>
+        <li data-t="ch03-045">اندیسی که وجود ندارد خطای <code>IndexError</code> می‌دهد. اگر روی ورودی کاربر کار می‌کنید، همیشه احتمال بدهید که کاربر چیزی وارد نکرده باشد و رشته خالی باشد.</li>
+    </ul>
+
+    <h2 id="s5" data-t="ch03-046">۵. برش</h2>
+
+    <p data-t="ch03-047">
+        اندیس یک کاراکتر می‌دهد، <strong>برش</strong> یک تکه می‌دهد. شکلش این است:
+        <code>text[start:stop:step]</code>. نکته کلیدی: عدد اول
+        <strong>شامل</strong> است و عدد دوم <strong>شامل نیست</strong>.
+    </p>
+
+    <pre class="code"><code># A slice takes a PIECE of the string: text[start:stop:step]
+# 'start' is included, 'stop' is NOT included.
+name = 'Kadoos'
+
+print(name[1:4])    # 'ado'   -&gt; characters 1, 2, 3
+print(name[:3])     # 'Kad'   -&gt; from the beginning to index 2
+print(name[2:])     # 'doos'  -&gt; from index 2 to the end
+print(name[:])      # 'Kadoos'-&gt; a full copy
+print(name[::2])    # 'Kdo'   -&gt; every second character
+print(name[::-1])   # 'soodaK'-&gt; the string reversed
+print(name[-3:])    # 'oos'   -&gt; the last three characters</code></pre>
+    <p class="code-caption" data-t="ch03-048">برش رشته: نمونه 05_slicing.py</p>
+
+    <pre class="out">ado
+Kad
+doos
+Kadoos
+Kdo
+soodaK
+oos</pre>
+
+    <h3 data-t="ch03-049">شرح مثال</h3>
+
+    <ul>
+        <li data-t="ch03-050"><code>name[1:4]</code> کاراکترهای ۱ و ۲ و ۳ را می‌دهد. کاراکتر ۴ داخل نیست. اگر این را عجیب می‌دانید، به این فکر کنید که <code>4 - 1</code> برابر ۳ است و دقیقاً سه کاراکتر گرفته‌ایم.</li>
+        <li data-t="ch03-051">اگر عدد اول را ننویسید یعنی «از اول»، اگر عدد دوم را ننویسید یعنی «تا آخر».</li>
+        <li data-t="ch03-052">عدد سوم گام است. <code>[::2]</code> یعنی یکی در میان.</li>
+        <li data-t="ch03-053"><code>[::-1]</code> معروف‌ترین ترفند پایتون است: گام منفی یعنی از آخر به اول، یعنی رشته برعکس. برای تشخیص کلمه متقارن دقیقاً همین را لازم دارید.</li>
+    </ul>
+
+    <div class="note">
+        <span class="box-title" data-t="ch03-054">برش هرگز خطا نمی‌دهد</span>
+        <p data-t="ch03-055">
+            برخلاف اندیس، برش هیچ‌وقت <code>IndexError</code> نمی‌دهد.
+            <code>'Kadoos'[2:100]</code> خطا نمی‌دهد و فقط تا آخر رشته را
+            برمی‌گرداند. اگر بازه کاملاً بیرون رشته باشد، رشته خالی می‌گیرید.
+        </p>
+    </div>
+
+    <h2 id="s6" data-t="ch03-056">۶. چسباندن و تکرار</h2>
+
+    <pre class="code"><code># '+' glues two strings together.
+first_name = 'Ali'
+last_name = 'Rezaei'
+
+full_name = first_name + ' ' + last_name
+print(full_name)
+
+# '*' repeats a string.
+print('-' * 30)
+print('ab' * 3)
+
+# '+' only works between two strings. This line would raise a TypeError:
+# print('Score: ' + 20)
+# The fix is to convert the number to text first:
+print('Score: ' + str(20))</code></pre>
+    <p class="code-caption" data-t="ch03-057">چسباندن و تکرار: نمونه 06_concatenation.py</p>
+
+    <pre class="out">Ali Rezaei
+------------------------------
+ababab
+Score: 20</pre>
+
+    <h3 data-t="ch03-058">شرح مثال</h3>
+
+    <ul>
+        <li data-t="ch03-059">عملگر <code>+</code> بین دو رشته یعنی «به هم بچسبان». دقت کنید که فاصله خودکار اضافه نمی‌شود؛ اگر فاصله می‌خواهید باید خودتان <code>' '</code> را وسط بگذارید.</li>
+        <li data-t="ch03-060">عملگر <code>*</code> بین رشته و عدد یعنی تکرار. <code>'-' * 30</code> یک خط جداکننده تمیز می‌سازد و در برنامه‌های متنی خیلی به کار می‌آید.</li>
+        <li data-t="ch03-061">نمی‌شود رشته را با عدد جمع زد. <code>'Score: ' + 20</code> خطای <code>TypeError</code> می‌دهد. یا باید عدد را با <code>str</code> به متن تبدیل کنید، یا بهتر از آن، از f-string استفاده کنید که چند بخش جلوتر می‌آید.</li>
+    </ul>
+
+    <h2 id="s7" data-t="ch03-062">۷. متدهای رشته</h2>
+
+    <p data-t="ch03-063"><strong>متد</strong> تابعی است که متعلق به یک مقدار است و با نقطه صدا زده می‌شود. رشته‌ها ده‌ها متد دارند. این موارد پرکاربردترین‌هایشان هستند.</p>
+
+    <pre class="code"><code># A "method" is a function that belongs to a value and is called with a dot.
+text = '  Kadoos Institute, Rasht  '
+
+print(text.upper())            # everything in capitals
+print(text.lower())            # everything in small letters
+print(text.title())            # First Letter Of Each Word In Capitals
+print(text.strip())            # remove the spaces at both ends
+print(text.strip().center(40, '.'))
+
+print(text.replace('Rasht', 'Tehran'))
+
+# split() cuts a string into a list of pieces.
+words = text.strip().split(' ')
+print(words)                   # ['Kadoos', 'Institute,', 'Rasht']
+
+# join() does the opposite: it glues a list of strings together.
+print('-'.join(['2026', '09', '08']))
+
+# Useful checks that return True or False:
+print('12345'.isdigit())       # True  -&gt; only digits
+print('Kadoos'.isalpha())      # True  -&gt; only letters
+print('kadoos'.islower())      # True</code></pre>
+    <p class="code-caption" data-t="ch03-064">متدهای رشته: نمونه 07_string_methods.py</p>
+
+    <div class="table-scroll">
+        <table>
+            <thead>
+                <tr><th data-t="ch03-065">متد</th><th data-t="ch03-066">وظیفه آن</th></tr>
+            </thead>
+            <tbody>
+                <tr><td><code>upper()</code> <code>lower()</code></td><td data-t="ch03-067">همه حروف بزرگ یا همه کوچک</td></tr>
+                <tr><td><code>title()</code> <code>capitalize()</code></td><td data-t="ch03-068">حرف اول هر کلمه بزرگ، یا فقط حرف اول جمله</td></tr>
+                <tr><td><code>strip()</code></td><td data-t="ch03-069">پاک کردن فاصله‌های اول و آخر</td></tr>
+                <tr><td><code>replace(a, b)</code></td><td data-t="ch03-070">جایگزینی همه a ها با b</td></tr>
+                <tr><td><code>split(sep)</code></td><td data-t="ch03-071">بریدن رشته و تبدیلش به لیست تکه‌ها</td></tr>
+                <tr><td><code>join(list)</code></td><td data-t="ch03-072">چسباندن اعضای یک لیست با یک جداکننده</td></tr>
+                <tr><td><code>center(n, ch)</code></td><td data-t="ch03-073">وسط‌چین کردن در عرض n کاراکتر</td></tr>
+                <tr><td><code>isdigit()</code> <code>isalpha()</code></td><td data-t="ch03-074">آیا فقط رقم است، آیا فقط حرف است</td></tr>
+            </tbody>
+        </table>
+    </div>
+
+    <h3 data-t="ch03-075">شرح مثال</h3>
+
+    <ul>
+        <li data-t="ch03-076">متدها را می‌شود زنجیره کرد: <code>text.strip().split(' ')</code> یعنی اول فاصله‌ها را بگیر، بعد نتیجه را ببُر. از چپ به راست خوانده می‌شود.</li>
+        <li data-t="ch03-077"><code>strip()</code> پرکاربردترین متد در کار با ورودی کاربر است. کاربرها دائم فاصله اضافه تایپ می‌کنند و <code>'ali '</code> با <code>'ali'</code> برابر نیست.</li>
+        <li data-t="ch03-078"><code>split</code> خروجی‌اش <strong>لیست</strong> است. لیست را در فصل نهم می‌بینید؛ فعلاً همین‌قدر که بدانید مجموعه‌ای از مقدارهاست کافی است.</li>
+        <li data-t="ch03-079"><code>join</code> برعکس <code>split</code> است و شکل نوشتنش کمی عجیب است: جداکننده جلو می‌آید و لیست داخل پرانتز.</li>
+        <li data-t="ch03-080"><code>isdigit()</code> راه ساده‌ای است برای اینکه پیش از <code>int()</code> مطمئن شویم کاربر واقعاً عدد وارد کرده است.</li>
+    </ul>
+
+    <h2 id="s8" data-t="ch03-081">۸. جست‌وجو در رشته</h2>
+
+    <pre class="code"><code>text = 'Kadoos Institute, Rasht'
+
+# 'in' answers: does this piece exist inside the text?
+print('Rasht' in text)          # True
+print('Tehran' in text)         # False
+
+# find() gives the index of the first occurrence, or -1 when it is not found.
+print(text.find('Institute'))   # 7
+print(text.find('Tehran'))      # -1
+
+# count() says how many times a piece appears.
+print(text.count('a'))
+
+# startswith() / endswith() are used a lot when checking file names.
+print(text.startswith('Kadoos'))   # True
+print('app.py'.endswith('.py'))    # True</code></pre>
+    <p class="code-caption" data-t="ch03-082">جست‌وجو: نمونه 08_search_in_string.py</p>
+
+    <pre class="out">True
+False
+7
+-1
+2
+True
+True</pre>
+
+    <h3 data-t="ch03-083">شرح مثال</h3>
+
+    <ul>
+        <li data-t="ch03-084">عملگر <code>in</code> جواب بله یا خیر می‌دهد، یعنی <code>True</code> یا <code>False</code>. این همان نوع <code>bool</code> فصل قبل است و در فصل بعد قلب دستور شرط می‌شود.</li>
+        <li data-t="ch03-085"><code>find</code> جای اولین تطابق را می‌دهد و اگر پیدا نکند منفی یک برمی‌گرداند. مراقب باشید: منفی یک خودش یک اندیس معتبر است، پس همیشه نتیجه را با <code>-1</code> مقایسه کنید و بی‌فکر به وظیفه آن نبرید.</li>
+        <li data-t="ch03-086"><code>endswith('.py')</code> دقیقاً همان چیزی است که در فصل هجدهم برای پیدا کردن فایل‌های پایتونی در یک پوشه لازم می‌شود.</li>
+    </ul>
+
+    <h2 id="s9" data-t="ch03-087">۹. f-string</h2>
+
+    <p data-t="ch03-088">
+        تا اینجا برای ساختن پیام یا از ویرگول در <code>print</code> استفاده
+        کردیم یا از <code>+</code> با <code>str()</code>. هر دو زشت‌اند.
+        راه درست و مدرن، <strong>f-string</strong> است: یک حرف
+        <code>f</code> پیش از گیومه بگذارید و هر جای متن که مقدار می‌خواهید،
+        آکولاد باز و بسته کنید.
+    </p>
+
+    <pre class="code"><code># An f-string is a string with the letter f in front of it.
+# Anything inside { } is evaluated and inserted into the text.
+name = 'Noshad'
+age = 20
+
+print(f'{name} is {age} years old.')
+
+# Any expression is allowed inside the braces.
+print(f'Next year {name} will be {age + 1}.')
+
+# It works with items of a list ...
+numbers = [3, 5, 7, 18, -9]
+print(f'My number: {numbers[2]}')
+
+# ... and with items of a dictionary.
+person = {
+    'name': 'Mehrsa',
+    'age': 15,
+    'city': 'Rasht',
+}
+print(f"My name is {person['name']} and I live in {person['city']}.")</code></pre>
+    <p class="code-caption" data-t="ch03-089">ساختن پیام با f-string: نمونه 09_fstrings.py</p>
+
+    <pre class="out">Noshad is 20 years old.
+Next year Noshad will be 21.
+My number: 7
+My name is Mehrsa and I live in Rasht.</pre>
+
+    <h3 data-t="ch03-090">شرح مثال</h3>
+
+    <ul>
+        <li data-t="ch03-091">داخل آکولاد هر <strong>عبارتی</strong> مجاز است، نه فقط نام متغیر. <code>{age + 1}</code> کاملاً درست است.</li>
+        <li data-t="ch03-092">تبدیل نوع خودکار انجام می‌شود. ضرورتی ندارد <code>str()</code> بنویسید.</li>
+        <li data-t="ch03-093">در خط آخر، بیرون f-string جفت‌گیومه به کار رفته و داخل آکولاد تک‌گیومه. اگر هر دو یکی باشند، در نسخه‌های پایتون پیش از ۳٫۱۲ خطای نگارشی می‌گیرید. عادت کنید نوع گیومه بیرون و داخل را متفاوت بگذارید.</li>
+        <li data-t="ch03-094">لیست و دیکشنری در این مثال آمده‌اند؛ آنها را در فصل‌های نهم و چهاردهم کامل یاد می‌گیرید.</li>
+    </ul>
+
+    <h2 id="s10" data-t="ch03-095">۱۰. قالب‌بندی با f-string</h2>
+
+    <p data-t="ch03-096">
+        f-string فقط مقدار را جای نمی‌گذارد، بلکه می‌تواند <strong>شکل نمایش</strong>
+        آن را هم تعیین کند. بعد از دونقطه داخل آکولاد، دستور قالب‌بندی می‌آید.
+    </p>
+
+    <pre class="code"><code># f-strings can also control HOW a value is displayed.
+price = 1234.5678
+name = 'Ali'
+
+print(f'{price:.2f}')      # 1234.57   -&gt; two digits after the point
+print(f'{price:10.2f}')    # right aligned in a field of 10 characters
+print(f'{price:,.2f}')     # 1,234.57  -&gt; thousands separator
+
+print(f'{name:&gt;10}|')      # right aligned
+print(f'{name:&lt;10}|')      # left aligned
+print(f'{name:^10}|')      # centred
+
+# '=' prints the expression and its value - very useful while debugging.
+total = 42
+print(f'{total = }')</code></pre>
+    <p class="code-caption" data-t="ch03-097">قالب‌بندی: نمونه 10_fstring_formatting.py</p>
+
+    <pre class="out">1234.57
+   1234.57
+1,234.57
+       Ali|
+Ali       |
+   Ali    |
+total = 42</pre>
+
+    <div class="table-scroll">
+        <table>
+            <thead>
+                <tr><th data-t="ch03-098">قالب</th><th data-t="ch03-099">معنی</th></tr>
+            </thead>
+            <tbody>
+                <tr><td><code>:.2f</code></td><td data-t="ch03-100">دو رقم اعشار، با گرد کردن</td></tr>
+                <tr><td><code>:10.2f</code></td><td data-t="ch03-101">دو رقم اعشار، در عرض ۱۰ کاراکتر</td></tr>
+                <tr><td><code>:,</code></td><td data-t="ch03-102">جداکننده هزارگان</td></tr>
+                <tr><td><code>:&gt;10</code> <code>:&lt;10</code> <code>:^10</code></td><td data-t="ch03-103">راست‌چین، چپ‌چین، وسط‌چین در عرض ۱۰</td></tr>
+                <tr><td><code>{x = }</code></td><td data-t="ch03-104">چاپ نام متغیر همراه مقدارش، برای عیب‌یابی</td></tr>
+            </tbody>
+        </table>
+    </div>
+
+    <div class="tip">
+        <span class="box-title" data-t="ch03-105">همین یک قلم را یاد بگیرید</span>
+        <p data-t="ch03-106">
+            قالب <code>{x = }</code> بهترین دوست شما موقع پیدا کردن اشکال است.
+            به جای اینکه بنویسید <code>print('total is', total)</code>، بنویسید
+            <code>print(f'{total = }')</code> و هم نام و هم مقدار را با هم
+            ببینید. وقتی ده متغیر را چاپ می‌کنید، دیگر قاطی نمی‌شوند.
+        </p>
+    </div>
+
+    <h2 id="s11" data-t="ch03-107">۱۱. رشته تغییرناپذیر است</h2>
+
+    <p data-t="ch03-108">این یکی از مهم‌ترین مفاهیم پایتون است. رشته پس از ساخته شدن <strong>هرگز</strong> تغییر نمی‌کند. هر متدی که فکر می‌کنید رشته را عوض می‌کند، در عمل یک رشته <strong>تازه</strong> می‌سازد و برمی‌گرداند.</p>
+
+    <pre class="code"><code># Strings are IMMUTABLE: once created, a string can never be changed.
+name = 'kadoos'
+
+# This line would raise a TypeError:
+# name[0] = 'K'
+
+# Instead we build a NEW string and store it back in the variable.
+name = 'K' + name[1:]
+print(name)          # Kadoos
+
+# The same idea with a method: capitalize() returns a new string,
+# it does not modify the original one.
+city = 'rasht'
+print(city.capitalize())   # Rasht
+print(city)                # rasht  -&gt; unchanged!</code></pre>
+    <p class="code-caption" data-t="ch03-109">تغییرناپذیری: نمونه 11_immutability.py</p>
+
+    <pre class="out">Kadoos
+Rasht
+rasht</pre>
+
+    <div class="warn">
+        <span class="box-title" data-t="ch03-110">دام بسیار رایج</span>
+        <p data-t="ch03-111">
+            خیلی‌ها می‌نویسند <code>city.upper()</code> و بعد تعجب می‌کنند که
+            چرا <code>city</code> عوض نشده است. متد رشته، رشته را عوض نمی‌کند،
+            بلکه یک رشته تازه <strong>برمی‌گرداند</strong>. اگر نتیجه را جایی
+            ذخیره نکنید، از بین می‌رود. درستش این است:
+            <code>city = city.upper()</code>.
+        </p>
+    </div>
+
+    <p data-t="ch03-112">
+        در فصل نهم می‌بینید که لیست برعکس رشته <strong>تغییرپذیر</strong> است، و
+        همان‌جا معنی این تفاوت روشن‌تر می‌شود.
+    </p>
+
+    <h2 id="s12" data-t="ch03-113">۱۲. برنامه: حروف اول نام</h2>
+
+    <p data-t="ch03-114">
+        برنامه کوچکی که نام کامل را می‌گیرد و حروف اولش را چاپ می‌کند. این مثال
+        یک حلقه <code>for</code> دارد که موضوع فصل ششم است؛ فعلاً فقط منطقش را
+        دنبال کنید و بعد از فصل ششم دوباره به آن سر بزنید.
+    </p>
+
+    <pre class="code"><code># Small program: read a full name and print the initials, e.g. "Ali Rezaei" -&gt; "A.R."
+full_name = input('Enter your full name: ')
+
+parts = full_name.strip().split(' ')
+
+initials = ''
+for part in parts:
+    if part != '':                       # skip the extra spaces
+        initials = initials + part[0].upper() + '.'
+
+print('Initials:', initials)</code></pre>
+    <p class="code-caption" data-t="ch03-115">حروف اول نام: نمونه 12_initials.py</p>
+
+    <pre class="out">Enter your full name: ali rezaei
+Initials: A.R.</pre>
+
+    <h3 data-t="ch03-116">شرح مثال</h3>
+
+    <ul>
+        <li data-t="ch03-117"><code>strip()</code> فاصله‌های اول و آخر را می‌گیرد و <code>split(' ')</code> نام را به تکه‌ها می‌شکند.</li>
+        <li data-t="ch03-118">متغیر <code>initials</code> با رشته خالی شروع می‌شود و در هر دور یک حرف به آن اضافه می‌شود. این همان الگوی <strong>انباره</strong> است که در فصل ششم کامل توضیح داده می‌شود، فقط اینجا انباره متنی است نه عددی.</li>
+        <li data-t="ch03-119">شرط <code>if part != ''</code> برای این است که اگر کاربر دو فاصله پشت سر هم زده باشد، یک تکه خالی تولید می‌شود و <code>part[0]</code> روی رشته خالی خطای <code>IndexError</code> می‌دهد. این دقیقاً همان باگی است که در نسخه اصلی این فایل وجود داشت و اصلاح شده است.</li>
+        <li data-t="ch03-120"><code>part[0].upper()</code> یعنی حرف اول تکه را بگیر و بزرگش کن.</li>
+    </ul>
+
+    <div class="folder-ref">
+        <span class="box-title" data-t="ch03-121">فایل‌های تمرینی این فصل</span>
+        <p data-t="ch03-122">
+            پوشه <code>S03-strings</code> شامل نمونه‌های
+            <code>01_quotes.py</code> تا <code>12_initials.py</code>.
+        </p>
+    </div>
+
+    <h2 data-t="ch03-123">خلاصه فصل</h2>
+
+    <div class="table-scroll">
+        <table>
+            <thead>
+                <tr><th data-t="ch03-124">ابزار</th><th data-t="ch03-125">وظیفه آن</th></tr>
+            </thead>
+            <tbody>
+                <tr><td><code>'...'</code> <code>"..."</code> <code>'''...'''</code></td><td data-t="ch03-126">سه شکل نوشتن رشته، سومی چندخطی</td></tr>
+                <tr><td><code>\n</code> <code>\t</code> <code>\\</code></td><td data-t="ch03-127">خط جدید، تب، بک‌اسلش</td></tr>
+                <tr><td><code>r'...'</code></td><td data-t="ch03-128">رشته خام، مناسب مسیر ویندوز</td></tr>
+                <tr><td><code>len(s)</code></td><td data-t="ch03-129">تعداد کاراکترها</td></tr>
+                <tr><td><code>s[i]</code></td><td data-t="ch03-130">یک کاراکتر. شمارش از صفر، منفی یعنی از آخر</td></tr>
+                <tr><td><code>s[a:b:c]</code></td><td data-t="ch03-131">برش. a شامل است، b شامل نیست، c گام است</td></tr>
+                <tr><td><code>s[::-1]</code></td><td data-t="ch03-132">رشته برعکس</td></tr>
+                <tr><td data-t="ch03-133"><code>+</code> و <code>*</code></td><td data-t="ch03-134">چسباندن و تکرار</td></tr>
+                <tr><td><code>upper strip replace split join</code></td><td data-t="ch03-135">پرکاربردترین متدها</td></tr>
+                <tr><td><code>in</code> <code>find</code> <code>count</code></td><td data-t="ch03-136">جست‌وجو در متن</td></tr>
+                <tr><td><code>f'{x}'</code></td><td data-t="ch03-137">ساختن پیام. بهترین راه</td></tr>
+                <tr><td data-t="ch03-138">تغییرناپذیری</td><td data-t="ch03-139">رشته عوض نمی‌شود، رشته تازه ساخته می‌شود</td></tr>
+            </tbody>
+        </table>
+    </div>
+
+    <div class="exercise">
+        <h3 data-t="ch03-140">تمرین‌های فصل سه</h3>
+        <ol>
+            <li data-t="ch03-141">یک کلمه بگیرید و آن را برعکس چاپ کنید.</li>
+            <li data-t="ch03-142">یک نام بگیرید و بگویید چند کاراکتر دارد.</li>
+            <li data-t="ch03-143">یک جمله بگیرید و یک بار با حروف بزرگ و یک بار با حروف کوچک چاپش کنید.</li>
+            <li data-t="ch03-144">یک جمله بگیرید و بگویید چند کلمه دارد.</li>
+            <li data-t="ch03-145">یک نام بگیرید و <code>Hello &lt;Name&gt;!</code> را چاپ کنید، طوری که حرف اول همیشه بزرگ باشد، هر جور که کاربر تایپ کرده باشد.</li>
+            <li data-t="ch03-146">یک نشانی ایمیل بگیرید و بخش پیش از <code>@</code> و بخش پس از آن را جدا چاپ کنید.</li>
+            <li data-t="ch03-147">یک کلمه بگیرید و بگویید متقارن هست یا نه، مثل <code>radar</code>.</li>
+            <li data-t="ch03-148">یک سطر فاکتور با f-string چاپ کنید که نام کالا چپ‌چین و قیمت راست‌چین با دو رقم اعشار باشد.</li>
+        </ol>
+    </div>
+
+    <div class="pager">
+        <a href="chapter-02.html">فصل قبل: عملگرها</a>
+        <a href="chapter-04.html">فصل بعد: شرط‌ها</a>
+    </div>
+
+</main>
+
+</body>
+</html>

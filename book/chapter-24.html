@@ -1,0 +1,726 @@
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="فصل بیست و چهار: متدهای جادویی دو زیرخطی، سربارگذاری عملگرها، مدیر زمینه و ساختن کلاس استثنای سفارشی">
+    <title>فصل ۲۴: متدهای جادویی و استثناهای سفارشی</title>
+    <link rel="icon" href="logokm.png" type="image/png">
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<header class="book-bar">
+    <a class="name" href="index.html">برنامه‌نویسی پایتون</a>
+    <a href="index.html">فهرست مطالب</a>
+</header>
+
+<main class="paper">
+
+    <div class="chapter-head">
+        <span class="chapter-num">فصل ۲۴</span>
+        <h1 data-t="ch24-001">متدهای جادویی و استثناهای سفارشی</h1>
+        <p class="lead" data-t="ch24-002">
+            چرا <code>len</code> روی لیست کار می‌کند و روی کلاس شما نه؟ چرا
+            می‌شود دو رشته را با <code>+</code> جمع کرد؟ در این فصل رازش را
+            می‌فهمید و کلاس‌هایتان را مثل نوع‌های خود پایتون می‌کنید.
+        </p>
+    </div>
+
+    <div class="mini-toc">
+        <span class="box-title" data-t="ch24-003">در این فصل می‌خوانید</span>
+        <ol>
+            <li data-t="ch24-004"><a href="#s1">متد جادویی چیست</a></li>
+            <li data-t="ch24-005"><a href="#s2">__str__ و __repr__</a></li>
+            <li data-t="ch24-006"><a href="#s3">len و bool و in</a></li>
+            <li data-t="ch24-007"><a href="#s4">مقایسه و مرتب‌سازی</a></li>
+            <li data-t="ch24-008"><a href="#s5">سربارگذاری عملگرهای ریاضی</a></li>
+            <li data-t="ch24-009"><a href="#s6">اندیس و پیمایش</a></li>
+            <li data-t="ch24-010"><a href="#s7">شیء قابل صدا زدن و مدیر زمینه</a></li>
+            <li data-t="ch24-011"><a href="#s8">نمونه کامل: بردار</a></li>
+            <li data-t="ch24-012"><a href="#s9">اولین استثنای سفارشی</a></li>
+            <li data-t="ch24-013"><a href="#s10">استثنایی که داده حمل می‌کند</a></li>
+            <li data-t="ch24-014"><a href="#s11">سلسله‌مراتب استثناها</a></li>
+            <li data-t="ch24-015"><a href="#s12">زنجیره استثناها</a></li>
+        </ol>
+    </div>
+
+    <h2 id="s1" data-t="ch24-016">۱. متد جادویی چیست</h2>
+
+    <p data-t="ch24-017">
+        متدهایی که نامشان با دو زیرخط شروع و تمام می‌شود،
+        <strong>متد جادویی</strong> یا dunder نام دارند. شما آنها را صدا
+        نمی‌زنید؛ <strong>پایتون</strong> در موقعیت‌های خاص خودش صدایشان
+        می‌زند.
+    </p>
+
+    <div class="table-scroll">
+        <table>
+            <thead>
+                <tr><th data-t="ch24-018">وقتی می‌نویسید</th><th data-t="ch24-019">پایتون صدا می‌زند</th></tr>
+            </thead>
+            <tbody>
+                <tr><td><code>Person('Ali')</code></td><td><code>__init__</code></td></tr>
+                <tr><td><code>print(p)</code></td><td><code>__str__</code></td></tr>
+                <tr><td><code>len(p)</code></td><td><code>__len__</code></td></tr>
+                <tr><td><code>a + b</code></td><td><code>__add__</code></td></tr>
+                <tr><td><code>a == b</code></td><td><code>__eq__</code></td></tr>
+                <tr><td><code>x in p</code></td><td><code>__contains__</code></td></tr>
+                <tr><td><code>p[0]</code></td><td><code>__getitem__</code></td></tr>
+                <tr><td><code>for x in p</code></td><td><code>__iter__</code></td></tr>
+                <tr><td><code>with p:</code></td><td data-t="ch24-020"><code>__enter__</code> و <code>__exit__</code></td></tr>
+            </tbody>
+        </table>
+    </div>
+
+    <h2 id="s2" data-t="ch24-021">۲. __str__ و __repr__</h2>
+
+    <pre class="code"><code># Without __str__, printing an object gives something useless like
+# &lt;__main__.Human object at 0x000001C3...&gt;
+class Human:
+    def __init__(self, name: str = 'Adam', lastname: str = ''):
+        self.name = name
+        self.lastname = lastname
+
+    def __str__(self) -&gt; str:
+        '''Used by print() and str(): a friendly text for the USER.'''
+        return f'{self.name} {self.lastname}'.strip()
+
+    def __repr__(self) -&gt; str:
+        '''Used in the interpreter, in a list, and while debugging:
+        a precise text for the DEVELOPER.'''
+        return f'Human(name={self.name!r}, lastname={self.lastname!r})'
+
+
+if __name__ == '__main__':
+    h = Human('Kasra', 'Bagheri')
+
+    print(h)             # __str__
+    print(repr(h))       # __repr__
+    print([h])           # a list uses __repr__ for its items!
+    print(f'{h}')        # __str__
+    print(f'{h!r}')      # __repr__</code></pre>
+    <p class="code-caption" data-t="ch24-022">دو نمایش متنی: نمونه 01_str_and_repr.py</p>
+
+    <pre class="out">Kasra Bagheri
+Human(name='Kasra', lastname='Bagheri')
+[Human(name='Kasra', lastname='Bagheri')]
+Kasra Bagheri
+Human(name='Kasra', lastname='Bagheri')</pre>
+
+    <div class="table-scroll">
+        <table>
+            <thead>
+                <tr><th></th><th><code>__str__</code></th><th><code>__repr__</code></th></tr>
+            </thead>
+            <tbody>
+                <tr><td data-t="ch24-023">برای چه کسی</td><td data-t="ch24-024">کاربر نهایی</td><td data-t="ch24-025">برنامه‌نویس</td></tr>
+                <tr><td data-t="ch24-026">چه شکلی</td><td data-t="ch24-027">خوانا و ساده</td><td data-t="ch24-028">دقیق، ترجیحاً شبیه کد ساخت شیء</td></tr>
+                <tr><td data-t="ch24-029">کجا</td><td data-t="ch24-030"><code>print</code>، <code>str()</code>، f-string</td><td data-t="ch24-031">مفسر، داخل لیست، عیب‌یابی</td></tr>
+            </tbody>
+        </table>
+    </div>
+
+    <div class="tip">
+        <span class="box-title" data-t="ch24-032">اگر فقط یکی را می‌نویسید</span>
+        <p data-t="ch24-033">
+            <code>__repr__</code> را بنویسید. اگر <code>__str__</code> نباشد،
+            پایتون به <code>__repr__</code> پناه می‌برد. برعکسش صادق نیست، و
+            بدون <code>__repr__</code>، اشیاء داخل لیست به شکل بی‌فایده
+            <code>&lt;object at 0x...&gt;</code> چاپ می‌شوند.
+        </p>
+    </div>
+
+    <h2 id="s3" data-t="ch24-034">۳. len و bool و in</h2>
+
+    <pre class="code"><code>class Playlist:
+    def __init__(self, name: str) -&gt; None:
+        self.name = name
+        self.songs: list[str] = []
+
+    def add(self, song: str) -&gt; None:
+        self.songs.append(song)
+
+    def __len__(self) -&gt; int:
+        'len(playlist)'
+        return len(self.songs)
+
+    def __bool__(self) -&gt; bool:
+        '''bool(playlist) and "if playlist:".'''
+        return len(self.songs) &gt; 0
+
+    def __contains__(self, song: str) -&gt; bool:
+        '"song in playlist"'
+        return song in self.songs
+
+    def __str__(self) -&gt; str:
+        return f'{self.name} ({len(self)} songs)'
+
+
+if __name__ == '__main__':
+    playlist = Playlist('Study')
+
+    if not playlist:
+        print('The playlist is empty.')
+
+    playlist.add('Song A')
+    playlist.add('Song B')
+
+    print(len(playlist))          # 2
+    print('Song A' in playlist)   # True
+    print(playlist)</code></pre>
+    <p class="code-caption" data-t="ch24-035">رفتار ظرف‌مانند: نمونه 02_len_bool_contains.py</p>
+
+    <p data-t="ch24-036">
+        با سه متد ساده، کلاس شما در دستور <code>if</code>، در
+        <code>len</code> و با عملگر <code>in</code> طبیعی رفتار می‌کند. نکته:
+        اگر <code>__bool__</code> نباشد پایتون از <code>__len__</code>
+        استفاده می‌کند و اگر آن هم نباشد، هر شیئی همیشه <code>True</code>
+        حساب می‌شود.
+    </p>
+
+    <h2 id="s4" data-t="ch24-037">۴. مقایسه و مرتب‌سازی</h2>
+
+    <pre class="code"><code>from functools import total_ordering
+
+
+@total_ordering          # generates &lt;=, &gt;, &gt;= out of __eq__ and __lt__
+class Student:
+    def __init__(self, name: str, score: float) -&gt; None:
+        self.name = name
+        self.score = score
+
+    def __repr__(self) -&gt; str:
+        return f'Student({self.name!r}, {self.score})'
+
+    def __eq__(self, other) -&gt; bool:
+        # Always check the type: comparing with something else must not crash.
+        if not isinstance(other, Student):
+            return NotImplemented
+        return self.score == other.score
+
+    def __lt__(self, other) -&gt; bool:
+        if not isinstance(other, Student):
+            return NotImplemented
+        return self.score &lt; other.score
+
+    def __hash__(self) -&gt; int:
+        '''Defining __eq__ removes the default __hash__, so the object can no
+        longer go into a set or be a dict key. We give it back here.'''
+        return hash(self.score)
+
+
+if __name__ == '__main__':
+    a = Student('Ali', 18)
+    b = Student('Sara', 20)
+    c = Student('Reza', 18)
+
+    print(a == c)        # True  - same score
+    print(a &lt; b)         # True
+    print(b &gt;= a)        # True  - generated by total_ordering
+
+    students = [b, a, c]
+    print(sorted(students))
+    print(max(students))</code></pre>
+    <p class="code-caption" data-t="ch24-038">مقایسه: نمونه 03_comparison.py</p>
+
+    <h3 data-t="ch24-039">شرح مثال</h3>
+
+    <ul>
+        <li data-t="ch24-040">با تعریف <code>__eq__</code> و <code>__lt__</code>، دیگر ضرورتی ندارد موقع <code>sorted</code> پارامتر <code>key</code> بدهید؛ خود کلاس می‌داند چطور مقایسه شود.</li>
+        <li data-t="ch24-041">دکوراتور <code>@total_ordering</code> چهار عملگر دیگر را از روی همین دو تا می‌سازد.</li>
+        <li data-t="ch24-042">برگرداندن <code>NotImplemented</code> وقتی نوع طرف مقابل جور نیست، کار درست است: به پایتون می‌گوید «من بلد نیستم، تو تصمیم بگیر».</li>
+        <li data-t="ch24-043">نکته ظریف: به محض تعریف <code>__eq__</code>، پایتون <code>__hash__</code> پیش‌فرض را حذف می‌کند و شیء دیگر داخل مجموعه یا کلید دیکشنری نمی‌رود. اگر لازمش دارید باید خودتان تعریفش کنید.</li>
+    </ul>
+
+    <h2 id="s5" data-t="ch24-044">۵. سربارگذاری عملگرهای ریاضی</h2>
+
+    <pre class="code"><code>class Money:
+    def __init__(self, amount: float, currency: str = 'Toman') -&gt; None:
+        self.amount = amount
+        self.currency = currency
+
+    def __str__(self) -&gt; str:
+        return f'{self.amount:,.0f} {self.currency}'
+
+    def __add__(self, other: 'Money') -&gt; 'Money':
+        '''Called by  a + b.
+        IMPORTANT: it must RETURN a value, not print one.'''
+        if not isinstance(other, Money) or other.currency != self.currency:
+            return NotImplemented
+        return Money(self.amount + other.amount, self.currency)
+
+    def __mul__(self, factor: float) -&gt; 'Money':
+        'Called by  money * 3'
+        return Money(self.amount * factor, self.currency)
+
+    def __rmul__(self, factor: float) -&gt; 'Money':
+        'Called by  3 * money  (the "reflected" version)'
+        return self * factor
+
+    def __neg__(self) -&gt; 'Money':
+        'Called by  -money'
+        return Money(-self.amount, self.currency)
+
+
+if __name__ == '__main__':
+    price = Money(15_000)
+    tax = Money(1_350)
+
+    print(price + tax)
+    print(price * 3)
+    print(3 * price)         # works thanks to __rmul__
+    print(-price)
+
+    # A different currency is refused by Python itself:
+    try:
+        print(price + Money(10, 'Euro'))
+    except TypeError as e:
+        print('Refused:', e)</code></pre>
+    <p class="code-caption" data-t="ch24-045">عملگرهای ریاضی: نمونه 04_arithmetic.py</p>
+
+    <div class="warn">
+        <span class="box-title" data-t="ch24-046">باگی که در نسخه اصلی این دوره بود</span>
+        <p data-t="ch24-047">
+            در فایل اصلی، متد <code>__add__</code> نتیجه را
+            <strong>چاپ</strong> می‌کرد به جای اینکه برگرداند، و
+            <code>__eq__</code> هم چیزی برنمی‌گرداند یعنی <code>None</code>
+            می‌داد. نتیجه این بود که <code>a + b</code> برابر <code>None</code>
+            می‌شد و <code>a == b</code> بی‌سروصدا همیشه نادرست بود. قانون:
+            متد جادویی ریاضی <strong>همیشه</strong> باید یک شیء
+            <strong>تازه</strong> برگرداند.
+        </p>
+    </div>
+
+    <p data-t="ch24-048">
+        نکته <code>__rmul__</code>: وقتی می‌نویسید <code>3 * price</code>،
+        پایتون اول از عدد ۳ می‌پرسد که آیا می‌داند چطور در یک
+        <code>Money</code> ضرب شود. جواب منفی است، پس سراغ نسخه
+        <strong>آینه‌ای</strong> در کلاس شما می‌آید.
+    </p>
+
+    <h2 id="s6" data-t="ch24-049">۶. اندیس و پیمایش</h2>
+
+    <pre class="code"><code>class Deck:
+    def __init__(self) -&gt; None:
+        self.cards = [f'{value}{suit}'
+                      for suit in 'SHDC'
+                      for value in ['A', '2', '3', 'J', 'Q', 'K']]
+
+    def __len__(self) -&gt; int:
+        return len(self.cards)
+
+    def __getitem__(self, index):
+        'deck[0] and even deck[0:3]'
+        return self.cards[index]
+
+    def __setitem__(self, index, value) -&gt; None:
+        'deck[0] = ...'
+        self.cards[index] = value
+
+    def __iter__(self):
+        'for card in deck'
+        return iter(self.cards)
+
+
+if __name__ == '__main__':
+    deck = Deck()
+
+    print(deck[0])
+    print(deck[0:3])         # slicing works for free
+
+    for card in deck:
+        print(card, end=' ')
+    print()
+
+    # Once __iter__ exists, everything that loops works: in, list(), sorted()...
+    print('QH' in deck)
+    print(list(deck)[:5])</code></pre>
+    <p class="code-caption" data-t="ch24-050">اندیس و پیمایش: نمونه 05_indexing_and_iteration.py</p>
+
+    <p data-t="ch24-051">
+        با تعریف <code>__iter__</code>، ناگهان همه ابزارهایی که با حلقه کار
+        می‌کنند روی کلاس شما هم کار می‌کنند: <code>in</code>،
+        <code>list()</code>، <code>sorted()</code>، <code>sum()</code>، درک
+        لیستی و همه چیز. این قدرت واقعی متدهای جادویی است.
+    </p>
+
+    <h2 id="s7" data-t="ch24-052">۷. شیء قابل صدا زدن و مدیر زمینه</h2>
+
+    <pre class="code"><code># __call__ makes an OBJECT behave like a function.
+class Multiplier:
+    def __init__(self, factor: float) -&gt; None:
+        self.factor = factor
+
+    def __call__(self, value: float) -&gt; float:
+        return value * self.factor
+
+
+double = Multiplier(2)
+triple = Multiplier(3)
+
+print(double(10))        # 20  - the object is called like a function
+print(callable(double))  # True</code></pre>
+    <p class="code-caption" data-t="ch24-053">شیء قابل صدا زدن: نمونه 06_call_and_context.py</p>
+
+    <pre class="code"><code># __enter__ / __exit__ let us write our own 'with' block.
+class Timer:
+    'Measure how long the block inside "with" takes.'
+
+    def __init__(self, label: str = 'block') -&gt; None:
+        self.label = label
+
+    def __enter__(self):
+        import time
+        self.start = time.perf_counter()
+        print(f'[{self.label}] started')
+        return self          # what "as t" receives
+
+    def __exit__(self, exc_type, exc_value, traceback):
+        import time
+        self.elapsed = time.perf_counter() - self.start
+        print(f'[{self.label}] took {self.elapsed:.4f} s')
+        # Returning False (or None) lets an exception propagate normally.
+        return False
+
+
+if __name__ == '__main__':
+    with Timer('sum'):
+        total = sum(range(2_000_000))</code></pre>
+    <p class="code-caption" data-t="ch24-054">مدیر زمینه: نمونه 06_call_and_context.py</p>
+
+    <h3 data-t="ch24-055">شرح مثال</h3>
+
+    <ul>
+        <li data-t="ch24-056">حالا می‌فهمید <code>with open(...)</code> فصل هجدهم چطور کار می‌کرد: فایل هم یک مدیر زمینه است.</li>
+        <li data-t="ch24-057"><code>__enter__</code> در ابتدای بلوک اجرا می‌شود و هر چه برگرداند به متغیر بعد از <code>as</code> می‌رسد.</li>
+        <li data-t="ch24-058"><code>__exit__</code> در پایان اجرا می‌شود، <strong>حتی اگر</strong> داخل بلوک خطا رخ دهد. سه پارامترش اطلاعات آن خطا هستند.</li>
+        <li data-t="ch24-059">برگرداندن <code>False</code> یعنی «خطا را قورت نمی‌دهم، بگذار بالا برود». اگر <code>True</code> برگردانید، خطا خفه می‌شود که معمولاً کار بدی است.</li>
+    </ul>
+
+    <h2 id="s8" data-t="ch24-060">۸. نمونه کامل: بردار</h2>
+
+    <pre class="code"><code>'''A 2-D vector class that uses many dunder methods at once.'''
+
+import math
+
+
+class Vector:
+    def __init__(self, x: float, y: float) -&gt; None:
+        self.x = x
+        self.y = y
+
+    # --- text representations ---
+    def __str__(self) -&gt; str:
+        return f'({self.x}, {self.y})'
+
+    def __repr__(self) -&gt; str:
+        return f'Vector({self.x}, {self.y})'
+
+    # --- arithmetic ---
+    def __add__(self, other: 'Vector') -&gt; 'Vector':
+        return Vector(self.x + other.x, self.y + other.y)
+
+    def __mul__(self, factor: float) -&gt; 'Vector':
+        return Vector(self.x * factor, self.y * factor)
+
+    def __rmul__(self, factor: float) -&gt; 'Vector':
+        return self * factor
+
+    def __neg__(self) -&gt; 'Vector':
+        return Vector(-self.x, -self.y)
+
+    # --- comparison ---
+    def __eq__(self, other) -&gt; bool:
+        if not isinstance(other, Vector):
+            return NotImplemented
+        return self.x == other.x and self.y == other.y
+
+    def __hash__(self) -&gt; int:
+        return hash((self.x, self.y))
+
+    # --- built-in functions ---
+    def __abs__(self) -&gt; float:
+        'abs(v) returns the length of the vector.'
+        return math.sqrt(self.x ** 2 + self.y ** 2)
+
+    def __getitem__(self, index: int) -&gt; float:
+        'v[0] is x, v[1] is y.'
+        return (self.x, self.y)[index]
+
+    def __iter__(self):
+        'Allows  x, y = v'
+        yield self.x
+        yield self.y
+
+
+if __name__ == '__main__':
+    a = Vector(3, 4)
+    b = Vector(1, 2)
+
+    print(a + b)
+    print(a * 2, 2 * a)
+    print(abs(a))            # 5.0
+    x, y = a                 # unpacking, thanks to __iter__
+    print(x, y)</code></pre>
+    <p class="code-caption" data-t="ch24-061">کلاس بردار: نمونه 07_vector.py</p>
+
+    <p data-t="ch24-062">
+        این کلاس دقیقاً مثل یک نوع درونی پایتون رفتار می‌کند: جمع می‌شود، ضرب
+        می‌شود، طولش با <code>abs</code> گرفته می‌شود، باز می‌شود و در مجموعه
+        می‌نشیند. کلمه <code>yield</code> در <code>__iter__</code> موضوع فصل
+        بیست و ششم است.
+    </p>
+
+    <h2 id="s9" data-t="ch24-063">۹. اولین استثنای سفارشی</h2>
+
+    <pre class="code"><code># An exception is just a class that inherits from Exception.
+class LoginError(Exception):
+    'Raised when a login attempt fails.'
+
+
+def login(username: str, password: str) -&gt; str:
+    if username != 'admin':
+        raise LoginError('Username is incorrect')
+    if password != '1234':
+        raise LoginError('Password is incorrect')
+    return 'Logged in!'
+
+
+if __name__ == '__main__':
+    try:
+        print(login('admin', 'wrong'))
+    except LoginError as e:
+        print('Error:', e)</code></pre>
+    <p class="code-caption" data-t="ch24-064">استثنای سفارشی: نمونه 08_custom_exception.py</p>
+
+    <h3 data-t="ch24-065">چرا استثنای خودمان</h3>
+
+    <ul>
+        <li data-t="ch24-066">ساختنش فقط یک خط است: کلاسی که از <code>Exception</code> ارث می‌برد.</li>
+        <li data-t="ch24-067">صداکننده می‌تواند <strong>دقیقاً</strong> خطای برنامه شما را بگیرد، نه یک <code>ValueError</code> کلی که ممکن است از هر جای دیگری آمده باشد.</li>
+        <li data-t="ch24-068">نام خطا خودش مستندسازی است: <code>LoginError</code> بدون هیچ توضیحی معلوم است چیست.</li>
+        <li data-t="ch24-069">چون از <code>Exception</code> ارث می‌برد، <code>except Exception</code> هم آن را می‌گیرد.</li>
+    </ul>
+
+    <h2 id="s10" data-t="ch24-070">۱۰. استثنایی که داده حمل می‌کند</h2>
+
+    <pre class="code"><code># An exception is an object, so it can carry extra data - a code, a field name,
+# the value that was refused...
+class AppError(Exception):
+    def __init__(self, message: str, code: int) -&gt; None:
+        super().__init__(message)     # let Exception store the message
+        self.code = code              # our own extra data
+
+
+def withdraw(balance: float, amount: float) -&gt; float:
+    if amount &lt;= 0:
+        raise AppError('The amount must be more than zero.', code=1001)
+    if amount &gt; balance:
+        raise AppError('Not enough money.', code=1002)
+    return balance - amount
+
+
+if __name__ == '__main__':
+    try:
+        withdraw(200, -1000)
+    except AppError as e:
+        print(f'Error [{e.code}]: {e}')
+
+    # The code lets the caller react differently to each situation,
+    # and lets the message be translated without touching the logic.
+    MESSAGES = {
+        1001: 'The amount you entered is not valid.',
+        1002: 'Your balance is too low.',
+    }
+
+    try:
+        withdraw(100, 500)
+    except AppError as e:
+        print(MESSAGES.get(e.code, 'Unknown error.'))</code></pre>
+    <p class="code-caption" data-t="ch24-071">استثنا با کد: نمونه 10_exception_with_code.py</p>
+
+    <p data-t="ch24-072">
+        استثنا هم یک شیء است، پس می‌تواند صفت داشته باشد. کد خطا به شما اجازه
+        می‌دهد پیام‌ها را جدا نگه دارید و مثلاً به فارسی ترجمه‌شان کنید، بدون
+        اینکه به منطق برنامه دست بزنید.
+    </p>
+
+    <h2 id="s11" data-t="ch24-073">۱۱. سلسله‌مراتب استثناها</h2>
+
+    <p data-t="ch24-074">
+        یک برنامه واقعی یک <strong>خانواده</strong> از استثناها تعریف می‌کند تا
+        بشود در سطوح مختلف آنها را گرفت.
+    </p>
+
+    <pre class="out">ShopError                &lt;- the base: catch this to catch everything
+  +-- ProductError
+  |     +-- ProductNotFound
+  |     +-- OutOfStock
+  +-- PaymentError
+        +-- NotEnoughMoney</pre>
+
+    <pre class="code"><code>class ShopError(Exception):
+    'Base class of every error of the shop.'
+
+
+class ProductError(ShopError):
+    'Something is wrong with a product.'
+
+
+class ProductNotFound(ProductError):
+    def __init__(self, name: str) -&gt; None:
+        super().__init__(f'The product {name!r} does not exist.')
+        self.name = name
+
+
+class OutOfStock(ProductError):
+    def __init__(self, name: str, available: int) -&gt; None:
+        super().__init__(f'Only {available} left of {name!r}.')
+        self.name = name
+        self.available = available
+
+
+class PaymentError(ShopError):
+    'Something is wrong with the payment.'
+
+
+class NotEnoughMoney(PaymentError):
+    def __init__(self, missing: float) -&gt; None:
+        super().__init__(f'You need {missing:,.0f} more.')
+        self.missing = missing</code></pre>
+    <p class="code-caption" data-t="ch24-075">خانواده استثناها: نمونه 11_exception_hierarchy.py</p>
+
+    <pre class="code"><code>def buy(name: str, quantity: int, wallet: float) -&gt; float:
+    if name not in STOCK:
+        raise ProductNotFound(name)
+
+    if STOCK[name] &lt; quantity:
+        raise OutOfStock(name, STOCK[name])
+
+    total = PRICES[name] * quantity
+    if total &gt; wallet:
+        raise NotEnoughMoney(total - wallet)
+
+    return wallet - total
+
+
+def main() -&gt; None:
+    for name, quantity, wallet in orders:
+        try:
+            rest = buy(name, quantity, wallet)
+        except ProductError as e:
+            # One handler for every product problem.
+            print(f'[product] {e}')
+        except PaymentError as e:
+            print(f'[payment] {e} (missing {e.missing:,.0f})')
+        except ShopError as e:
+            # The safety net for anything new added later.
+            print(f'[shop] {e}')
+        else:
+            print(f'Bought {quantity} x {name}, {rest:,.0f} left.')</code></pre>
+    <p class="code-caption" data-t="ch24-076">گرفتن در سطوح مختلف: نمونه 11_exception_hierarchy.py</p>
+
+    <h3 data-t="ch24-077">چرا این ساختار ارزش دارد</h3>
+
+    <ul>
+        <li data-t="ch24-078">صداکننده می‌تواند در سطح <strong>دلخواه خودش</strong> خطا را بگیرد: خیلی دقیق (<code>OutOfStock</code>)، متوسط (<code>ProductError</code>)، یا کلی (<code>ShopError</code>).</li>
+        <li data-t="ch24-079">اگر فردا خطای تازه‌ای زیر <code>ProductError</code> اضافه کنید، کدی که <code>ProductError</code> را می‌گیرد بدون تغییر همچنان کار می‌کند.</li>
+        <li data-t="ch24-080">گرفتن <code>ShopError</code> در بالاترین سطح یعنی «هر خطای شناخته‌شده این برنامه». هر چیز دیگری واقعاً یک باگ است و باید دیده شود.</li>
+        <li data-t="ch24-081">ترتیب <code>except</code> ها از خاص به عام است. اگر برعکس بنویسید، اولی همه را می‌گیرد و بقیه بی‌فایده می‌شوند.</li>
+    </ul>
+
+    <h2 id="s12" data-t="ch24-082">۱۲. زنجیره استثناها</h2>
+
+    <pre class="code"><code># When you translate a low-level error into your own one, keep the original:
+# 'raise ... from e' records the cause and shows both in the traceback.
+class ConfigError(Exception):
+    'The configuration could not be read.'
+
+
+def read_port(path: str) -&gt; int:
+    try:
+        with open(path, encoding='utf-8') as f:
+            return int(f.read().strip())
+    except FileNotFoundError as e:
+        raise ConfigError(f'{path} is missing') from e
+    except ValueError as e:
+        raise ConfigError(f'{path} does not contain a number') from e
+
+
+if __name__ == '__main__':
+    try:
+        read_port('nothing.cfg')
+    except ConfigError as e:
+        print('Error:', e)
+        print('Caused by:', repr(e.__cause__))</code></pre>
+    <p class="code-caption" data-t="ch24-083">زنجیره: نمونه 12_raise_from.py</p>
+
+    <h3 data-t="ch24-084">شرح مثال</h3>
+
+    <ul>
+        <li data-t="ch24-085">الگوی رایج: خطای سطح پایین (فایل نیست) را به خطای سطح بالای برنامه‌تان (تنظیمات خراب است) ترجمه می‌کنید.</li>
+        <li data-t="ch24-086"><code>from e</code> علت اصلی را نگه می‌دارد. در ردیابی هر دو دیده می‌شوند، با جمله «این خطا علت مستقیم خطای بعدی بود».</li>
+        <li data-t="ch24-087">بدون <code>from</code>، اطلاعات علت اصلی گم می‌شود و عیب‌یابی سخت‌تر است.</li>
+        <li data-t="ch24-088"><code>from None</code> عمداً علت را پنهان می‌کند، وقتی که نمایش دادنش فقط کاربر را گیج می‌کند.</li>
+    </ul>
+
+    <div class="folder-ref">
+        <span class="box-title" data-t="ch24-089">فایل‌های تمرینی این فصل</span>
+        <p data-t="ch24-090">
+            پوشه <code>S24-oop-magic-methods-and-custom-exceptions</code> شامل
+            نمونه‌های <code>01_str_and_repr.py</code> تا
+            <code>12_raise_from.py</code>، به‌علاوه پوشه
+            <code>09_custom_exception_package</code> که یک استثنا را در ماژول
+            جداگانه نشان می‌دهد.
+        </p>
+    </div>
+
+    <h2 data-t="ch24-091">خلاصه فصل</h2>
+
+    <div class="table-scroll">
+        <table>
+            <thead>
+                <tr><th data-t="ch24-092">متد جادویی</th><th data-t="ch24-093">وظیفه آن</th></tr>
+            </thead>
+            <tbody>
+                <tr><td><code>__str__</code> <code>__repr__</code></td><td data-t="ch24-094">نمایش برای کاربر و برای برنامه‌نویس</td></tr>
+                <tr><td><code>__len__</code> <code>__bool__</code> <code>__contains__</code></td><td data-t="ch24-095">رفتار مثل یک ظرف</td></tr>
+                <tr><td><code>__eq__</code> <code>__lt__</code></td><td data-t="ch24-096">مقایسه و مرتب‌سازی</td></tr>
+                <tr><td><code>@total_ordering</code></td><td data-t="ch24-097">ساختن بقیه عملگرهای مقایسه</td></tr>
+                <tr><td><code>__hash__</code></td><td data-t="ch24-098">بعد از تعریف <code>__eq__</code> لازم می‌شود</td></tr>
+                <tr><td><code>__add__</code> <code>__mul__</code> <code>__neg__</code></td><td data-t="ch24-099">عملگرهای ریاضی. باید مقدار برگردانند</td></tr>
+                <tr><td><code>__rmul__</code></td><td data-t="ch24-100">وقتی شیء شما سمت راست عملگر است</td></tr>
+                <tr><td><code>__getitem__</code> <code>__iter__</code></td><td data-t="ch24-101">اندیس و حلقه</td></tr>
+                <tr><td><code>__call__</code></td><td data-t="ch24-102">شیئی که مثل تابع صدا زده می‌شود</td></tr>
+                <tr><td><code>__enter__</code> <code>__exit__</code></td><td data-t="ch24-103">ساختن مدیر زمینه برای <code>with</code></td></tr>
+                <tr><td><code>class MyError(Exception)</code></td><td data-t="ch24-104">استثنای سفارشی</td></tr>
+                <tr><td data-t="ch24-105">سلسله‌مراتب استثنا</td><td data-t="ch24-106">گرفتن خطا در سطح دلخواه</td></tr>
+                <tr><td><code>raise X from e</code></td><td data-t="ch24-107">حفظ علت اصلی خطا</td></tr>
+            </tbody>
+        </table>
+    </div>
+
+    <div class="exercise">
+        <h3 data-t="ch24-108">تمرین‌های فصل بیست و چهار</h3>
+        <ol>
+            <li data-t="ch24-109">به کلاس <code>Book</code> خود، <code>__str__</code> و <code>__repr__</code> اضافه کنید.</li>
+            <li data-t="ch24-110"><code>__eq__</code> را طوری بنویسید که دو کتاب با شابک یکسان برابر باشند.</li>
+            <li data-t="ch24-111"><code>__lt__</code> را بنویسید تا لیستی از کتاب‌ها بر اساس سال مرتب شود.</li>
+            <li data-t="ch24-112">کلاس <code>Fraction</code> را با <code>__add__</code> و <code>__mul__</code> و <code>__str__</code> بنویسید.</li>
+            <li data-t="ch24-113">کلاس <code>Matrix</code> را با <code>__getitem__</code> و <code>__add__</code> بنویسید.</li>
+            <li data-t="ch24-114">مدیر زمینه <code>OpenDatabase</code> را بنویسید که «متصل شد» و «قطع شد» چاپ کند.</li>
+            <li data-t="ch24-115">سلسله‌مراتب استثنا برای یک برنامه کتابخانه طراحی کنید: <code>LibraryError</code>، <code>BookNotFound</code>، <code>AlreadyBorrowed</code> و مانند این موارد.</li>
+            <li data-t="ch24-116">یکی از برنامه‌های قبلی‌تان را طوری بازنویسی کنید که هر خطا به جای چاپ پیام، یکی از استثناهای خودتان را بیندازد.</li>
+        </ol>
+    </div>
+
+    <div class="pager">
+        <a href="chapter-23.html">فصل قبل: وراثت و چندریختی</a>
+        <a href="chapter-25.html">فصل بعد: کد پایتونی، بخش اول</a>
+    </div>
+
+</main>
+
+</body>
+</html>

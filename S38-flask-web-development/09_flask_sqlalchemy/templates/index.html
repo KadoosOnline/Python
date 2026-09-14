@@ -1,0 +1,20 @@
+{% extends 'base.html' %}
+
+{% block content %}
+    <h2>Authors</h2>
+    <ul>
+        {% for author in authors %}
+            <li>
+                <a href="{{ url_for('author_page', author_id=author.id) }}">
+                    {{ author.name }}</a>
+                {# author.books works because of the relationship: SQLAlchemy
+                   fetches the books when we ask for them. #}
+                ({{ author.books | length }} book(s))
+            </li>
+        {% else %}
+            <li>Nothing yet. Run <code>flask --app app init-db</code>.</li>
+        {% endfor %}
+    </ul>
+
+    <p>The API: <a href="{{ url_for('api_books') }}">/api/books</a></p>
+{% endblock %}

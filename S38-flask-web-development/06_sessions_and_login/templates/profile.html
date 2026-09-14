@@ -1,0 +1,17 @@
+{% extends 'base.html' %}
+
+{% block title %}{{ user.name }}{% endblock %}
+
+{% block content %}
+    <h1>{{ user.name }}</h1>
+    <p>user name: {{ username }}</p>
+
+    <h3>Your notes</h3>
+    <ul>
+        {% for note in notes %}
+            <li>{{ note }}</li>
+        {% else %}
+            <li>nothing yet</li>
+        {% endfor %}
+    </ul>
+{% endblock %}

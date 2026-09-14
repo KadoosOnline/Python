@@ -1,0 +1,12 @@
+The WordPress REST API is a good playground: every WordPress site exposes it.
+
+Documentation:
+    https://developer.wordpress.org/rest-api/
+
+The endpoints used here:
+    GET  <site>/wp-json/wp/v2/posts?page=1&per_page=20
+    GET  <site>/wp-json/wp/v2/posts/<id>
+
+Useful response headers:
+    X-WP-Total        the total number of posts
+    X-WP-TotalPages   how many pages there are

@@ -1,0 +1,25 @@
+{% extends 'base.html' %}
+
+{% block title %}Categories{% endblock %}
+
+{% block content %}
+    <h2>Categories</h2>
+
+    <ul class="notes">
+        {% for category in categories %}
+            <li>
+                <a href="{{ url_for('notes.index', category=category.id) }}">
+                    {{ category.name }}</a>
+                <span class="tag">{{ category.notes | length }} note(s)</span>
+            </li>
+        {% else %}
+            <li>No category yet.</li>
+        {% endfor %}
+    </ul>
+
+    <form method="post">
+        <label for="name">A new category</label>
+        <input id="name" name="name" placeholder="for example: Homework">
+        <button type="submit">Add</button>
+    </form>
+{% endblock %}

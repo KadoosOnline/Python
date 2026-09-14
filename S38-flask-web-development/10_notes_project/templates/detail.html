@@ -1,0 +1,29 @@
+{% extends 'base.html' %}
+
+{% block title %}{{ note.title }}{% endblock %}
+
+{% block content %}
+    <h2>{{ note.title }}</h2>
+
+    <div class="meta">
+        created {{ note.created_at.strftime('%Y-%m-%d %H:%M') }}
+        &middot; last change {{ note.updated_at.strftime('%Y-%m-%d %H:%M') }}
+        {% if note.category %}&middot; {{ note.category.name }}{% endif %}
+    </div>
+
+    {# The body may contain several lines. Jinja escapes it (so no HTML from
+       the user can run), and the CSS keeps the line breaks visible. #}
+    <p class="body">{{ note.body }}</p>
+
+    <div class="actions">
+        <a class="button"
+           href="{{ url_for('notes.edit', note_id=note.id) }}">Edit</a>
+
+        {# Deleting is a POST, never a plain link. #}
+        <form method="post"
+              action="{{ url_for('notes.delete', note_id=note.id) }}"
+              onsubmit="return confirm('Delete this note?');">
+            <button class="danger" type="submit">Delete</button>
+        </form>
+    </div>
+{% endblock %}

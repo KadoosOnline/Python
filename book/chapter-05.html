@@ -1,0 +1,455 @@
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="فصل پنج: دستور elif، شرط‌های تودرتو، عملگر شرطی یک‌خطی و دستور match در پایتون">
+    <title>فصل ۵: elif و شرط‌های تودرتو</title>
+    <link rel="icon" href="logokm.png" type="image/png">
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<header class="book-bar">
+    <a class="name" href="index.html">برنامه‌نویسی پایتون</a>
+    <a href="index.html">فهرست مطالب</a>
+</header>
+
+<main class="paper">
+
+    <div class="chapter-head">
+        <span class="chapter-num">فصل ۵</span>
+        <h1 data-t="ch05-001">elif و شرط‌های تودرتو</h1>
+        <p class="lead" data-t="ch05-002">
+            دنیای واقعی دو حالته نیست. نمره دانش‌آموز چهار درجه دارد، منوی برنامه
+            پنج گزینه، و روزهای هفته هفت تا. این فصل درباره انتخاب از میان چند
+            حالت است.
+        </p>
+    </div>
+
+    <div class="mini-toc">
+        <span class="box-title" data-t="ch05-003">در این فصل می‌خوانید</span>
+        <ol>
+            <li data-t="ch05-004"><a href="#s1">دستور elif</a></li>
+            <li data-t="ch05-005"><a href="#s2">فقط اولین شاخه درست اجرا می‌شود</a></li>
+            <li data-t="ch05-006"><a href="#s3">ترتیب شاخه‌ها مهم است</a></li>
+            <li data-t="ch05-007"><a href="#s4">ماشین‌حساب</a></li>
+            <li data-t="ch05-008"><a href="#s5">شرط تودرتو</a></li>
+            <li data-t="ch05-009"><a href="#s6">elif یا تودرتو، کدام</a></li>
+            <li data-t="ch05-010"><a href="#s7">عملگر شرطی یک‌خطی</a></li>
+            <li data-t="ch05-011"><a href="#s8">دستور match</a></li>
+            <li data-t="ch05-012"><a href="#s9">منو با match</a></li>
+            <li data-t="ch05-013"><a href="#s10">یک برنامه کوچک ترکیبی</a></li>
+        </ol>
+    </div>
+
+    <h2 id="s1" data-t="ch05-014">۱. دستور elif</h2>
+
+    <p data-t="ch05-015">
+        کلمه <code>elif</code> کوتاه‌شده <code>else if</code> است، یعنی «وگرنه
+        اگر». با آن می‌شود هر تعداد شاخه پشت سر هم گذاشت.
+    </p>
+
+    <pre class="code"><code># 'elif' means "else if". Python tests the branches from top to bottom and
+# runs ONLY the first one whose condition is True.
+user_input = input('Enter a number (1-7): ')
+
+if user_input == '1':
+    print('Shanbe')
+elif user_input == '2':
+    print('Yekshanbe')
+elif user_input == '3':
+    print('Doshanbe')
+elif user_input == '4':
+    print('Seshanbe')
+elif user_input == '5':
+    print('Chaharshanbe')
+elif user_input == '6':
+    print('Panjshanbe')
+elif user_input == '7':
+    print('Jome')
+else:
+    print('Error: the number must be between 1 and 7')</code></pre>
+    <p class="code-caption" data-t="ch05-016">روز هفته: نمونه 01_elif_days.py</p>
+
+    <pre class="out">Enter a number (1-7): 3
+Doshanbe</pre>
+
+    <h3 data-t="ch05-017">شرح مثال</h3>
+
+    <ul>
+        <li data-t="ch05-018">ساختار همیشه این است: یک <code>if</code>، بعد هر تعداد <code>elif</code>، و در انتها یک <code>else</code> که اختیاری است.</li>
+        <li data-t="ch05-019"><code>else</code> آخر همیشه ارزش دارد. بدون آن، اگر کاربر عدد ۹ وارد کند، برنامه هیچ چیزی چاپ نمی‌کند و کاربر فکر می‌کند خراب شده است.</li>
+        <li data-t="ch05-020">اینجا ورودی با رشته مقایسه شده است، یعنی <code>'1'</code> با گیومه. چون <code>input</code> رشته می‌دهد و تبدیلش نکرده‌ایم. این کار عمدی است: اگر کاربر حرف تایپ کند، <code>int()</code> برنامه را خراب می‌کرد ولی این‌طور فقط به شاخه <code>else</code> می‌رود.</li>
+    </ul>
+
+    <h2 id="s2" data-t="ch05-021">۲. فقط اولین شاخه درست اجرا می‌شود</h2>
+
+    <p data-t="ch05-022">
+        این مهم‌ترین قانون <code>elif</code> است. پایتون شرط‌ها را از بالا به
+        پایین امتحان می‌کند و به محض اینکه یکی درست شد، بلوکش را اجرا می‌کند و
+        <strong>بقیه را کاملاً نادیده می‌گیرد</strong>.
+    </p>
+
+    <pre class="code"><code># Three possible outcomes -&gt; if / elif / else.
+user_input = input('Enter a number: ')
+number = float(user_input)
+
+if number &gt; 0:
+    print('Positive')
+elif number &lt; 0:
+    print('Negative')
+else:
+    print('Zero')</code></pre>
+    <p class="code-caption" data-t="ch05-023">مثبت، منفی یا صفر: نمونه 02_elif_sign.py</p>
+
+    <div class="note">
+        <span class="box-title" data-t="ch05-024">فرق سه if جدا با if و دو elif</span>
+        <p data-t="ch05-025">
+            اگر سه <code>if</code> جداگانه بنویسید، پایتون هر سه را بررسی می‌کند و
+            ممکن است چند تایشان اجرا شوند. با <code>elif</code> فقط یکی اجرا
+            می‌شود و بقیه حتی بررسی هم نمی‌شوند. وقتی حالت‌ها
+            <strong>متقابلاً ناسازگارند</strong> (عدد نمی‌تواند هم مثبت باشد هم
+            منفی)، همیشه <code>elif</code> درست‌تر و سریع‌تر است.
+        </p>
+    </div>
+
+    <h2 id="s3" data-t="ch05-026">۳. ترتیب شاخه‌ها مهم است</h2>
+
+    <pre class="code"><code># The ORDER of the branches matters. We test from the highest score downwards,
+# so when we reach 'elif score &gt;= 17' we already know the score is below 20.
+user_input = input('Enter the score (0-20): ')
+score = float(user_input)
+
+if score &gt; 20 or score &lt; 0:
+    print('Invalid score')
+elif score &gt;= 17:
+    print('A - Excellent')
+elif score &gt;= 14:
+    print('B - Good')
+elif score &gt;= 10:
+    print('C - Passed')
+else:
+    print('F - Failed')</code></pre>
+    <p class="code-caption" data-t="ch05-027">نمره به حرف: نمونه 03_elif_grades.py</p>
+
+    <h3 data-t="ch05-028">شرح مثال</h3>
+
+    <ul>
+        <li data-t="ch05-029">شرط‌ها از بالا به پایین از سخت‌گیرترین به آسان‌ترین چیده شده‌اند. وقتی به <code>score &gt;= 14</code> می‌رسیم، مطمئنیم نمره زیر ۱۷ است، چون اگر بالای ۱۷ بود شاخه قبلی گرفته بودش. برای همین ضرورتی ندارد بنویسیم <code>14 &lt;= score &lt; 17</code>.</li>
+        <li data-t="ch05-030">اگر ترتیب را برعکس کنید و <code>score &gt;= 10</code> را اول بگذارید، نمره ۱۹ هم <code>C</code> می‌گیرد و کل برنامه غلط می‌شود، بدون اینکه هیچ خطایی ببینید.</li>
+        <li data-t="ch05-031">شاخه اول اعتبارسنجی است: اول ورودی نامعتبر را رد می‌کنیم، بعد سراغ حالت‌های واقعی می‌رویم. این الگو در برنامه‌نویسی حرفه‌ای بسیار رایج است.</li>
+    </ul>
+
+    <h2 id="s4" data-t="ch05-032">۴. ماشین‌حساب</h2>
+
+    <p data-t="ch05-033">
+        این مثال هم <code>elif</code> دارد و هم یک <code>if</code> تودرتو، و
+        نمونه خوبی است از اینکه هر دو ابزار در یک برنامه کنار هم می‌نشینند.
+    </p>
+
+    <pre class="code"><code># A simple calculator: two numbers and one operator.
+num1 = float(input('Enter number 1: '))
+num2 = float(input('Enter number 2: '))
+
+operator = input('Enter the sign (+ - * / **): ')
+
+if operator == '+':
+    result = num1 + num2
+    print(result)
+elif operator == '-':
+    result = num1 - num2
+    print(result)
+elif operator == '*':
+    result = num1 * num2
+    print(result)
+elif operator == '/':
+    # Dividing by zero would crash the program, so we check it first.
+    if num2 == 0:
+        print('Error: division by zero!')
+    else:
+        result = num1 / num2
+        print(result)
+elif operator == '**':
+    result = num1 ** num2
+    print(result)
+else:
+    print('Error: unknown operator!')</code></pre>
+    <p class="code-caption" data-t="ch05-034">ماشین‌حساب: نمونه 04_calculator.py</p>
+
+    <pre class="out">Enter number 1: 8
+Enter number 2: 0
+Enter the sign (+ - * / **): /
+Error: division by zero!</pre>
+
+    <div class="warn">
+        <span class="box-title" data-t="ch05-035">باگی که در نسخه اصلی این برنامه بود</span>
+        <p data-t="ch05-036">
+            در فایل اصلی دوره، بررسی تقسیم بر صفر وجود نداشت. اگر کاربر مخرج را
+            صفر می‌داد، برنامه با خطای <code>ZeroDivisionError</code> کاملاً
+            متوقف می‌شد. قانون کلی: هر جا تقسیم دارید، به مخرج صفر فکر کنید.
+            این یکی از سه چهار خطایی است که در تمام دنیا برنامه‌ها را از کار
+            می‌اندازد.
+        </p>
+    </div>
+
+    <h2 id="s5" data-t="ch05-037">۵. شرط تودرتو</h2>
+
+    <p data-t="ch05-038">
+        شرط تودرتو یعنی یک <code>if</code> داخل بلوک یک <code>if</code> دیگر.
+        وقتی به کار می‌آید که سؤال دوم فقط در صورتی معنا دارد که جواب سؤال اول
+        مثبت باشد.
+    </p>
+
+    <pre class="code"><code># A nested 'if' is an 'if' placed inside the block of another 'if'.
+# Here the password is only asked about when the username is correct.
+username = input('Enter the username: ')
+password = input('Enter the password: ')
+
+if username == 'admin':
+    if password == '123456':
+        print('Welcome', username)
+    else:
+        print('The password is incorrect!')
+else:
+    print('The username is incorrect!')</code></pre>
+    <p class="code-caption" data-t="ch05-039">ورود تودرتو: نمونه 05_nested_login.py</p>
+
+    <p data-t="ch05-040">
+        نسخه دوم همین برنامه یک قدم جلوتر می‌رود: رمز را اصلاً
+        <strong>نمی‌پرسد</strong> مگر اینکه نام کاربری درست باشد.
+    </p>
+
+    <pre class="code"><code># Same program, but the password is only READ when the username is correct.
+# This is the real advantage of nesting: we skip work we do not need.
+USERNAME = 'admin'
+PASSWORD = '123456'
+
+username_input = input('Enter username: ')
+
+if username_input == USERNAME:
+    password_input = input('Enter password: ')
+
+    if password_input == PASSWORD:
+        print('Welcome!')
+    else:
+        print('Password error!')
+else:
+    print('Username error!')</code></pre>
+    <p class="code-caption" data-t="ch05-041">ورود تودرتو، نسخه دوم: نمونه 06_nested_login2.py</p>
+
+    <h3 data-t="ch05-042">شرح مثال</h3>
+
+    <ul>
+        <li data-t="ch05-043">هر سطح تودرتویی، چهار فاصله دیگر تورفتگی می‌گیرد. <code>if</code> داخلی هشت فاصله از ابتدای خط فاصله دارد.</li>
+        <li data-t="ch05-044">هر <code>else</code> به <code>if</code> هم‌تراز خودش تعلق دارد. تورفتگی است که این را مشخص می‌کند، پس در شرط‌های تودرتو باید خیلی مراقب باشید.</li>
+        <li data-t="ch05-045">مزیت واقعی نسخه دوم این است که کار غیرلازم انجام نمی‌دهد. اگر نام کاربری غلط است، چرا اصلاً رمز بپرسیم.</li>
+    </ul>
+
+    <div class="tip">
+        <span class="box-title" data-t="ch05-046">نکته امنیتی</span>
+        <p data-t="ch05-047">
+            جالب است بدانید سایت‌های واقعی عمداً برعکس این کار را می‌کنند و
+            همیشه پیام یکسان «نام کاربری یا رمز اشتباه است» می‌دهند. اگر برنامه
+            بگوید «نام کاربری اشتباه است»، مهاجم می‌فهمد کدام نام‌های کاربری
+            وجود دارند و نصف کار را انجام داده است.
+        </p>
+    </div>
+
+    <h2 id="s6" data-t="ch05-048">۶. elif یا تودرتو، کدام</h2>
+
+    <div class="table-scroll">
+        <table>
+            <thead>
+                <tr><th data-t="ch05-049">حالت</th><th data-t="ch05-050">ابزار درست</th><th data-t="ch05-051">مثال</th></tr>
+            </thead>
+            <tbody>
+                <tr><td data-t="ch05-052">چند حالت هم‌رده و ناسازگار</td><td><code>elif</code></td><td data-t="ch05-053">روز هفته، نمره، منو</td></tr>
+                <tr><td data-t="ch05-054">سؤال دوم وابسته به جواب سؤال اول</td><td data-t="ch05-055">تودرتو</td><td data-t="ch05-056">اول نام کاربری، بعد رمز</td></tr>
+            </tbody>
+        </table>
+    </div>
+
+    <p data-t="ch05-057">
+        قانون عملی: اگر تودرتویی از سه سطح بیشتر شد، معمولاً یعنی طراحی را باید
+        عوض کرد. کد عمیقاً تودرتو خوانده نمی‌شود. در فصل یازدهم با تابع و در
+        فصل هشتم با <code>continue</code> راه‌هایی برای صاف کردن این تودرتویی‌ها
+        می‌بینید.
+    </p>
+
+    <h2 id="s7" data-t="ch05-058">۷. عملگر شرطی یک‌خطی</h2>
+
+    <p data-t="ch05-059">
+        وقتی کل کار <code>if</code> و <code>else</code> فقط انتخاب بین
+        <strong>دو مقدار</strong> است، پایتون شکل یک‌خطی زیبایی دارد.
+    </p>
+
+    <pre class="code"><code># When an if/else only chooses between two VALUES, Python offers a one-line form:
+#     value_if_true if condition else value_if_false
+age = int(input('Enter your age: '))
+
+status = 'adult' if age &gt;= 18 else 'minor'
+print(status)
+
+# The long version does exactly the same thing:
+if age &gt;= 18:
+    status = 'adult'
+else:
+    status = 'minor'
+print(status)
+
+# It is often used directly inside a print():
+number = 7
+print(f'{number} is', 'even' if number % 2 == 0 else 'odd')</code></pre>
+    <p class="code-caption" data-t="ch05-060">عملگر شرطی: نمونه 08_ternary.py</p>
+
+    <pre class="out">Enter your age: 20
+adult
+adult
+7 is odd</pre>
+
+    <h3 data-t="ch05-061">شرح مثال</h3>
+
+    <ul>
+        <li data-t="ch05-062">ترتیب نوشتن کمی عجیب است: اول مقدار حالت درست، بعد شرط، بعد مقدار حالت نادرست. آن را این‌طور بخوانید: «adult، اگر سن بالای ۱۸ است، وگرنه minor».</li>
+        <li data-t="ch05-063">این عملگر فقط برای انتخاب <strong>مقدار</strong> است، نه برای اجرای چند دستور. اگر داخل هر شاخه بیش از یک کار دارید، شکل بلند را بنویسید.</li>
+        <li data-t="ch05-064">در فصل بیست و پنجم می‌بینید که همین عملگر داخل درک لیستی خیلی به کار می‌آید.</li>
+    </ul>
+
+    <h2 id="s8" data-t="ch05-065">۸. دستور match</h2>
+
+    <p data-t="ch05-066">
+        از پایتون ۳٫۱۰ به بعد، ساختار تازه‌ای اضافه شده که وقتی همه شاخه‌ها
+        <strong>یک مقدار واحد</strong> را با چیزهای مختلف مقایسه می‌کنند،
+        تمیزتر از زنجیره <code>elif</code> است.
+    </p>
+
+    <pre class="code"><code># From Python 3.10 on, 'match ... case' is a clean alternative to a long
+# chain of elif branches that all compare the SAME value.
+user_input = input('Enter a number (1-7): ')
+
+match user_input:
+    case '1':
+        print('Shanbe')
+    case '2':
+        print('Yekshanbe')
+    case '3':
+        print('Doshanbe')
+    case '4':
+        print('Seshanbe')
+    case '5':
+        print('Chaharshanbe')
+    case '6' | '7':          # '|' means "or": one branch for two values
+        print('Weekend')
+    case _:                  # '_' is the default branch, like 'else'
+        print('Error: the number must be between 1 and 7')</code></pre>
+    <p class="code-caption" data-t="ch05-067">روز هفته با match: نمونه 09_match_days.py</p>
+
+    <h3 data-t="ch05-068">شرح مثال</h3>
+
+    <ul>
+        <li data-t="ch05-069">بعد از <code>match</code> مقداری می‌آید که می‌خواهیم بررسی‌اش کنیم، و هر <code>case</code> یک حالت ممکن است.</li>
+        <li data-t="ch05-070">علامت <code>|</code> یعنی «یا»: یک شاخه برای چند مقدار.</li>
+        <li data-t="ch05-071">زیرخط <code>_</code> شاخه پیش‌فرض است و نقش <code>else</code> را دارد. اگر ننویسیدش و هیچ حالتی جور در نیاید، هیچ اتفاقی نمی‌افتد.</li>
+        <li data-t="ch05-072"><code>match</code> فقط وقتی به درد می‌خورد که همه شاخه‌ها یک متغیر واحد را بررسی کنند. برای شرط‌های متفاوت مثل <code>score &gt;= 17</code> باید همان <code>elif</code> را به کار ببرید.</li>
+    </ul>
+
+    <h2 id="s9" data-t="ch05-073">۹. منو با match</h2>
+
+    <pre class="code"><code># A menu is the classic use of match/case.
+print('1) New file')
+print('2) Open file')
+print('3) Save file')
+print('0) Exit')
+
+choice = input('Enter the number: ')
+
+match choice:
+    case '1':
+        print('Creating a new file...')
+    case '2':
+        print('Opening a file...')
+    case '3':
+        print('Saving the file...')
+    case '0':
+        print('Goodbye!')
+    case _:
+        print('Unknown option.')</code></pre>
+    <p class="code-caption" data-t="ch05-074">منو: نمونه 10_match_menu.py</p>
+
+    <p data-t="ch05-075">
+        منو کلاسیک‌ترین کاربرد <code>match</code> است. فعلاً این برنامه یک بار
+        اجرا می‌شود و تمام. در فصل هشتم آن را داخل یک حلقه <code>while</code>
+        می‌گذاریم تا منو تا وقتی کاربر گزینه خروج را نزده تکرار شود، و آن وقت
+        تازه شبیه یک برنامه واقعی می‌شود.
+    </p>
+
+    <h2 id="s10" data-t="ch05-076">۱۰. یک برنامه کوچک ترکیبی</h2>
+
+    <pre class="code"><code># If the number is odd, make it even by adding 1, then print its square.
+user_input = input('Please enter a number: ')
+number = int(user_input)
+
+if number % 2 != 0:
+    number += 1
+
+result = number ** 2
+print('Result:', result)</code></pre>
+    <p class="code-caption" data-t="ch05-077">زوج کردن و توان دو: نمونه 11_make_it_even.py</p>
+
+    <pre class="out">Please enter a number: 7
+Result: 64</pre>
+
+    <p data-t="ch05-078">اینجا <code>if</code> بدون <code>else</code> آمده است و کاملاً درست است. وقتی عدد زوج باشد، هیچ کاری ضرورتی ندارد. این الگو، یعنی «اگر لازم بود اصلاحش کن و بعد ادامه بده»، در برنامه‌های واقعی بسیار دیده می‌شود.</p>
+
+    <div class="folder-ref">
+        <span class="box-title" data-t="ch05-079">فایل‌های تمرینی این فصل</span>
+        <p data-t="ch05-080">
+            پوشه <code>S05-elif-and-nested-conditionals</code> شامل نمونه‌های
+            <code>01_elif_days.py</code> تا <code>11_make_it_even.py</code>.
+        </p>
+    </div>
+
+    <h2 data-t="ch05-081">خلاصه فصل</h2>
+
+    <div class="table-scroll">
+        <table>
+            <thead>
+                <tr><th data-t="ch05-082">ابزار</th><th data-t="ch05-083">وظیفه آن</th></tr>
+            </thead>
+            <tbody>
+                <tr><td><code>elif</code></td><td data-t="ch05-084">شاخه بعدی. هر تعداد که بخواهید</td></tr>
+                <tr><td data-t="ch05-085">ترتیب شاخه‌ها</td><td data-t="ch05-086">فقط اولین شاخه درست اجرا می‌شود، پس ترتیب حیاتی است</td></tr>
+                <tr><td data-t="ch05-087"><code>else</code> پایانی</td><td data-t="ch05-088">گرفتن حالت‌های پیش‌بینی‌نشده. تقریباً همیشه بنویسیدش</td></tr>
+                <tr><td data-t="ch05-089">شرط تودرتو</td><td data-t="ch05-090">وقتی سؤال دوم فقط با جواب مثبت سؤال اول معنا دارد</td></tr>
+                <tr><td><code>a if cond else b</code></td><td data-t="ch05-091">انتخاب یک‌خطی بین دو مقدار</td></tr>
+                <tr><td data-t="ch05-092"><code>match</code> و <code>case</code></td><td data-t="ch05-093">جایگزین تمیز زنجیره elif وقتی همه یک متغیر را می‌سنجند</td></tr>
+                <tr><td><code>case _:</code></td><td data-t="ch05-094">شاخه پیش‌فرض در match</td></tr>
+                <tr><td data-t="ch05-095">تقسیم بر صفر</td><td data-t="ch05-096">هر جا تقسیم هست، مخرج صفر را بررسی کنید</td></tr>
+            </tbody>
+        </table>
+    </div>
+
+    <div class="exercise">
+        <h3 data-t="ch05-097">تمرین‌های فصل پنج</h3>
+        <ol>
+            <li data-t="ch05-098">شماره ماه (۱ تا ۱۲) را بگیرید و بگویید مربوط به کدام فصل است.</li>
+            <li data-t="ch05-099">یک نمره بگیرید و با <code>elif</code> حرف معادلش را چاپ کنید.</li>
+            <li data-t="ch05-100">یک منوی چهار گزینه‌ای بنویسید و به هر گزینه واکنش نشان دهید. از <code>match</code> استفاده کنید.</li>
+            <li data-t="ch05-101">وزن و قد را بگیرید، شاخص توده بدنی را با <code>weight / height ** 2</code> حساب کنید و دسته‌اش را بگویید: زیر ۱۸٫۵، بین ۱۸٫۵ و ۲۵، بین ۲۵ و ۳۰، بالای ۳۰.</li>
+            <li data-t="ch05-102">سه عدد بگیرید و از کوچک به بزرگ مرتب چاپشان کنید، فقط با <code>if</code> و <code>elif</code> و <code>else</code>.</li>
+            <li data-t="ch05-103">ماشین‌حساب را طوری کامل کنید که <code>%</code> و <code>//</code> را هم پشتیبانی کند.</li>
+            <li data-t="ch05-104">تمرین اول فصل چهار را با عملگر شرطی یک‌خطی بازنویسی کنید.</li>
+            <li data-t="ch05-105">یک کاراکتر بگیرید و بگویید حرف صدادار است، بی‌صداست یا رقم.</li>
+        </ol>
+    </div>
+
+    <div class="pager">
+        <a href="chapter-04.html">فصل قبل: شرط‌ها</a>
+        <a href="chapter-06.html">فصل بعد: حلقه for</a>
+    </div>
+
+</main>
+
+</body>
+</html>

@@ -1,0 +1,6 @@
+{# A piece of a page, included by index.html and courses.html. #}
+<div class="card">
+    <h4>{{ course.title }}</h4>
+    <p>{{ course.sessions }} sessions</p>
+    <p class="price">{{ '{:,}'.format(course.price) }} toman</p>
+</div>

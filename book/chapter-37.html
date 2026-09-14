@@ -1,0 +1,877 @@
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="فصل سی و هفت: همروندی در پایتون، نخ‌ها، شرایط رقابتی، قفل، صف، استخر نخ، قفل سراسری و پردازه‌ها، و برنامه‌نویسی ناهمگام با asyncio">
+    <title>فصل ۳۷: همروندی، نخ‌ها و asyncio</title>
+    <link rel="icon" href="logokm.png" type="image/png">
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<header class="book-bar">
+    <a class="name" href="index.html">برنامه‌نویسی پایتون</a>
+    <a href="index.html">فهرست مطالب</a>
+</header>
+
+<main class="paper">
+
+    <div class="chapter-head">
+        <span class="chapter-num">فصل ۳۷</span>
+        <h1 data-t="ch37-001">همروندی: نخ‌ها و asyncio</h1>
+        <p class="lead" data-t="ch37-002">
+            تا اینجا هر برنامه ما یک کار را در یک لحظه انجام می‌داد: خط دوم
+            منتظر خط اول می‌ماند. در این فصل یاد می‌گیریم چند کار را با هم
+            پیش ببریم، و مهم‌تر از آن، یاد می‌گیریم کدام یک از سه ابزار را
+            انتخاب کنیم. انتخاب اشتباه، تمام پیچیدگی را به شما می‌دهد و هیچ
+            سرعتی را.
+        </p>
+    </div>
+
+    <div class="mini-toc">
+        <span class="box-title" data-t="ch37-003">در این فصل می‌خوانید</span>
+        <ol>
+            <li data-t="ch37-004"><a href="#s1">سه ابزار، یک جدول</a></li>
+            <li data-t="ch37-005"><a href="#s2">اولین نخ</a></li>
+            <li data-t="ch37-006"><a href="#s3">نخ برای کار انتظاری</a></li>
+            <li data-t="ch37-007"><a href="#s4">شرایط رقابتی</a></li>
+            <li data-t="ch37-008"><a href="#s5">قفل و رویداد</a></li>
+            <li data-t="ch37-009"><a href="#s6">صف و کارگرها</a></li>
+            <li data-t="ch37-010"><a href="#s7">استخر نخ</a></li>
+            <li data-t="ch37-011"><a href="#s8">نخ و رابط گرافیکی</a></li>
+            <li data-t="ch37-012"><a href="#s9">قفل سراسری و پردازه‌ها</a></li>
+            <li data-t="ch37-013"><a href="#s10">اولین کوروتین</a></li>
+            <li data-t="ch37-014"><a href="#s11">اجرای همزمان با gather</a></li>
+            <li data-t="ch37-015"><a href="#s12">تسک، لغو و مهلت</a></li>
+            <li data-t="ch37-016"><a href="#s13">صف ناهمگام</a></li>
+            <li data-t="ch37-017"><a href="#s14">پروژه: ربات پیام‌رسان</a></li>
+        </ol>
+    </div>
+
+    <h2 id="s1" data-t="ch37-018">۱. سه ابزار، یک جدول</h2>
+
+    <p data-t="ch37-019">
+        اگر فقط یک چیز از این فصل یادتان بماند، همین جدول باشد:
+    </p>
+
+    <div class="table-scroll">
+        <table>
+            <thead>
+                <tr><th data-t="ch37-020">برنامه شما وقتش را صرف چه می‌کند</th><th data-t="ch37-021">ابزار</th><th data-t="ch37-022">چرا</th></tr>
+            </thead>
+            <tbody>
+                <tr><td data-t="ch37-023"><strong>انتظار</strong> (شبکه، دیسک، پایگاه داده) و تعداد کارها کم است</td><td><code>threading</code></td><td data-t="ch37-024">قفل سراسری هنگام انتظار آزاد می‌شود</td></tr>
+                <tr><td data-t="ch37-025"><strong>انتظار</strong>، ولی صدها یا هزاران کار</td><td><code>asyncio</code></td><td data-t="ch37-026">یک کوروتین تقریباً هیچ هزینه‌ای ندارد؛ یک نخ دارد</td></tr>
+                <tr><td data-t="ch37-027"><strong>محاسبه</strong> (حلقه، ریاضی، پردازش تصویر)</td><td><code>multiprocessing</code></td><td data-t="ch37-028">هر پردازه قفل خودش را دارد، پس چند هسته واقعاً کار می‌کنند</td></tr>
+            </tbody>
+        </table>
+    </div>
+
+    <h2 id="s2" data-t="ch37-029">۲. اولین نخ</h2>
+
+    <p data-t="ch37-030">
+        <strong>نخ</strong> یک خط اجرای دوم در همان برنامه است، پس دو تکه کد
+        می‌توانند با هم پیش بروند.
+    </p>
+
+    <pre class="code"><code>import threading
+import time
+
+
+def worker() -&gt; None:
+    '''This function will run in a thread of its own.'''
+    name = threading.current_thread().name
+    for step in range(3):
+        print(f'[{name}] step {step}')
+        time.sleep(1)
+    print(f'[{name}] finished')
+
+
+def main() -&gt; None:
+    print(f'[{threading.current_thread().name}] creating the thread')
+
+    thread = threading.Thread(target=worker, name='worker')
+    thread.start()                 # start() -- never run()
+
+    # The main thread is free while the worker sleeps.
+    print('[MainThread] the thread is running; I am not blocked')
+    print(f'[MainThread] is it alive? {thread.is_alive()}')
+
+    thread.join()                  # wait for it
+    print('[MainThread] done')</code></pre>
+    <p class="code-caption" data-t="ch37-031">اولین نخ: نمونه 01_first_thread/app.py</p>
+
+    <h3 data-t="ch37-032">سه قاعده از همان روز اول</h3>
+
+    <ul>
+        <li data-t="ch37-033"><code>start()</code> تابع را در نخ تازه اجرا می‌کند. اگر اشتباهی <code>thread.run()</code> بنویسید، تابع در نخ <strong>فعلی</strong> اجرا می‌شود: هیچ همروندی‌ای در کار نیست و هیچ چیز هم به شما هشدار نمی‌دهد.</li>
+        <li data-t="ch37-034"><code>join()</code> هیچ چیز را متوقف یا نابود نمی‌کند؛ فقط <strong>منتظر</strong> می‌ماند.</li>
+        <li data-t="ch37-035">نخ‌های یک برنامه متغیرهای مشترک دارند. این هم قدرتشان است و هم خطرشان، که در بخش چهارم می‌بینید.</li>
+    </ul>
+
+    <p data-t="ch37-036">
+        نکته‌ای که همه یک بار گیرش می‌افتند: <code>args=('A',)</code> با
+        ویرگول انتهایی. بدون آن یک رشته است نه تاپل، و پایتون کاراکترهایش را
+        به عنوان آرگومان‌های جدا می‌فرستد.
+    </p>
+
+    <h2 id="s3" data-t="ch37-037">۳. نخ برای کار انتظاری</h2>
+
+    <p data-t="ch37-038">
+        نخ کی برنامه را واقعاً سریع‌تر می‌کند؟ وقتی برنامه
+        <strong>منتظر</strong> است. هنگام دانلود یک فایل یا پرس‌وجو از پایگاه
+        داده، پردازنده بیکار است و نخ دیگری می‌تواند از آن وقت استفاده کند.
+    </p>
+
+    <pre class="code"><code>SITES = ['kadoos.ir', 'python.org', 'sqlite.org', 'qt.io']
+
+
+def fake_download(site: str, seconds: float = 1.0) -&gt; None:
+    '''Pretend to download a page. `sleep` = waiting for the network.'''
+    time.sleep(seconds)
+    print(f'  downloaded {site}')
+
+
+def sequential() -&gt; float:
+    start = time.perf_counter()
+    for site in SITES:
+        fake_download(site)
+    return time.perf_counter() - start
+
+
+def threaded() -&gt; float:
+    start = time.perf_counter()
+    threads = [threading.Thread(target=fake_download, args=(site,))
+               for site in SITES]
+    for thread in threads:
+        thread.start()
+    for thread in threads:
+        thread.join()
+    return time.perf_counter() - start</code></pre>
+    <p class="code-caption" data-t="ch37-039">چهار ثانیه به یک ثانیه: نمونه 03_threads_for_io/app.py</p>
+
+    <pre class="out">one after the other (4 sites):
+  -&gt; 4.01 seconds
+
+with 4 threads:
+  -&gt; 1.00 seconds
+
+4.0 times faster</pre>
+
+    <p data-t="ch37-040">
+        دقت کنید الگو همیشه یکی است: اول <strong>همه</strong> نخ‌ها را
+        <code>start</code> کنید، بعد <strong>همه</strong> را
+        <code>join</code>. اگر هر نخ را بلافاصله بعد از راه‌اندازی
+        <code>join</code> کنید، دوباره پشت سر هم اجرا می‌شوند و هیچ سودی
+        نمی‌برید.
+    </p>
+
+    <p data-t="ch37-041">
+        برای اندازه‌گیری زمان از <code>time.perf_counter()</code> استفاده
+        کنید، نه <code>time.time()</code>: فقط جلو می‌رود و دقت بالایی دارد.
+    </p>
+
+    <h2 id="s4" data-t="ch37-042">۴. شرایط رقابتی</h2>
+
+    <p data-t="ch37-043">
+        حالا خطرناک‌ترین باگ دنیای همروندی: باگی که فقط
+        <strong>گاهی</strong> خودش را نشان می‌دهد.
+    </p>
+
+    <pre class="code"><code>counter = 0                 # shared between every thread
+
+
+def worker(rounds: int) -&gt; None:
+    global counter
+    for _ in range(rounds):
+        # This is `counter += 1` written out in slow motion.
+        temp = counter          # 1. read
+        time.sleep(0.000_01)    # &lt;- the interruption, made visible
+        temp += 1               # 2. add
+        counter = temp          # 3. write
+
+
+def main() -&gt; None:
+    threads = [threading.Thread(target=worker, args=(1000,))
+               for _ in range(10)]
+    for thread in threads:
+        thread.start()
+    for thread in threads:
+        thread.join()
+
+    print(f'expected: 10000')
+    print(f'obtained: {counter}')
+    print(f'lost:     {10000 - counter} increments')</code></pre>
+    <p class="code-caption" data-t="ch37-044">شرایط رقابتی: نمونه 04_race_condition/app.py</p>
+
+    <pre class="out">expected: 10000
+obtained: 1247
+lost:     8753 increments</pre>
+
+    <h3 data-t="ch37-045">شرح مثال</h3>
+
+    <ul>
+        <li data-t="ch37-046">ده نخ، هر کدام هزار بار یکی اضافه می‌کنند، پس پاسخ باید ده هزار باشد. اجرایش کنید: تقریباً هیچ وقت ده هزار نمی‌گیرید.</li>
+        <li data-t="ch37-047">علت این است که <code>counter += 1</code> یک قدم نیست، بلکه سه قدم است: خواندن، اضافه کردن، نوشتن. اگر نخ A بین قدم یک و سه قطع شود، نخ B <strong>همان</strong> مقدار قدیمی را می‌خواند و هر دو یک عدد را برمی‌گردانند: یک افزایش گم می‌شود.</li>
+        <li data-t="ch37-048">آن <code>sleep</code> کوچک فقط پنجره را آنقدر پهن می‌کند که هر بار ببینیدش. باگ بدون <code>sleep</code> هم هست؛ فقط یک بار در چند هزار اجرا ظاهر می‌شود: روی کامپیوتر مشتری، عصر پنجشنبه. و همین است که خطرناکش می‌کند.</li>
+        <li data-t="ch37-049">قاعده: <strong>لحظه‌ای که دو نخ روی یک متغیر می‌نویسند، به قفل نیاز دارید.</strong></li>
+    </ul>
+
+    <h2 id="s5" data-t="ch37-050">۵. قفل و رویداد</h2>
+
+    <pre class="code"><code>class BankAccount:
+    '''A shared account. Every change to `balance` goes through the lock.'''
+
+    def __init__(self, balance: int = 0) -&gt; None:
+        self.balance = balance
+        self.lock = threading.Lock()
+
+    def deposit(self, amount: int) -&gt; None:
+        with self.lock:
+            # Slow motion again, to prove the lock really protects us.
+            new_balance = self.balance + amount
+            time.sleep(0.000_01)
+            self.balance = new_balance
+
+    def withdraw(self, amount: int) -&gt; bool:
+        with self.lock:
+            # "Check, then act" MUST be inside the same lock, otherwise the
+            # balance can change between the `if` and the subtraction.
+            if amount &gt; self.balance:
+                return False
+            self.balance -= amount
+            return True</code></pre>
+    <p class="code-caption" data-t="ch37-051">قفل: نمونه 05_locks/app.py</p>
+
+    <h3 data-t="ch37-052">شرح مثال</h3>
+
+    <ul>
+        <li data-t="ch37-053">تا وقتی یک نخ قفل را در دست دارد، هر نخ دیگری که به <code>with lock:</code> برسد <strong>منتظر</strong> می‌ماند. سه قدم افزایش دیگر نصف نمی‌شوند.</li>
+        <li data-t="ch37-054"><code>with lock:</code> قفل را حتی اگر استثنا رخ دهد آزاد می‌کند. هرگز دستی <code>acquire</code> و <code>release</code> ننویسید.</li>
+        <li data-t="ch37-055">بخش بحرانی را تا می‌توانید <strong>کوتاه</strong> نگه دارید. هر چه داخل قفل است دوباره ترتیبی اجرا می‌شود، پس قفل دور یک عملیات کند یعنی دور ریختن همه همروندی.</li>
+        <li data-t="ch37-056">الگوی «بررسی کن، بعد عمل کن» باید داخل <strong>یک</strong> قفل باشد، وگرنه موجودی می‌تواند بین <code>if</code> و تفریق عوض شود.</li>
+    </ul>
+
+    <div class="table-scroll">
+        <table>
+            <thead>
+                <tr><th data-t="ch37-057">ابزار</th><th data-t="ch37-058">وظیفه آن</th></tr>
+            </thead>
+            <tbody>
+                <tr><td><code>Lock</code></td><td data-t="ch37-059">هر لحظه فقط یک نخ داخل بخش بحرانی</td></tr>
+                <tr><td><code>RLock</code></td><td data-t="ch37-060">همان نخ می‌تواند چند بار بگیردش، برای فراخوانی تودرتو</td></tr>
+                <tr><td><code>Event</code></td><td data-t="ch37-061">یک نخ منتظر علامت نخ دیگر می‌ماند: <code>wait()</code> و <code>set()</code></td></tr>
+                <tr><td><code>Semaphore</code></td><td data-t="ch37-062">حداکثر N نخ همزمان، مثلاً برای استخر اتصال</td></tr>
+            </tbody>
+        </table>
+    </div>
+
+    <pre class="code"><code>    stop = threading.Event()
+
+    def blinker() -&gt; None:
+        while not stop.is_set():
+            print('  ...working')
+            # wait() returns as soon as the event is set: much better than
+            # sleep(), which would always run to the end.
+            stop.wait(timeout=0.3)
+        print('  worker stopped cleanly')
+
+    worker = threading.Thread(target=blinker)
+    worker.start()
+    time.sleep(1)
+    stop.set()                  # ask it to stop
+    worker.join()</code></pre>
+    <p class="code-caption" data-t="ch37-063">رویداد: توقف تمیز یک نخ</p>
+
+    <div class="warn">
+        <span class="box-title" data-t="ch37-064">بن‌بست</span>
+        <p data-t="ch37-065">
+            دام بزرگ قفل‌ها <strong>بن‌بست</strong> است: دو نخ، دو قفل، و
+            ترتیب متفاوت. نخ A قفل یک را دارد و منتظر قفل دو است، نخ B قفل دو
+            را دارد و منتظر قفل یک؛ برنامه برای همیشه می‌ایستد. درمانش یک قاعده
+            ساده است: قفل‌ها را همیشه به <strong>یک ترتیب</strong> بگیرید.
+        </p>
+    </div>
+
+    <h2 id="s6" data-t="ch37-066">۶. صف و کارگرها</h2>
+
+    <p data-t="ch37-067">
+        <code>queue.Queue</code> فهرستی است که <strong>خودش</strong> از قبل
+        امن است: <code>put</code> و <code>get</code> قفل را برایتان می‌گیرند.
+        برای همین است که توصیه اول هر برنامه‌نویس باتجربه این است: «داده را از
+        راه صف رد و بدل کنید، نه از راه متغیر مشترک».
+    </p>
+
+    <pre class="code"><code>def worker(tasks: queue.Queue, results: queue.Queue) -&gt; None:
+    '''Take numbers from the queue until the sentinel arrives.'''
+    name = threading.current_thread().name
+    while True:
+        number = tasks.get()
+        try:
+            if number is None:          # the sentinel: "no more work"
+                return
+            time.sleep(0.2)             # pretend the job takes time
+            results.put((name, number, number * number))
+        finally:
+            # In a `finally`, so an exception cannot make queue.join() hang
+            # for ever waiting for a task_done() that never comes.
+            tasks.task_done()
+
+
+def main() -&gt; None:
+    tasks: queue.Queue = queue.Queue()
+    results: queue.Queue = queue.Queue()
+
+    workers = [threading.Thread(target=worker, args=(tasks, results),
+                                name=f'worker-{index}', daemon=True)
+               for index in range(3)]
+    for thread in workers:
+        thread.start()
+
+    for number in range(1, 11):
+        tasks.put(number)
+
+    # One sentinel per worker, so each of them sees exactly one.
+    for _ in workers:
+        tasks.put(None)
+
+    tasks.join()                    # wait until everything is handled
+    for thread in workers:
+        thread.join()</code></pre>
+    <p class="code-caption" data-t="ch37-068">صف و کارگرها: نمونه 06_queue_and_workers/app.py</p>
+
+    <h3 data-t="ch37-069">شرح مثال</h3>
+
+    <ul>
+        <li data-t="ch37-070"><code>get()</code> یک آیتم برمی‌دارد و اگر صف خالی باشد <strong>منتظر</strong> می‌ماند. پس کارگر حلقه شلوغ نمی‌زند.</li>
+        <li data-t="ch37-071"><strong>نگهبان</strong> (<code>None</code>) به کارگرها می‌گوید کار تمام شد. به تعداد کارگرها نگهبان بگذارید تا هر کدام دقیقاً یکی ببیند.</li>
+        <li data-t="ch37-072"><code>task_done()</code> باید در <code>finally</code> باشد، وگرنه یک استثنا باعث می‌شود <code>queue.join()</code> تا ابد منتظر بماند.</li>
+        <li data-t="ch37-073"><code>daemon=True</code> یعنی «این نخ مهم نیست»؛ پایتون هنگام پایان برنامه منتظرش نمی‌ماند. برای کارگری که تا ابد حلقه می‌زند عالی است، ولی برای نخی که فایل می‌نویسد خطرناک، چون وسط کار قطع می‌شود.</li>
+    </ul>
+
+    <h2 id="s7" data-t="ch37-074">۷. استخر نخ</h2>
+
+    <p data-t="ch37-075">
+        <code>concurrent.futures</code> راه کوتاه و امروزی همه کارهای بالاست:
+        استخری از نخ‌های آماده که راه‌اندازی و انتظار و جمع‌آوری نتیجه را
+        خودش انجام می‌دهد.
+    </p>
+
+    <pre class="code"><code>from concurrent.futures import ThreadPoolExecutor, as_completed
+
+    # -- map: simple, ordered, and it stops at the first exception ---------
+    with ThreadPoolExecutor(max_workers=4) as pool:
+        good_sites = [site for site in SITES if site != 'flask.dev']
+        for site, size in zip(good_sites, pool.map(fetch, good_sites)):
+            print(f'  {site}: {size} bytes')
+
+    # -- submit + as_completed: answers as soon as they are ready ----------
+    with ThreadPoolExecutor(max_workers=4) as pool:
+        # A dict Future -&gt; site, to know which job an answer belongs to.
+        futures = {pool.submit(fetch, site): site for site in SITES}
+
+        for future in as_completed(futures):
+            site = futures[future]
+            try:
+                size = future.result()      # re-raises the worker's exception
+            except ConnectionError as error:
+                print(f'  {site}: FAILED ({error})')
+            else:
+                print(f'  {site}: {size} bytes')</code></pre>
+    <p class="code-caption" data-t="ch37-076">استخر نخ: نمونه 07_thread_pool/app.py</p>
+
+    <div class="table-scroll">
+        <table>
+            <thead>
+                <tr><th><code>map</code></th><th><code>submit</code></th></tr>
+            </thead>
+            <tbody>
+                <tr><td data-t="ch37-077">یک تابع روی یک فهرست</td><td data-t="ch37-078">هر کار جداگانه، با یک <code>Future</code></td></tr>
+                <tr><td data-t="ch37-079">نتیجه‌ها <strong>به ترتیب ورودی</strong></td><td data-t="ch37-080">با <code>as_completed</code> به ترتیب <strong>آماده شدن</strong></td></tr>
+                <tr><td data-t="ch37-081">ساده‌تر</td><td data-t="ch37-082">انعطاف بیشتر، مدیریت خطای هر کار جدا</td></tr>
+            </tbody>
+        </table>
+    </div>
+
+    <div class="warn">
+        <span class="box-title" data-t="ch37-083">خطایی که هرگز نمی‌بینید</span>
+        <p data-t="ch37-084">
+            استثنایی که داخل یک کارگر رخ می‌دهد، برنامه را
+            <strong>نمی‌ترکاند</strong> و <strong>هیچ چیزی چاپ نمی‌کند</strong>.
+            در <code>Future</code> ذخیره می‌شود و فقط وقتی
+            <code>.result()</code> را صدا بزنید دوباره پرتاب می‌شود. یعنی
+            <code>submit()</code>ی که نتیجه‌اش را هرگز نمی‌خوانید، خطایی است
+            که هیچ وقت نخواهید دید.
+        </p>
+    </div>
+
+    <p data-t="ch37-085">بلوک <code>with</code> پیش از پایان، منتظر همه کارها می‌ماند. پس دیگر حلقه <code>join</code> ضرورتی ندارد.</p>
+
+    <h2 id="s8" data-t="ch37-086">۸. نخ و رابط گرافیکی</h2>
+
+    <p data-t="ch37-087">
+        اینجا دلیل واقعی نیاز شما به نخ است. فصل سی و پنجم گفت کار طولانی داخل
+        تابع پاسخ، پنجره را منجمد می‌کند. <code>after()</code> برای یک
+        زمان‌سنج جواب داد، ولی برای کار واقعی نه: یک دانلود را نمی‌شود به
+        تکه‌های صدمیلی‌ثانیه‌ای برید.
+    </p>
+
+    <div class="warn">
+        <span class="box-title" data-t="ch37-088">قانون طلایی</span>
+        <p data-t="ch37-089">
+            <strong>هرگز از نخ دیگری به ویجت دست نزنید.</strong> نه tkinter و
+            نه Qt و نه تقریباً هیچ کتابخانه گرافیکی دیگری امن-نخ نیست. صدا زدن
+            <code>label.config(...)</code> از داخل کارگر، به شما خرابی‌های
+            تصادفی، پنجره منجمد، یا هیچ می‌دهد؛ و فقط روی بعضی کامپیوترها.
+        </p>
+    </div>
+
+    <p data-t="ch37-090">الگوی امن این است:</p>
+
+    <pre class="out">worker thread  --put--&gt;  queue.Queue  --get--&gt;  main thread (after())</pre>
+
+    <pre class="code"><code>    # -- the worker thread -------------------------------------------------
+    def download(self) -&gt; None:
+        '''Runs in a THREAD. It must not touch a single widget.'''
+        for percent in range(0, 101, 5):
+            if self.stop_event.is_set():
+                self.messages.put(('done', 'cancelled'))
+                return
+            time.sleep(0.2)                     # the waiting work
+            self.messages.put(('progress', percent))
+        self.messages.put(('done', 'finished'))
+
+    # -- the GUI thread ----------------------------------------------------
+    def poll_queue(self) -&gt; None:
+        '''Runs in the MAIN thread: here, and only here, we touch widgets.'''
+        try:
+            while True:
+                # get_nowait raises Empty instead of blocking the interface.
+                kind, value = self.messages.get_nowait()
+                if kind == 'progress':
+                    self.bar['value'] = value
+                    self.status.config(text=f'downloading... {value} %')
+                elif kind == 'done':
+                    self.status.config(text=str(value))
+                    self.start_button.config(state='normal')
+        except queue.Empty:
+            pass
+        # Ask to be called again. This line must never be skipped.
+        self.root.after(self.POLL_MS, self.poll_queue)
+
+    def cancel(self) -&gt; None:
+        '''You cannot kill a thread; you ASK it to stop.'''
+        self.stop_event.set()
+        self.status.config(text='cancelling...')</code></pre>
+    <p class="code-caption" data-t="ch37-091">نخ و tkinter: نمونه 08_thread_with_gui/app.py</p>
+
+    <h3 data-t="ch37-092">شرح مثال</h3>
+
+    <ul>
+        <li data-t="ch37-093">کارگر فقط پیام در صف می‌گذارد. نخ اصلی هر صد میلی‌ثانیه با <code>after()</code> صف را می‌خواند و <strong>تنها او</strong> به ویجت‌ها دست می‌زند.</li>
+        <li data-t="ch37-094"><code>get_nowait()</code> اگر صف خالی باشد <code>Empty</code> پرتاب می‌کند به جای اینکه رابط کاربری را قفل کند.</li>
+        <li data-t="ch37-095">نخ را <strong>نمی‌شود کشت</strong>. فقط می‌شود از او <strong>خواهش</strong> کرد که تمام کند، با یک <code>Event</code> که خودش مرتب بررسی‌اش می‌کند.</li>
+        <li data-t="ch37-096">نسخه Qt همین ایده: کارگر یک <strong>سیگنال</strong> منتشر می‌کند و Qt خودش آن را به نخ رابط کاربری تحویل می‌دهد.</li>
+    </ul>
+
+    <h2 id="s9" data-t="ch37-097">۹. قفل سراسری و پردازه‌ها</h2>
+
+    <p data-t="ch37-098">
+        <strong>GIL</strong> یا قفل سراسری مفسر، قفلی است داخل خود CPython:
+        <strong>در هر لحظه فقط یک نخ بایت‌کد پایتون اجرا می‌کند</strong>.
+        نتیجه‌اش همان جدول بخش اول است.
+    </p>
+
+    <pre class="code"><code>from concurrent.futures import ProcessPoolExecutor, ThreadPoolExecutor
+
+
+def count_primes(limit: int) -&gt; int:
+    '''Pure calculation, no waiting at all: the GIL's worst case.'''
+    total = 0
+    for number in range(2, limit):
+        for divisor in range(2, int(number ** 0.5) + 1):
+            if number % divisor == 0:
+                break
+        else:
+            total += 1
+    return total</code></pre>
+    <p class="code-caption" data-t="ch37-099">محاسبه خالص: نمونه 09_gil_and_processes/app.py</p>
+
+    <p data-t="ch37-100">
+        این برنامه را اجرا کنید: نسخه نخ‌دار یک محاسبه خالص، به همان کندی نسخه
+        ترتیبی است و گاهی کندتر، به خاطر هزینه جابه‌جایی بین نخ‌ها. پاسخ
+        درست برای محاسبه، <code>ProcessPoolExecutor</code> است: چند
+        <strong>پردازه</strong> واقعی سیستم‌عامل، هر کدام با مفسر و قفل خودش،
+        روی چند هسته.
+    </p>
+
+    <h3 data-t="ch37-101">بهای یک پردازه</h3>
+
+    <ul>
+        <li data-t="ch37-102">آرگومان‌ها و نتیجه‌ها <code>pickle</code> و کپی می‌شوند، پس فرستادن شیء بزرگ گران است. یک <code>lambda</code> یا تابع محلی اصلاً قابل pickle نیست.</li>
+        <li data-t="ch37-103">دیگر هیچ متغیر مشترکی وجود ندارد. این خبر بد و خبر خوب است: دیگر شرایط رقابتی هم ندارید.</li>
+        <li data-t="ch37-104">روی ویندوز هر پردازه ماژول شما را دوباره وارد می‌کند، و برای همین <code>if __name__ == '__main__':</code> اینجا <strong>اختیاری نیست</strong>. بدون آن، برنامه بی‌نهایت بار خودش را راه می‌اندازد.</li>
+    </ul>
+
+    <div class="note">
+        <span class="box-title" data-t="ch37-105">آینده GIL</span>
+        <p data-t="ch37-106">
+            نسخه‌های آزاد-نخ پایتون ۳.۱۳ به بعد می‌توانند بدون GIL اجرا شوند.
+            تا وقتی این حالت همه‌جا عادی نشده است، قاعده بالا همان چیزی است که
+            با آن برنامه‌ریزی می‌کنید.
+        </p>
+    </div>
+
+    <h2 id="s10" data-t="ch37-107">۱۰. اولین کوروتین</h2>
+
+    <p data-t="ch37-108">
+        یک نخ گران است: سیستم‌عامل می‌سازدش، به آن سوئیچ می‌کند، و هر کدام
+        حافظه می‌خورند. هزار نخ یک مشکل است؛ هزار <strong>کوروتین</strong>
+        هیچ چیز نیست. asyncio همروندی با <strong>یک</strong> نخ است.
+    </p>
+
+    <div class="table-scroll">
+        <table>
+            <thead>
+                <tr><th data-t="ch37-109">واژه</th><th data-t="ch37-110">یعنی</th></tr>
+            </thead>
+            <tbody>
+                <tr><td><code>async def</code></td><td data-t="ch37-111">تعریف یک کوروتین: تابعی که می‌تواند مکث کند</td></tr>
+                <tr><td><code>await</code></td><td data-t="ch37-112">اینجا مکث کن تا این آماده شود، و بگذار در این فاصله چیز دیگری اجرا شود</td></tr>
+                <tr><td><code>asyncio.run()</code></td><td data-t="ch37-113">حلقه رویداد را راه می‌اندازد و یک کوروتین را تا آخر اجرا می‌کند</td></tr>
+            </tbody>
+        </table>
+    </div>
+
+    <pre class="code"><code>import asyncio
+import time
+
+
+async def worker(name: str, seconds: float) -&gt; str:
+    '''A coroutine: it can pause at every `await`.'''
+    print(f'{name}: starting')
+    await asyncio.sleep(seconds)        # NOT time.sleep()
+    print(f'{name}: finished after {seconds} s')
+    return f'{name} is done'
+
+
+async def main_async() -&gt; None:
+    # `await` one after the other = sequential. Two seconds in total.
+    first = await worker('A', 1)
+    second = await worker('B', 1)
+
+    # What happens if you forget the await:
+    coroutine = worker('C', 1)          # nothing runs here
+    print(f'without await, worker() gives: {type(coroutine).__name__}')
+    print(await coroutine)              # NOW it runs
+
+
+def main() -&gt; None:
+    # asyncio.run creates the event loop, runs the coroutine, closes the loop.
+    # Call it ONCE, at the very top of your program.
+    asyncio.run(main_async())</code></pre>
+    <p class="code-caption" data-t="ch37-114">اولین کوروتین: نمونه 10_first_coroutine/app.py</p>
+
+    <h3 data-t="ch37-115">دو قاعده‌ای که همه رویشان می‌لغزند</h3>
+
+    <ul>
+        <li data-t="ch37-116">صدا زدن یک کوروتین <strong>اجرایش نمی‌کند</strong>. <code>worker()</code> فقط یک شیء کوروتین می‌سازد؛ <code>await worker()</code> اجرایش می‌کند. پایتون هشدار می‌دهد: <code dir="ltr">coroutine 'worker' was never awaited</code>.</li>
+        <li data-t="ch37-117"><code>await</code> فقط داخل <code>async def</code> مجاز است.</li>
+    </ul>
+
+    <div class="warn">
+        <span class="box-title" data-t="ch37-118">هرگز حلقه رویداد را مسدود نکنید</span>
+        <p data-t="ch37-119">
+            <code>time.sleep(1)</code> داخل یک کوروتین،
+            <strong>کل</strong> حلقه رویداد را یک ثانیه متوقف می‌کند، شامل هر
+            کوروتین دیگری. نسخه ناهمگامش <code>await asyncio.sleep(1)</code>
+            است. همین درباره <code>requests</code> (مسدودکننده) در برابر
+            <code>httpx.AsyncClient</code> (ناهمگام) هم صادق است. برای
+            فراخوانی مسدودکننده‌ای که چاره‌ای جز آن ندارید:
+            <code>await asyncio.to_thread(function, arg)</code>.
+        </p>
+    </div>
+
+    <h2 id="s11" data-t="ch37-120">۱۱. اجرای همزمان با gather</h2>
+
+    <pre class="code"><code>async def main_async() -&gt; None:
+    sites = [('kadoos.ir', 1.0), ('python.org', 0.4),
+             ('sqlite.org', 0.7), ('qt.io', 0.2)]
+
+    print('sequential:')
+    for site, seconds in sites:
+        await fetch(site, seconds)
+
+    print('with gather:')
+    sizes = await asyncio.gather(*(fetch(site, seconds)
+                                   for site, seconds in sites))
+    print(f'   results in the ORDER OF THE ARGUMENTS: {sizes}')
+
+    print('with a failure and return_exceptions=True:')
+    results = await asyncio.gather(
+        fetch('kadoos.ir', 0.3),
+        fetch('broken.ir', 0.1),
+        fetch('qt.io', 0.2),
+        return_exceptions=True,
+    )
+    for result in results:
+        if isinstance(result, Exception):
+            print(f'   FAILED: {result}')
+        else:
+            print(f'   ok: {result} bytes')</code></pre>
+    <p class="code-caption" data-t="ch37-121">gather: نمونه 11_gather/app.py</p>
+
+    <h3 data-t="ch37-122">شرح مثال</h3>
+
+    <ul>
+        <li data-t="ch37-123"><code>await one(); await two()</code> ترتیبی است. برای اجرای همزمان باید هر دو را به <code>gather</code> بدهید.</li>
+        <li data-t="ch37-124"><code>gather</code> نتیجه‌ها را <strong>به ترتیبی که پاس داده‌اید</strong> برمی‌گرداند، نه به ترتیب تمام شدن.</li>
+        <li data-t="ch37-125">به طور پیش‌فرض اولین استثنا بلافاصله پرتاب می‌شود. با <code>return_exceptions=True</code> به جایش شیء استثنا داخل فهرست نتیجه می‌آید، و این دقیقاً چیزی است که می‌خواهید وقتی یک دانلود خراب نباید چهار دانلود موفق را از بین ببرد.</li>
+        <li data-t="ch37-126">جایگزین امروزی‌تر (پایتون ۳.۱۱ به بعد) <code>asyncio.TaskGroup</code> است که وقتی یکی شکست بخورد بقیه را لغو می‌کند؛ معمولاً همان چیزی است که در یک سرور می‌خواهید.</li>
+    </ul>
+
+    <h2 id="s12" data-t="ch37-127">۱۲. تسک، لغو و مهلت</h2>
+
+    <pre class="code"><code>async def long_job(name: str, seconds: float) -&gt; str:
+    '''A job that cleans up properly when it is cancelled.'''
+    try:
+        for second in range(int(seconds)):
+            print(f'  {name}: working ({second + 1}/{int(seconds)})')
+            await asyncio.sleep(1)
+        return f'{name} finished'
+    except asyncio.CancelledError:
+        print(f'  {name}: cancelled -- closing the file, the socket...')
+        raise            # ALWAYS re-raise: the caller must know
+
+
+async def main_async() -&gt; None:
+    # -- create_task: the work starts, we do something else meanwhile -------
+    task = asyncio.create_task(long_job('background', 3))
+    print('  the main coroutine is free')
+    await asyncio.sleep(1)
+    print(f'  is it done? {task.done()}')
+    print(f'  result: {await task}')
+
+    # -- cancelling --------------------------------------------------------
+    task = asyncio.create_task(long_job('endless', 10))
+    await asyncio.sleep(2.5)
+    task.cancel()
+    try:
+        await task
+    except asyncio.CancelledError:
+        print('  the caller sees CancelledError')
+
+    # -- timeout (Python 3.11+) --------------------------------------------
+    try:
+        async with asyncio.timeout(2):
+            await long_job('slow', 10)
+    except TimeoutError:
+        print('  too slow: the job was cancelled for us')</code></pre>
+    <p class="code-caption" data-t="ch37-128">تسک‌ها: نمونه 12_tasks_cancel_timeout/app.py</p>
+
+    <h3 data-t="ch37-129">شرح مثال</h3>
+
+    <ul>
+        <li data-t="ch37-130"><code>create_task</code> کوروتین را <strong>در همین مرحله</strong> در پس‌زمینه شروع می‌کند و کد شما ادامه می‌یابد. بعداً با <code>await task</code> پاسخ را جمع می‌کنید.</li>
+        <li data-t="ch37-131">یک ارجاع به تسک نگه دارید. حلقه رویداد فقط ارجاع ضعیف نگه می‌دارد، پس تسکی که کسی نگهش نداشته می‌تواند وسط کار زباله‌روبی شود.</li>
+        <li data-t="ch37-132"><code>task.cancel()</code> باعث می‌شود <code>await</code> داخل کوروتین <code>CancelledError</code> پرتاب کند. آن را بگیرید تا تمیزکاری کنید، و بعد <strong>دوباره پرتابش کنید</strong>. قورت دادنش یعنی تسک از لغو شدن سر باز می‌زند، و این‌طور است که برنامه به Ctrl-C جواب نمی‌دهد.</li>
+        <li data-t="ch37-133"><code>asyncio.timeout()</code> کوروتین را برایتان لغو می‌کند و <code>TimeoutError</code> می‌دهد. شکل قدیمی‌تر که همه جا کار می‌کند <code>asyncio.wait_for()</code> است.</li>
+    </ul>
+
+    <h2 id="s13" data-t="ch37-134">۱۳. صف ناهمگام</h2>
+
+    <p data-t="ch37-135">
+        همان ایده بخش ششم، ولی با کوروتین به جای نخ. و چون همه چیز در یک نخ
+        اجرا می‌شود، اصلاً شرایط رقابتی‌ای وجود ندارد که از آن محافظت کنیم.
+    </p>
+
+    <pre class="code"><code>async def producer(queue: asyncio.Queue, count: int) -&gt; None:
+    '''Puts `count` jobs into the queue.'''
+    for number in range(1, count + 1):
+        await asyncio.sleep(random.uniform(0.05, 0.15))
+        await queue.put(number)
+        print(f'produced  {number:&gt;2}   (queue: {queue.qsize()})')
+    print('the producer has finished')
+
+
+async def consumer(name: str, queue: asyncio.Queue) -&gt; None:
+    '''Takes jobs for ever, until it is cancelled.'''
+    while True:
+        number = await queue.get()
+        try:
+            await asyncio.sleep(random.uniform(0.1, 0.3))
+            print(f'  {name} handled {number:&gt;2} -&gt; {number ** 2}')
+        finally:
+            # In a `finally`, so a failure cannot make join() wait for ever.
+            queue.task_done()</code></pre>
+    <p class="code-caption" data-t="ch37-136">صف ناهمگام: نمونه 14_async_queue/app.py</p>
+
+    <p data-t="ch37-137">
+        <code>maxsize</code> به شما <strong>فشار برگشتی</strong> می‌دهد: وقتی
+        مصرف‌کننده‌ها عقب می‌مانند، صف پر می‌شود و <code>put</code> شروع به
+        انتظار می‌کند، پس تولیدکننده کند می‌شود به جای اینکه همه حافظه را
+        بخورد. تمام ترفند یک خط لوله سالم همین است.
+    </p>
+
+    <h2 id="s14" data-t="ch37-138">۱۴. پروژه: ربات پیام‌رسان</h2>
+
+    <p data-t="ch37-139">
+        ربات طبیعی‌ترین پروژه asyncio است: تقریباً همیشه منتظر شبکه است و
+        همزمان به آدم‌های زیادی خدمت می‌کند؛ دقیقاً همان شکلی که asyncio برایش
+        ساخته شد. کتابخانه <code>python-telegram-bot</code> از بالا تا پایین
+        روی asyncio ساخته شده و برای همین هر پاسخگر یک <code>async def</code>
+        است.
+    </p>
+
+    <pre class="code"><code>async def hello(update: Update, context: ContextTypes.DEFAULT_TYPE) -&gt; None:
+    '''Answers /hello.'''
+    # update.message CAN be None (an edited message, a channel post...), so
+    # check instead of silencing the type checker with a `# type: ignore`.
+    if update.message is None or update.effective_user is None:
+        return
+    name = update.effective_user.first_name
+    await update.message.reply_text(f'Hello {name}! Welcome to Kadoos.')
+
+
+def main() -&gt; None:
+    # `.base_url(...)` is what makes the same library talk to Bale.
+    application = (Application.builder()
+                   .token(get_token())
+                   .base_url(BASE_URL)
+                   .build())
+
+    application.add_handler(CommandHandler('hello', hello))
+    application.add_handler(CommandHandler('dice', dice))
+    application.add_handler(CommandHandler('help', help_command))
+
+    print('The bot is running. Press Ctrl-C to stop it.')
+    application.run_polling()
+
+
+# The main guard matters here: without it, importing this file would start the
+# bot. The first version of this course built the application at module level.
+if __name__ == '__main__':
+    main()</code></pre>
+    <p class="code-caption" data-t="ch37-140">ربات: نمونه 15_messenger_bot/01_hello_bot.py</p>
+
+    <div class="warn">
+        <span class="box-title" data-t="ch37-141">توکن یک رمز عبور است</span>
+        <p data-t="ch37-142">
+            نسخه اول این دوره، توکن زنده ربات را داخل
+            <code>constants.py</code> نوشته بود و آن فایل همراه پروژه سفر
+            می‌کرد. هر کسی که پروژه را می‌گرفت، مالک ربات می‌شد. سه قاعده:
+            توکن و رمز و کلید API در <strong>متغیر محیطی</strong> یا فایل
+            <code>.env</code> می‌نشینند، نه در کد؛ فایل <code>.env</code> از
+            روز اول در <code>.gitignore</code> می‌رود؛ و اگر توکنی یک بار
+            کامیت شده باشد، باید <strong>باطلش کنید</strong>، چون پاک کردن آن
+            خط کافی نیست: توکن هنوز در تاریخچه مخزن هست.
+        </p>
+    </div>
+
+    <pre class="code"><code>def get_token() -&gt; str:
+    '''Read the token, or explain clearly what is missing.'''
+    token = os.environ.get('BOT_TOKEN')
+    if not token:
+        raise SystemExit(
+            'BOT_TOKEN is not set.\n\n'
+            '  Windows : set BOT_TOKEN=your-token-here\n'
+            '  Linux   : export BOT_TOKEN="your-token-here"\n\n'
+            'Get a token from @BotFather (Telegram) or @BotFather (Bale).')
+    return token</code></pre>
+    <p class="code-caption" data-t="ch37-143">خواندن توکن از محیط: نمونه 15_messenger_bot/config.py</p>
+
+    <p data-t="ch37-144">
+        نکته امنیتی دوم در بخش دریافت فایل است. نام فایل را
+        <strong>فرستنده</strong> انتخاب می‌کند، پس نامی مثل
+        <code>../../passwords.txt</code> بیرون از پوشه دانلود شما نوشته
+        می‌شود. به این حمله <strong>پیمایش مسیر</strong> می‌گویند و دفاعش این
+        است که فقط آخرین بخش نام را نگه دارید و بعد بررسی کنید مسیر نهایی
+        واقعاً داخل پوشه مورد نظر است.
+    </p>
+
+    <pre class="code"><code>def safe_filename(name: str) -&gt; str:
+    '''Turn a name chosen by a stranger into a name we can safely write.'''
+    # Path(...).name drops every folder: '../../etc/passwd' -&gt; 'passwd'
+    name = Path(name).name
+    # Then keep only harmless characters.
+    name = re.sub(r'[^A-Za-z0-9._-]', '_', name)
+    # '.' and '..' survive both steps above and are not file names at all.
+    if name in {'', '.', '..'}:
+        return 'file.bin'
+    return name</code></pre>
+    <p class="code-caption" data-t="ch37-145">نام فایل امن: نمونه 15_messenger_bot/04_files_bot.py</p>
+
+    <div class="folder-ref">
+        <span class="box-title" data-t="ch37-146">فایل‌های تمرینی این فصل</span>
+        <p data-t="ch37-147">
+            پوشه <code>S37-concurrency-threading-asyncio</code> شامل پانزده
+            پوشه است. نمونه‌های ۰۱ تا ۱۲ و ۱۴ فقط به کتابخانه استاندارد نیاز
+            دارند. نمونه ۱۳ به <code>httpx</code> و نمونه ۱۵ به
+            <code>python-telegram-bot</code> و یک توکن. نمونه‌های ۰۲ و ۰۴ را
+            <strong>چند بار</strong> اجرا کنید: خروجی هر بار فرق می‌کند و
+            تمام درس همین است.
+        </p>
+    </div>
+
+    <h2 data-t="ch37-148">خلاصه فصل</h2>
+
+    <div class="table-scroll">
+        <table>
+            <thead>
+                <tr><th data-t="ch37-149">ابزار</th><th data-t="ch37-150">وظیفه آن</th></tr>
+            </thead>
+            <tbody>
+                <tr><td><code>Thread(target=, args=)</code></td><td data-t="ch37-151">ساختن نخ. ویرگول تاپل را فراموش نکنید</td></tr>
+                <tr><td data-t="ch37-152"><code>start()</code> و <code>join()</code></td><td data-t="ch37-153">راه‌اندازی و انتظار. هرگز <code>run()</code></td></tr>
+                <tr><td data-t="ch37-154"><code>Lock</code> و <code>with lock:</code></td><td data-t="ch37-155">محافظت از متغیر مشترک</td></tr>
+                <tr><td><code>Event</code></td><td data-t="ch37-156">درخواست توقف تمیز از یک نخ</td></tr>
+                <tr><td><code>queue.Queue</code></td><td data-t="ch37-157">تبادل امن داده، بدون قفل</td></tr>
+                <tr><td data-t="ch37-158">نگهبان <code>None</code></td><td data-t="ch37-159">پایان دادن به کارگرهای حلقه‌ای</td></tr>
+                <tr><td><code>ThreadPoolExecutor</code></td><td data-t="ch37-160">استخر نخ. <code>map</code> یا <code>submit</code></td></tr>
+                <tr><td><code>as_completed</code></td><td data-t="ch37-161">نتیجه‌ها به ترتیب آماده شدن</td></tr>
+                <tr><td><code>future.result()</code></td><td data-t="ch37-162">خطای کارگر را دوباره پرتاب می‌کند. حتماً بخوانیدش</td></tr>
+                <tr><td>GIL</td><td data-t="ch37-163">یک نخ در هر لحظه. برای محاسبه، نخ بی‌فایده است</td></tr>
+                <tr><td><code>ProcessPoolExecutor</code></td><td data-t="ch37-164">چند هسته واقعی، برای محاسبه</td></tr>
+                <tr><td data-t="ch37-165"><code>async def</code> و <code>await</code></td><td data-t="ch37-166">کوروتین و مکث</td></tr>
+                <tr><td><code>asyncio.run()</code></td><td data-t="ch37-167">یک بار، در بالاترین سطح برنامه</td></tr>
+                <tr><td><code>asyncio.gather()</code></td><td data-t="ch37-168">اجرای همزمان، نتیجه به ترتیب ورودی</td></tr>
+                <tr><td data-t="ch37-169"><code>create_task</code> و <code>cancel</code></td><td data-t="ch37-170">کار پس‌زمینه و لغوش</td></tr>
+                <tr><td><code>asyncio.timeout()</code></td><td data-t="ch37-171">مهلت، با لغو خودکار</td></tr>
+                <tr><td><code>asyncio.Queue</code></td><td data-t="ch37-172">تولیدکننده و مصرف‌کننده، با فشار برگشتی</td></tr>
+                <tr><td data-t="ch37-173">قانون رابط گرافیکی</td><td data-t="ch37-174">هرگز از نخ دیگر به ویجت دست نزنید</td></tr>
+                <tr><td data-t="ch37-175">قانون asyncio</td><td data-t="ch37-176">هرگز تابع مسدودکننده در کوروتین صدا نزنید</td></tr>
+            </tbody>
+        </table>
+    </div>
+
+    <div class="exercise">
+        <h3 data-t="ch37-177">تمرین‌های فصل سی و هفت</h3>
+        <ol>
+            <li data-t="ch37-178">برنامه‌ای بنویسید که ده صفحه را هر کدام با یک نخ «دانلود» کند و زمان کل را چاپ کند. با نسخه ترتیبی مقایسه کنید.</li>
+            <li data-t="ch37-179">از نمونه شرایط رقابتی، <code>time.sleep</code> را بردارید و بیست بار اجرایش کنید. آیا نتیجه غلط باز هم ظاهر می‌شود؟ این درباره باگ‌های غیرقابل بازتولید چه به شما می‌آموزد؟</li>
+            <li data-t="ch37-180">همان نمونه را با <code>Lock</code> درست کنید و بسنجید چقدر کندتر شد. بعد قفل را دور کل حلقه ببرید: چه بر سر همروندی آمد؟</li>
+            <li data-t="ch37-181">نخی بنویسید که از ده تا صفر بشمارد و در هر لحظه با یک <code>Event</code> از نخ اصلی متوقف شود.</li>
+            <li data-t="ch37-182">نمونه صف و کارگرها را با <code>ThreadPoolExecutor</code> بازنویسی کنید. چند خط حذف کردید؟</li>
+            <li data-t="ch37-183">با <code>ThreadPoolExecutor</code> ده فایل متنی را همزمان بخوانید و تعداد کلمات هر کدام را گزارش دهید. نبود یک فایل نباید بقیه را متوقف کند.</li>
+            <li data-t="ch37-184">در نمونه GIL اندازه کار را آنقدر کم کنید تا پردازه‌ها دیگر سریع‌تر از نسخه ترتیبی نباشند. چرا اندازه‌ای هست که پایین‌تر از آن پردازه‌ها می‌بازند؟</li>
+            <li data-t="ch37-185">در سه خط و با زبان خودتان توضیح دهید چرا نخ یک دانلود را سریع می‌کند و یک محاسبه را نه.</li>
+            <li data-t="ch37-186">تمرین اول را با <code>asyncio.gather</code> بازنویسی کنید.</li>
+            <li data-t="ch37-187">کوروتین <code>countdown(name, seconds)</code> بنویسید و سه تای آن را با مدت‌های متفاوت با هم اجرا کنید.</li>
+            <li data-t="ch37-188">به یکی از آن سه، مهلت سه ثانیه‌ای بدهید و مطمئن شوید دو تای دیگر تمام می‌شوند.</li>
+            <li data-t="ch37-189">در نمونه صف ناهمگام، <code>maxsize</code> را یک و بعد صد بگذارید. چه چیزی در خروجی عوض می‌شود و چرا؟</li>
+            <li data-t="ch37-190">کوروتینی بنویسید که <code>CancelledError</code> را بگیرد و <strong>دوباره پرتاب نکند</strong>. چه بر سر <code>asyncio.timeout</code> می‌آید؟</li>
+            <li data-t="ch37-191">به ربات دستور <code>/weather &lt;city&gt;</code> اضافه کنید که یک REST API عمومی را با <code>httpx.AsyncClient</code> صدا بزند. چرا آنجا <strong>نباید</strong> از <code>requests</code> استفاده کنید؟</li>
+            <li data-t="ch37-192">برنامه شما باید پانصد عکس را تغییر اندازه دهد. نخ، پردازه یا asyncio؟ و اگر باید همزمان به پنج هزار کاربر چت جواب بدهد چه؟</li>
+        </ol>
+    </div>
+
+    <div class="pager">
+        <a href="chapter-36.html">فصل قبل: PySide6 و ساخت فایل اجرایی</a>
+        <a href="chapter-38.html">فصل بعد: وب با Flask</a>
+    </div>
+
+</main>
+
+</body>
+</html>

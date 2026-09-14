@@ -1,0 +1,660 @@
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="فصل بیست و سه: وراثت، بازنویسی متد، تابع super، ترتیب MRO، وراثت چندگانه، چندریختی، تایپ اردکی و کلاس انتزاعی">
+    <title>فصل ۲۳: وراثت و چندریختی</title>
+    <link rel="icon" href="logokm.png" type="image/png">
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<header class="book-bar">
+    <a class="name" href="index.html">برنامه‌نویسی پایتون</a>
+    <a href="index.html">فهرست مطالب</a>
+</header>
+
+<main class="paper">
+
+    <div class="chapter-head">
+        <span class="chapter-num">فصل ۲۳</span>
+        <h1 data-t="ch23-001">وراثت و چندریختی</h1>
+        <p class="lead" data-t="ch23-002">
+            دو ستون باقی‌مانده شیءگرایی. وراثت یعنی استفاده دوباره از یک کلاس
+            به جای کپی کردنش، و چندریختی یعنی اینکه اشیاء مختلف به یک پیام
+            واحد، هر کدام به شیوه خودشان جواب دهند.
+        </p>
+    </div>
+
+    <div class="mini-toc">
+        <span class="box-title" data-t="ch23-003">در این فصل می‌خوانید</span>
+        <ol>
+            <li data-t="ch23-004"><a href="#s1">اولین وراثت</a></li>
+            <li data-t="ch23-005"><a href="#s2">بازنویسی متد</a></li>
+            <li data-t="ch23-006"><a href="#s3">تابع super</a></li>
+            <li data-t="ch23-007"><a href="#s4">فرزندی که صفت اضافه می‌کند</a></li>
+            <li data-t="ch23-008"><a href="#s5">isinstance و issubclass</a></li>
+            <li data-t="ch23-009"><a href="#s6">وراثت چندسطحی و MRO</a></li>
+            <li data-t="ch23-010"><a href="#s7">وراثت چندگانه</a></li>
+            <li data-t="ch23-011"><a href="#s8">چندریختی</a></li>
+            <li data-t="ch23-012"><a href="#s9">تایپ اردکی</a></li>
+            <li data-t="ch23-013"><a href="#s10">کلاس انتزاعی</a></li>
+            <li data-t="ch23-014"><a href="#s11">نمونه کامل: اشکال هندسی</a></li>
+            <li data-t="ch23-015"><a href="#s12">وراثت یا ترکیب</a></li>
+        </ol>
+    </div>
+
+    <h2 id="s1" data-t="ch23-016">۱. اولین وراثت</h2>
+
+    <p data-t="ch23-017">
+        فرض کنید کلاس <code>Dog</code> و <code>Cat</code> دارید و هر دو باید
+        بتوانند بدوند. به جای نوشتن دو بار همان کد، یک کلاس
+        <strong>والد</strong> می‌سازیم و هر دو از آن <strong>ارث</strong>
+        می‌برند.
+    </p>
+
+    <pre class="code"><code># A child class receives everything the parent has, and may add more.
+class Animal:
+    def run(self):
+        print('Running...')
+
+
+class Dog(Animal):          # Dog inherits from Animal
+    def speak(self):
+        print('Bark')
+
+
+if __name__ == '__main__':
+    dog = Dog()
+    dog.speak()             # its own method
+    dog.run()               # inherited from Animal
+
+    # The parent knows nothing about the child:
+    animal = Animal()
+    animal.run()
+    # animal.speak()   -&gt;  AttributeError</code></pre>
+    <p class="code-caption" data-t="ch23-018">اولین وراثت: نمونه 01_first_inheritance.py</p>
+
+    <h3 data-t="ch23-019">شرح مثال</h3>
+
+    <ul>
+        <li data-t="ch23-020">نام کلاس والد داخل پرانتز جلوی نام کلاس فرزند نوشته می‌شود.</li>
+        <li data-t="ch23-021">فرزند <strong>همه چیز</strong> والد را می‌گیرد: متدها و صفت‌ها.</li>
+        <li data-t="ch23-022">رابطه یک‌طرفه است. والد هیچ خبری از فرزند ندارد.</li>
+        <li data-t="ch23-023">اصطلاح‌ها: کلاس والد را <strong>پایه</strong> یا superclass و کلاس فرزند را <strong>مشتق</strong> یا subclass هم می‌گویند.</li>
+    </ul>
+
+    <h2 id="s2" data-t="ch23-024">۲. بازنویسی متد</h2>
+
+    <pre class="code"><code># When the child defines a method that already exists in the parent,
+# the child version wins. This is called OVERRIDING.
+class Animal:
+    def speak(self):
+        print('Some generic sound')
+
+    def describe(self):
+        print('I am an animal and I say:')
+        self.speak()          # calls the CHILD version when self is a child
+
+
+class Dog(Animal):
+    def speak(self):
+        print('Bark')
+
+
+class Cat(Animal):
+    def speak(self):
+        print('Meow')
+
+
+if __name__ == '__main__':
+    Animal().describe()
+    Dog().describe()
+    Cat().describe()</code></pre>
+    <p class="code-caption" data-t="ch23-025">بازنویسی: نمونه 02_override.py</p>
+
+    <pre class="out">I am an animal and I say:
+Some generic sound
+I am an animal and I say:
+Bark
+I am an animal and I say:
+Meow</pre>
+
+    <div class="tip">
+        <span class="box-title" data-t="ch23-026">نکته کلیدی این مثال</span>
+        <p data-t="ch23-027">
+            متد <code>describe</code> فقط در <code>Animal</code> نوشته شده و
+            داخلش <code>self.speak()</code> را صدا می‌زند. ولی وقتی روی یک سگ
+            صدا زده شود، نسخه <strong>سگ</strong> اجرا می‌شود. چون
+            <code>self</code> همان شیء واقعی است و پایتون همیشه از کلاس واقعی
+            شیء شروع به گشتن می‌کند. این پایه چندریختی است.
+        </p>
+    </div>
+
+    <h2 id="s3" data-t="ch23-028">۳. تابع super</h2>
+
+    <pre class="code"><code># super() gives access to the parent class.
+# It is used above all to run the parent __init__.
+class Human:
+    def __init__(self, name: str = 'Adam'):
+        self.name = name
+
+    def greet(self):
+        print(f'Hello {self.name}!')
+
+
+class Student(Human):
+    def __init__(self, name: str = 'Adam'):
+        super().__init__(name)      # let Human set self.name
+        # extra work of the child would go here
+
+    def learn(self):
+        print('I try to learn!')</code></pre>
+    <p class="code-caption" data-t="ch23-029">تابع super: نمونه 03_super_init.py</p>
+
+    <p data-t="ch23-030">
+        <code>super()</code> یعنی «کلاس والد من». پرکاربردترین استفاده‌اش صدا
+        زدن سازنده والد است. اگر یادتان برود، صفت‌هایی که والد می‌ساخت اصلاً
+        ساخته نمی‌شوند و بعداً <code>AttributeError</code> می‌گیرید.
+    </p>
+
+    <h2 id="s4" data-t="ch23-031">۴. فرزندی که صفت اضافه می‌کند</h2>
+
+    <pre class="code"><code># The usual pattern: the child calls super().__init__() and then adds its own
+# attributes.
+class Person:
+    def __init__(self, name: str, age: int) -&gt; None:
+        self.name = name
+        self.age = age
+
+    def describe(self) -&gt; str:
+        return f'{self.name}, {self.age} years old'
+
+
+class Employee(Person):
+    def __init__(self, name: str, age: int, salary: float) -&gt; None:
+        super().__init__(name, age)     # name and age handled by Person
+        self.salary = salary            # only Employee has this
+
+    def describe(self) -&gt; str:
+        # Reusing the parent version instead of repeating it.
+        return f'{super().describe()}, salary {self.salary:,.0f}'
+
+
+class Manager(Employee):
+    def __init__(self, name: str, age: int, salary: float, team: list[str]) -&gt; None:
+        super().__init__(name, age, salary)
+        self.team = team
+
+    def describe(self) -&gt; str:
+        return f'{super().describe()}, manages {len(self.team)} people'
+
+
+if __name__ == '__main__':
+    print(Person('Ali', 30).describe())
+    print(Employee('Sara', 28, 30_000_000).describe())
+    print(Manager('Reza', 45, 60_000_000, ['Ali', 'Sara']).describe())</code></pre>
+    <p class="code-caption" data-t="ch23-032">افزودن صفت: نمونه 04_child_adds_attributes.py</p>
+
+    <pre class="out">Ali, 30 years old
+Sara, 28 years old, salary 30,000,000
+Reza, 45 years old, salary 60,000,000, manages 2 people</pre>
+
+    <p data-t="ch23-033">
+        الگوی استاندارد را ببینید: <code>super().__init__(...)</code> اول، بعد
+        صفت‌های خودمان. و در <code>describe</code> هم به جای تکرار متن والد،
+        <code>super().describe()</code> صدا زده شده و چیزی به آن اضافه شده
+        است. سه سطح وراثت اینجا زنجیره‌ای کار می‌کنند.
+    </p>
+
+    <h2 id="s5" data-t="ch23-034">۵. isinstance و issubclass</h2>
+
+    <pre class="code"><code>dog = Dog()
+
+# isinstance() also answers True for the parents.
+print(isinstance(dog, Dog))       # True
+print(isinstance(dog, Animal))    # True
+print(isinstance(dog, Cat))       # False
+
+# type() is exact, isinstance() is not - prefer isinstance().
+print(type(dog) is Dog)           # True
+print(type(dog) is Animal)        # False
+
+# issubclass() works on the classes themselves.
+print(issubclass(Dog, Animal))    # True
+print(issubclass(Animal, Dog))    # False
+
+# Everything in Python inherits from object.
+print(issubclass(Animal, object)) # True</code></pre>
+    <p class="code-caption" data-t="ch23-035">بررسی نوع: نمونه 05_isinstance.py</p>
+
+    <p data-t="ch23-036">
+        همیشه <code>isinstance</code> را به <code>type(x) is Y</code> ترجیح
+        دهید، چون وراثت را در نظر می‌گیرد. جمله آخر مهم است: در پایتون
+        <strong>همه چیز</strong> در نهایت از <code>object</code> ارث می‌برد،
+        حتی عدد و رشته.
+    </p>
+
+    <h2 id="s6" data-t="ch23-037">۶. وراثت چندسطحی و MRO</h2>
+
+    <pre class="code"><code># Three levels of inheritance. Every 'do' calls the one above it with super().
+class A:
+    def do(self):
+        print('A')
+
+
+class B(A):
+    def do(self):
+        print('B')
+        super().do()
+
+
+class C(B):
+    def do(self):
+        print('C')
+        super().do()
+
+
+if __name__ == '__main__':
+    c = C()
+    c.do()          # prints C, then B, then A
+
+    # The MRO (Method Resolution Order) is the exact list of classes Python
+    # searches, in order.
+    print(C.__mro__)</code></pre>
+    <p class="code-caption" data-t="ch23-038">MRO: نمونه 06_multilevel_mro.py</p>
+
+    <pre class="out">C
+B
+A
+(&lt;class 'C'&gt;, &lt;class 'B'&gt;, &lt;class 'A'&gt;, &lt;class 'object'&gt;)</pre>
+
+    <p data-t="ch23-039"><strong>MRO</strong> یا ترتیب یافتن متد، فهرست دقیق کلاس‌هایی است که پایتون به ترتیب در آنها دنبال یک متد جست‌وجو می‌کند. هر وقت گیج شدید که کدام نسخه متد اجرا می‌شود، <code>__mro__</code> را چاپ کنید.</p>
+
+    <h2 id="s7" data-t="ch23-040">۷. وراثت چندگانه</h2>
+
+    <pre class="code"><code># A class may have several parents. super() then follows the MRO,
+# not simply "the first parent".
+class Logger:
+    def __init__(self):
+        print('Logger init')
+        super().__init__()          # keep the chain going!
+
+    def log(self, message='...'):
+        print('Logging:', message)
+
+
+class Database:
+    def __init__(self):
+        print('Database init')
+        super().__init__()
+
+
+class App(Logger, Database):
+    def __init__(self):
+        print('App init')
+        super().__init__()          # starts the chain: Logger, then Database
+
+
+if __name__ == '__main__':
+    app = App()
+    app.log('the application started')
+    print(App.__mro__)</code></pre>
+    <p class="code-caption" data-t="ch23-041">وراثت چندگانه: نمونه 07_multiple_inheritance.py</p>
+
+    <div class="warn">
+        <span class="box-title" data-t="ch23-042">با احتیاط</span>
+        <p data-t="ch23-043">
+            وراثت چندگانه قدرتمند است ولی به‌سرعت گیج‌کننده می‌شود. اگر همه
+            کلاس‌ها <code>super().__init__()</code> را صدا نزنند، زنجیره قطع
+            می‌شود و بعضی سازنده‌ها اجرا نمی‌شوند. در عمل، یا از
+            <strong>ترکیب</strong> استفاده کنید یا از <strong>میکسین</strong>:
+            کلاسی مثل <code>Logger</code> که فقط رفتار اضافه می‌کند و
+            هیچ داده‌ای ندارد.
+        </p>
+    </div>
+
+    <h2 id="s8" data-t="ch23-044">۸. چندریختی</h2>
+
+    <pre class="code"><code># Polymorphism: the same call gives a different result depending on the object.
+class Shape:
+    def area(self) -&gt; float:
+        raise NotImplementedError('every shape must implement area()')
+
+    def name(self) -&gt; str:
+        return type(self).__name__
+
+
+class Rectangle(Shape):
+    def __init__(self, width: float, height: float) -&gt; None:
+        self.width = width
+        self.height = height
+
+    def area(self) -&gt; float:
+        return self.width * self.height
+
+
+class Circle(Shape):
+    def __init__(self, radius: float) -&gt; None:
+        self.radius = radius
+
+    def area(self) -&gt; float:
+        return 3.14159 * self.radius ** 2
+
+
+class Square(Rectangle):
+    def __init__(self, side: float) -&gt; None:
+        super().__init__(side, side)
+
+
+if __name__ == '__main__':
+    shapes: list[Shape] = [Rectangle(3, 4), Circle(5), Square(2)]
+
+    # One single loop handles every kind of shape.
+    for shape in shapes:
+        print(f'{shape.name():&lt;10} area = {shape.area():.2f}')
+
+    print('Total area:', sum(shape.area() for shape in shapes))</code></pre>
+    <p class="code-caption" data-t="ch23-045">چندریختی: نمونه 08_polymorphism.py</p>
+
+    <pre class="out">Rectangle  area = 12.00
+Circle     area = 78.54
+Square     area = 4.00
+Total area: 94.53975</pre>
+
+    <h3 data-t="ch23-046">چرا این مهم است</h3>
+
+    <p data-t="ch23-047">
+        بدون چندریختی، آن حلقه باید این‌طور می‌بود: «اگر مستطیل است، طول در
+        عرض؛ وگرنه اگر دایره است، پی در شعاع به توان دو؛ وگرنه اگر...». هر بار
+        که شکل تازه‌ای اضافه شود، باید آن زنجیره <code>elif</code> را پیدا
+        کنید و عوضش کنید. با چندریختی، شکل تازه فقط یک کلاس تازه است و
+        <strong>هیچ کد موجودی عوض نمی‌شود</strong>. این یکی از مهم‌ترین اصول
+        طراحی نرم‌افزار است.
+    </p>
+
+    <h2 id="s9" data-t="ch23-048">۹. تایپ اردکی</h2>
+
+    <pre class="code"><code># Duck typing: "If it walks like a duck and quacks like a duck, it is a duck."
+# Python does not care about the class; it only cares that the method exists.
+class Dog:
+    def speak(self):
+        print('Bark')
+
+
+class Cat:
+    def speak(self):
+        print('Meow')
+
+
+class Robot:
+    'Not an animal at all - but it can speak, so it fits.'
+    def speak(self):
+        print('Beep boop')
+
+
+def talk(thing):
+    thing.speak()          # no inheritance, no interface, no check
+
+
+if __name__ == '__main__':
+    for thing in (Dog(), Cat(), Robot()):
+        talk(thing)
+
+    # If the method is missing we get an AttributeError at that moment.
+    # hasattr() lets us check first.
+    class Stone:
+        pass
+
+    stone = Stone()
+    if hasattr(stone, 'speak'):
+        talk(stone)
+    else:
+        print('A stone cannot speak.')</code></pre>
+    <p class="code-caption" data-t="ch23-049">تایپ اردکی: نمونه 09_duck_typing.py</p>
+
+    <p data-t="ch23-050">
+        در زبان‌هایی مثل جاوا، برای اینکه تابعی چند نوع را قبول کند، آن نوع‌ها
+        باید حتماً از یک والد یا رابط مشترک ارث ببرند. پایتون این را لازم
+        ندارد: فقط بررسی می‌کند که در لحظه اجرا، متد وجود دارد یا نه. این
+        انعطاف بالایی می‌دهد ولی خطاها را به زمان اجرا موکول می‌کند.
+    </p>
+
+    <h2 id="s10" data-t="ch23-051">۱۰. کلاس انتزاعی</h2>
+
+    <p data-t="ch23-052">
+        گاهی می‌خواهید <strong>مجبور</strong> کنید که هر فرزند، متد خاصی را
+        پیاده‌سازی کند. کلاس انتزاعی دقیقاً همین کار را می‌کند.
+    </p>
+
+    <pre class="code"><code># An abstract base class defines WHAT the children must provide,
+# without providing it itself. It cannot be instantiated.
+from abc import ABC, abstractmethod
+
+
+class Notifier(ABC):
+    def __init__(self, target: str) -&gt; None:
+        self.target = target
+
+    @abstractmethod
+    def send(self, message: str) -&gt; None:
+        'Every real notifier has to implement this.'
+
+    def send_all(self, messages: list[str]) -&gt; None:
+        'A normal method that the children inherit for free.'
+        for message in messages:
+            self.send(message)
+
+
+class EmailNotifier(Notifier):
+    def send(self, message: str) -&gt; None:
+        print(f'Email to {self.target}: {message}')
+
+
+class SmsNotifier(Notifier):
+    def send(self, message: str) -&gt; None:
+        print(f'SMS to {self.target}: {message}')
+
+
+if __name__ == '__main__':
+    notifiers: list[Notifier] = [
+        EmailNotifier('ali@kadoosedu.ir'),
+        SmsNotifier('09121234567'),
+    ]
+
+    for notifier in notifiers:
+        notifier.send_all(['Welcome!', 'Your class starts at 17:00'])
+
+    # Creating the abstract class itself is refused:
+    try:
+        Notifier('nobody')
+    except TypeError as e:
+        print('Refused:', e)</code></pre>
+    <p class="code-caption" data-t="ch23-053">کلاس انتزاعی: نمونه 10_abstract_base_class.py</p>
+
+    <h3 data-t="ch23-054">شرح مثال</h3>
+
+    <ul>
+        <li data-t="ch23-055">کلاس باید از <code>ABC</code> ارث ببرد و متدهای اجباری با <code>@abstractmethod</code> علامت بخورند.</li>
+        <li data-t="ch23-056">از خود کلاس انتزاعی <strong>نمی‌شود</strong> شیء ساخت. تلاش برای آن <code>TypeError</code> می‌دهد.</li>
+        <li data-t="ch23-057">فرزندی که متد انتزاعی را پیاده نکند هم قابل ساخت نیست. پس خطا <strong>زودتر</strong> و در جای درست پیدا می‌شود.</li>
+        <li data-t="ch23-058">کلاس انتزاعی می‌تواند متدهای عادی هم داشته باشد، مثل <code>send_all</code> که همه فرزندان رایگان می‌گیرند.</li>
+        <li data-t="ch23-059">این ساختار در فصل سی و سوم، هنگام یادگیری الگوی استراتژی، دوباره به کار می‌آید.</li>
+    </ul>
+
+    <h2 id="s11" data-t="ch23-060">۱۱. نمونه کامل: اشکال هندسی</h2>
+
+    <pre class="code"><code>import math
+from abc import ABC, abstractmethod
+
+
+class Shape(ABC):
+    def __init__(self, name: str) -&gt; None:
+        self.name = name
+
+    @abstractmethod
+    def area(self) -&gt; float:
+        'Return the area of the shape.'
+
+    @abstractmethod
+    def perimeter(self) -&gt; float:
+        'Return the perimeter of the shape.'
+
+    def describe(self) -&gt; str:
+        'Shared by every shape - written only once.'
+        return (f'{self.name:&lt;10} area={self.area():&gt;8.2f} '
+                f'perimeter={self.perimeter():&gt;8.2f}')
+
+
+class Rectangle(Shape):
+    def __init__(self, width: float, height: float) -&gt; None:
+        super().__init__('Rectangle')
+        self.width = width
+        self.height = height
+
+    def area(self) -&gt; float:
+        return self.width * self.height
+
+    def perimeter(self) -&gt; float:
+        return 2 * (self.width + self.height)
+
+
+class Square(Rectangle):
+    def __init__(self, side: float) -&gt; None:
+        super().__init__(side, side)
+        self.name = 'Square'
+
+
+class Circle(Shape):
+    def __init__(self, radius: float) -&gt; None:
+        super().__init__('Circle')
+        self.radius = radius
+
+    def area(self) -&gt; float:
+        return math.pi * self.radius ** 2
+
+    def perimeter(self) -&gt; float:
+        return 2 * math.pi * self.radius</code></pre>
+    <p class="code-caption" data-t="ch23-061">اشکال هندسی: نمونه 11_shapes.py</p>
+
+    <p data-t="ch23-062">
+        دقت کنید که <code>Square</code> از <code>Rectangle</code> ارث می‌برد،
+        نه از <code>Shape</code>. مربع واقعاً یک نوع مستطیل است، پس
+        <code>area</code> و <code>perimeter</code> را رایگان می‌گیرد و فقط
+        سازنده‌اش را ساده می‌کند.
+    </p>
+
+    <h2 id="s12" data-t="ch23-063">۱۲. وراثت یا ترکیب</h2>
+
+    <pre class="code"><code>'''Inheritance says "IS A", composition says "HAS A".'''
+
+
+# --- Wrong: a car is NOT an engine -------------------------------------------
+class Engine:
+    def start(self):
+        print('Engine started')
+
+
+class BadCar(Engine):
+    'A car that inherits from Engine also inherits everything an engine can do,'
+    'which makes no sense and breaks as soon as Engine changes.'
+
+
+# --- Right: a car HAS an engine ----------------------------------------------
+class GoodCar:
+    def __init__(self, brand: str, engine: Engine) -&gt; None:
+        self.brand = brand
+        self.engine = engine
+
+    def start(self) -&gt; None:
+        print(f'{self.brand}:', end=' ')
+        self.engine.start()
+
+
+# --- Right use of inheritance: an electric car IS A car ----------------------
+class ElectricCar(GoodCar):
+    def __init__(self, brand: str, battery_kwh: float) -&gt; None:
+        super().__init__(brand, Engine())
+        self.battery_kwh = battery_kwh
+
+    def start(self) -&gt; None:
+        print(f'{self.brand} starts silently ({self.battery_kwh} kWh).')</code></pre>
+    <p class="code-caption" data-t="ch23-064">مقایسه: نمونه 12_inheritance_vs_composition.py</p>
+
+    <div class="table-scroll">
+        <table>
+            <thead>
+                <tr><th data-t="ch23-065">رابطه</th><th data-t="ch23-066">ابزار</th><th data-t="ch23-067">مثال</th></tr>
+            </thead>
+            <tbody>
+                <tr><td data-t="ch23-068">«یک نوع از» است</td><td data-t="ch23-069">وراثت</td><td data-t="ch23-070">دانشجو یک نوع شخص است</td></tr>
+                <tr><td data-t="ch23-071">«دارد»</td><td data-t="ch23-072">ترکیب</td><td data-t="ch23-073">ماشین موتور دارد</td></tr>
+            </tbody>
+        </table>
+    </div>
+
+    <div class="tip">
+        <span class="box-title" data-t="ch23-074">آزمون ساده</span>
+        <p data-t="ch23-075">
+            جمله را به فارسی بگویید: «آیا X واقعاً یک نوع Y است؟» اگر جواب
+            بله است، وراثت. اگر جمله عجیب شد، مثل «ماشین یک نوع موتور است»،
+            ترکیب. انتخاب غلط بین این دو، رایج‌ترین اشتباه شیءگرایی در دنیاست.
+        </p>
+    </div>
+
+    <div class="folder-ref">
+        <span class="box-title" data-t="ch23-076">فایل‌های تمرینی این فصل</span>
+        <p data-t="ch23-077">
+            پوشه <code>S23-oop-inheritance-and-polymorphism</code> شامل
+            نمونه‌های <code>01_first_inheritance.py</code> تا
+            <code>12_inheritance_vs_composition.py</code>.
+        </p>
+    </div>
+
+    <h2 data-t="ch23-078">خلاصه فصل</h2>
+
+    <div class="table-scroll">
+        <table>
+            <thead>
+                <tr><th data-t="ch23-079">ابزار</th><th data-t="ch23-080">وظیفه آن</th></tr>
+            </thead>
+            <tbody>
+                <tr><td><code>class Child(Parent):</code></td><td data-t="ch23-081">فرزند همه چیز والد را می‌گیرد</td></tr>
+                <tr><td data-t="ch23-082">بازنویسی</td><td data-t="ch23-083">فرزند نسخه خودش از یک متد را می‌نویسد</td></tr>
+                <tr><td><code>super()</code></td><td data-t="ch23-084">دسترسی به والد، مخصوصاً برای سازنده</td></tr>
+                <tr><td><code>isinstance(x, C)</code></td><td data-t="ch23-085">بررسی نوع، با در نظر گرفتن وراثت</td></tr>
+                <tr><td><code>issubclass(A, B)</code></td><td data-t="ch23-086">بررسی رابطه بین دو کلاس</td></tr>
+                <tr><td><code>C.__mro__</code></td><td data-t="ch23-087">ترتیب دقیق جست‌وجوی متد</td></tr>
+                <tr><td data-t="ch23-088">وراثت چندگانه</td><td data-t="ch23-089">ممکن ولی خطرناک. میکسین یا ترکیب بهتر است</td></tr>
+                <tr><td data-t="ch23-090">چندریختی</td><td data-t="ch23-091">یک حلقه، چند کلاس، رفتار متفاوت</td></tr>
+                <tr><td data-t="ch23-092">تایپ اردکی</td><td data-t="ch23-093">مهم نیست چه کلاسی است، مهم است متد را دارد</td></tr>
+                <tr><td data-t="ch23-094"><code>ABC</code> و <code>@abstractmethod</code></td><td data-t="ch23-095">اجبار فرزندان به پیاده‌سازی</td></tr>
+                <tr><td data-t="ch23-096">وراثت یا ترکیب</td><td data-t="ch23-097">«است» یا «دارد»</td></tr>
+            </tbody>
+        </table>
+    </div>
+
+    <div class="exercise">
+        <h3 data-t="ch23-098">تمرین‌های فصل بیست و سه</h3>
+        <ol>
+            <li data-t="ch23-099">کلاس <code>Animal</code> و سپس <code>Dog</code> و <code>Cat</code> و <code>Bird</code> را بنویسید که <code>speak()</code> را بازنویسی کنند.</li>
+            <li data-t="ch23-100">کلاس <code>Person</code> و <code>Student(Person)</code> را بنویسید، طوری که دانشجو <code>student_id</code> هم داشته باشد.</li>
+            <li data-t="ch23-101">کلاس‌های <code>Vehicle</code> و <code>Car</code> و <code>Motorcycle</code> را با متد مشترک <code>describe()</code> بنویسید.</li>
+            <li data-t="ch23-102">کلاس انتزاعی <code>Employee</code> با متد انتزاعی <code>salary()</code> و دو فرزند <code>HourlyEmployee</code> و <code>MonthlyEmployee</code> بنویسید.</li>
+            <li data-t="ch23-103">اشیائی از چند کلاس را در یک لیست بگذارید و در یک حلقه، یک متد را روی همه صدا بزنید.</li>
+            <li data-t="ch23-104">ترتیب MRO کلاسی با سه سطح وراثت را نشان دهید.</li>
+            <li data-t="ch23-105">یک کلاس میکسین بنویسید که فقط متد <code>to_json()</code> اضافه کند و آن را با دو کلاس بی‌ربط به هم استفاده کنید.</li>
+            <li data-t="ch23-106">مثالی پیدا کنید که وراثت در آن اشتباه به کار رفته و با ترکیب بازنویسی‌اش کنید.</li>
+        </ol>
+    </div>
+
+    <div class="pager">
+        <a href="chapter-22.html">فصل قبل: کپسوله‌سازی و dataclass</a>
+        <a href="chapter-24.html">فصل بعد: متدهای جادویی</a>
+    </div>
+
+</main>
+
+</body>
+</html>

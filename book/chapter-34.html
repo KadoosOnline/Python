@@ -1,0 +1,840 @@
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="فصل سی و چهار: رابط گرافیکی با tkinter، پنجره و ویجت‌ها، سه مدیر چیدمان، رویدادها، متغیرهای کنترلی، منو و ماشین‌حساب">
+    <title>فصل ۳۴: رابط گرافیکی با tkinter</title>
+    <link rel="icon" href="logokm.png" type="image/png">
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<header class="book-bar">
+    <a class="name" href="index.html">برنامه‌نویسی پایتون</a>
+    <a href="index.html">فهرست مطالب</a>
+</header>
+
+<main class="paper">
+
+    <div class="chapter-head">
+        <span class="chapter-num">فصل ۳۴</span>
+        <h1 data-t="ch34-001">رابط گرافیکی با tkinter</h1>
+        <p class="lead" data-t="ch34-002">
+            تا اینجا همه برنامه‌های ما در ترمینال زندگی می‌کردند. از این فصل
+            بیرون می‌آییم: پنجره واقعی با دکمه و فیلد و منو. ابزار ما
+            <code>tkinter</code> است که جزو کتابخانه استاندارد پایتون است و
+            هیچ نصبی نمی‌خواهد.
+        </p>
+    </div>
+
+    <div class="mini-toc">
+        <span class="box-title" data-t="ch34-003">در این فصل می‌خوانید</span>
+        <ol>
+            <li data-t="ch34-004"><a href="#s1">اولین پنجره و حلقه رویداد</a></li>
+            <li data-t="ch34-005"><a href="#s2">برچسب</a></li>
+            <li data-t="ch34-006"><a href="#s3">دکمه و تابع پاسخ</a></li>
+            <li data-t="ch34-007"><a href="#s4">فیلد متنی</a></li>
+            <li data-t="ch34-008"><a href="#s5">سه مدیر چیدمان</a></li>
+            <li data-t="ch34-009"><a href="#s6">فرم با grid</a></li>
+            <li data-t="ch34-010"><a href="#s7">قاب‌ها</a></li>
+            <li data-t="ch34-011"><a href="#s8">تیک و دکمه رادیویی</a></li>
+            <li data-t="ch34-012"><a href="#s9">فهرست انتخاب</a></li>
+            <li data-t="ch34-013"><a href="#s10">متغیر کنترلی و شمارنده</a></li>
+            <li data-t="ch34-014"><a href="#s11">پنجره‌های پیام</a></li>
+            <li data-t="ch34-015"><a href="#s12">نوار منو</a></li>
+            <li data-t="ch34-016"><a href="#s13">فرم با اعتبارسنجی</a></li>
+            <li data-t="ch34-017"><a href="#s14">ماشین‌حساب کامل</a></li>
+        </ol>
+    </div>
+
+    <h2 id="s1" data-t="ch34-018">۱. اولین پنجره و حلقه رویداد</h2>
+
+    <pre class="code"><code>'''The smallest possible Tkinter program: one empty window.'''
+
+import tkinter as tk
+
+
+def main() -&gt; None:
+    # Tk() creates the main window. There must be exactly one per program.
+    root = tk.Tk()
+
+    root.title('A simple program')      # the text of the title bar
+    root.geometry('400x300')            # 'WIDTHxHEIGHT', in pixels
+
+    # mainloop() starts the EVENT LOOP: the program now waits for clicks and
+    # key presses, and it does not return until the window is closed.
+    # Nothing written after mainloop() runs before that.
+    root.mainloop()
+
+
+if __name__ == '__main__':
+    main()</code></pre>
+    <p class="code-caption" data-t="ch34-019">اولین پنجره: نمونه 01_window/app.py</p>
+
+    <h3 data-t="ch34-020">شرح مثال</h3>
+
+    <ul>
+        <li data-t="ch34-021"><code>tk.Tk()</code> پنجره اصلی را می‌سازد. در هر برنامه دقیقاً <strong>یکی</strong> از آن باید وجود داشته باشد.</li>
+        <li data-t="ch34-022"><code>geometry('400x300')</code> اندازه را به پیکسل می‌گیرد. حرف کوچک <code>x</code> بین دو عدد، ضربدر نیست بلکه جداکننده است.</li>
+        <li data-t="ch34-023"><code>mainloop()</code> مهم‌ترین خط است: <strong>حلقه رویداد</strong> را شروع می‌کند.</li>
+    </ul>
+
+    <div class="note">
+        <span class="box-title" data-t="ch34-024">حلقه رویداد چیست</span>
+        <p data-t="ch34-025">
+            برنامه ترمینالی از بالا به پایین اجرا می‌شود و تمام. برنامه گرافیکی
+            اما بعد از راه‌اندازی وارد یک حلقه بی‌پایان می‌شود و
+            <strong>منتظر</strong> می‌ماند: کلیک شد؟ کلیدی فشرده شد؟ پنجره
+            تغییر اندازه داد؟ برای هر رویداد، تابع مربوطه را صدا می‌زند و باز
+            منتظر می‌ماند. به همین دلیل هر چه بعد از <code>mainloop()</code>
+            بنویسید تا بسته شدن پنجره اجرا نمی‌شود.
+        </p>
+    </div>
+
+    <h2 id="s2" data-t="ch34-026">۲. برچسب</h2>
+
+    <p data-t="ch34-027">
+        <strong>برچسب</strong> متنی را نشان می‌دهد که کاربر نمی‌تواند
+        ویرایشش کند.
+    </p>
+
+    <pre class="code"><code>def main() -&gt; None:
+    root = tk.Tk()
+    root.title('Showing a label')
+    root.geometry('400x300')
+
+    # Every widget receives its PARENT as its first argument.
+    label = tk.Label(root, text='Welcome to my program')
+
+    # Creating a widget is not enough: it must be placed with a geometry
+    # manager, otherwise it stays invisible.
+    label.pack()
+
+    # A widget takes many options.
+    tk.Label(
+        root,
+        text='Kadoos Institute, Rasht',
+        font=('Arial', 18, 'bold'),
+        fg='white',                 # foreground = the color of the text
+        bg="#224160",               # background
+        padx=20,
+        pady=10,
+    ).pack(pady=20)
+
+    root.mainloop()</code></pre>
+    <p class="code-caption" data-t="ch34-028">برچسب: نمونه 02_label/app.py</p>
+
+    <h3 data-t="ch34-029">شرح مثال</h3>
+
+    <ul>
+        <li data-t="ch34-030">هر ویجت، <strong>والدش</strong> را به عنوان اولین آرگومان می‌گیرد. اینجا والد، پنجره اصلی است.</li>
+        <li data-t="ch34-031">ساختن ویجت کافی نیست. تا وقتی با یک مدیر چیدمان قرار داده نشود، نامرئی می‌ماند. این پرتکرارترین سؤال تازه‌کارهاست: «چرا چیزی نمی‌بینم؟»</li>
+        <li data-t="ch34-032"><code>fg</code> رنگ متن و <code>bg</code> رنگ پس‌زمینه است. رنگ را می‌شود با نام (<code>'white'</code>) یا با کد شانزده‌شانزدهی داد.</li>
+        <li data-t="ch34-033"><code>padx</code> و <code>pady</code> فاصله داخلی و بیرونی را تنظیم می‌کنند و بیشترین تأثیر را در زیبایی برنامه دارند.</li>
+    </ul>
+
+    <h2 id="s3" data-t="ch34-034">۳. دکمه و تابع پاسخ</h2>
+
+    <pre class="code"><code>'''A Button runs a function when it is clicked.
+
+Note how the widgets are created inside main() and the callback is a NESTED
+function: that way it sees `label` without needing `global`.
+'''
+
+def main() -&gt; None:
+    root = tk.Tk()
+    root.title('Button and label')
+    root.geometry('400x300')
+
+    label = tk.Label(root, text='I am waiting for a click')
+    label.pack(pady=20)
+
+    def change_text() -&gt; None:
+        'This function is called by the button.'
+        print('Clicked!')
+        # config() changes an option of an existing widget.
+        label.config(text='The button was clicked')
+
+    # command=change_text  passes the FUNCTION ITSELF.
+    # command=change_text()  would CALL it immediately and pass its result -
+    # that is the classic beginner mistake.
+    button = tk.Button(root, text='Click me', command=change_text)
+    button.pack()
+
+    # A counter, to show that the callback keeps its state between clicks.
+    clicks = {'count': 0}
+
+    def count_click() -&gt; None:
+        clicks['count'] += 1
+        counter_label.config(text=f'Clicks: {clicks["count"]}')
+
+    counter_label = tk.Label(root, text='Clicks: 0')
+    counter_label.pack(pady=(20, 0))
+    tk.Button(root, text='Count', command=count_click).pack()
+
+    root.mainloop()</code></pre>
+    <p class="code-caption" data-t="ch34-035">دکمه: نمونه 03_button/app.py</p>
+
+    <h3 data-t="ch34-036">شرح مثال</h3>
+
+    <ul>
+        <li data-t="ch34-037">بزرگ‌ترین نکته این فصل همین‌جاست: <code>command=change_text</code> بدون پرانتز. با پرانتز، تابع <strong>همان لحظه</strong> اجرا می‌شود و نتیجه‌اش به دکمه داده می‌شود، نه خود تابع.</li>
+        <li data-t="ch34-038"><code>config()</code> گزینه یک ویجت موجود را عوض می‌کند.</li>
+        <li data-t="ch34-039">توابع پاسخ به شکل <strong>تابع تودرتو</strong> داخل <code>main</code> نوشته شده‌اند، پس <code>label</code> را می‌بینند و هیچ نیازی به <code>global</code> نیست. نسخه اصلی این درس پر از <code>global</code> بود؛ این شکل بسیار تمیزتر است.</li>
+        <li data-t="ch34-040">شمارنده در یک دیکشنری نگه داشته شده است، چون تابع تودرتو می‌تواند دیکشنری بیرونی را <strong>تغییر</strong> دهد ولی نمی‌تواند به یک عدد بیرونی مقدار تازه بدهد. جایگزین دیگرش <code>nonlocal</code> است.</li>
+    </ul>
+
+    <h2 id="s4" data-t="ch34-041">۴. فیلد متنی</h2>
+
+    <pre class="code"><code>'''An Entry is a one-line text field.
+
+    entry.get()              -&gt; what the user typed (always a str)
+    entry.delete(0, tk.END)  -&gt; empty it
+    entry.insert(0, 'text')  -&gt; write into it
+'''
+
+def main() -&gt; None:
+    root = tk.Tk()
+    root.title('Text input')
+    root.geometry('400x300')
+
+    entry = tk.Entry(root, width=30)
+    entry.pack(pady=10)
+    entry.focus()                 # the cursor starts in this field
+
+    label = tk.Label(root, text='')
+    label.pack(pady=10)
+
+    def show_text() -&gt; None:
+        user_input = entry.get().strip()
+
+        if not user_input:
+            label.config(text='Please type something first.')
+            return
+
+        label.config(text='You wrote: ' + user_input)
+
+    tk.Button(root, text='Show', command=show_text).pack()
+    tk.Button(root, text='Clear',
+              command=lambda: entry.delete(0, tk.END)).pack(pady=5)
+
+    # bind() connects a keyboard or mouse event to a function.
+    # '&lt;Return&gt;' is the Enter key.
+    entry.bind('&lt;Return&gt;', lambda event: show_text())
+
+    root.mainloop()</code></pre>
+    <p class="code-caption" data-t="ch34-042">فیلد متنی: نمونه 04_entry/app.py</p>
+
+    <h3 data-t="ch34-043">شرح مثال</h3>
+
+    <ul>
+        <li data-t="ch34-044"><code>entry.get()</code> همیشه <strong>رشته</strong> می‌دهد، حتی اگر کاربر عدد تایپ کرده باشد. برای عدد باید خودتان تبدیل کنید و محافظ بگذارید.</li>
+        <li data-t="ch34-045">ورودی خالی باید همیشه بررسی شود. یک <code>strip()</code> هم فاصله‌های اضافه را برمی‌دارد.</li>
+        <li data-t="ch34-046"><code>lambda</code> وقتی به کار می‌آید که بخواهید تابعی با آرگومان را به <code>command</code> بدهید. به خاطر داشته باشید <code>command</code> تابع بدون آرگومان می‌خواهد.</li>
+        <li data-t="ch34-047"><code>bind</code> رویداد صفحه‌کلید یا ماوس را به تابع وصل می‌کند. تابعی که <code>bind</code> صدا می‌زند همیشه یک آرگومان رویداد می‌گیرد، به همین دلیل <code>lambda event: ...</code> نوشته شده است.</li>
+    </ul>
+
+    <h2 id="s5" data-t="ch34-048">۵. سه مدیر چیدمان</h2>
+
+    <p data-t="ch34-049">
+        در tkinter سه راه برای قرار دادن ویجت‌ها وجود دارد. انتخاب درست، نصف
+        کار طراحی رابط است.
+    </p>
+
+    <div class="table-scroll">
+        <table>
+            <thead>
+                <tr><th data-t="ch34-050">مدیر</th><th data-t="ch34-051">چه می‌کند</th><th data-t="ch34-052">کی به کار می‌آید</th></tr>
+            </thead>
+            <tbody>
+                <tr><td><code>pack()</code></td><td data-t="ch34-053">ویجت‌ها را پشت سر هم می‌چیند</td><td data-t="ch34-054">چیدمان‌های ساده، نوارها، ستون تکی</td></tr>
+                <tr><td><code>grid()</code></td><td data-t="ch34-055">جدولی از سطر و ستون</td><td data-t="ch34-056">فرم‌ها، ماشین‌حساب، هر چیز جدولی</td></tr>
+                <tr><td><code>place()</code></td><td data-t="ch34-057">مختصات دقیق پیکسلی</td><td data-t="ch34-058">به‌ندرت. با تغییر اندازه پنجره خراب می‌شود</td></tr>
+            </tbody>
+        </table>
+    </div>
+
+    <div class="warn">
+        <span class="box-title" data-t="ch34-059">هرگز دو مدیر را در یک ظرف قاطی نکنید</span>
+        <p data-t="ch34-060">
+            اگر روی ویجت‌هایی که <strong>والد مشترک</strong> دارند هم
+            <code>pack()</code> و هم <code>grid()</code> به کار ببرید، برنامه
+            بی‌هیچ پیامی <strong>قفل</strong> می‌شود. نه خطایی می‌بینید و نه
+            پنجره‌ای؛ فقط برنامه هنگ می‌کند. این یکی از سخت‌ترین باگ‌ها برای
+            تازه‌کارهاست. راه حل: هر قاب، مدیر مخصوص خودش را دارد.
+        </p>
+    </div>
+
+    <p data-t="ch34-061">
+        گزینه‌های پرکاربرد این دو مدیر را در یک جا ببینید:
+    </p>
+
+    <div class="table-scroll">
+        <table>
+            <thead>
+                <tr><th data-t="ch34-062">گزینه</th><th data-t="ch34-063">مال کدام</th><th data-t="ch34-064">وظیفه آن</th></tr>
+            </thead>
+            <tbody>
+                <tr><td><code>side</code></td><td>pack</td><td data-t="ch34-065">جهت چیدن: <code>top</code>، <code>left</code>، <code>right</code>، <code>bottom</code></td></tr>
+                <tr><td><code>fill</code></td><td>pack</td><td data-t="ch34-066">کشیده شدن در عرض یا ارتفاع: <code>x</code>، <code>y</code>، <code>both</code></td></tr>
+                <tr><td><code>expand</code></td><td>pack</td><td data-t="ch34-067">گرفتن فضای اضافه باقی‌مانده</td></tr>
+                <tr><td data-t="ch34-068"><code>row</code> و <code>column</code></td><td>grid</td><td data-t="ch34-069">شماره سطر و ستون، از صفر</td></tr>
+                <tr><td><code>columnspan</code></td><td>grid</td><td data-t="ch34-070">کشیده شدن روی چند ستون</td></tr>
+                <tr><td><code>sticky</code></td><td>grid</td><td data-t="ch34-071">چسبیدن به جهت‌ها: <code>n s e w</code> و ترکیبشان</td></tr>
+                <tr><td data-t="ch34-072"><code>padx</code> و <code>pady</code></td><td data-t="ch34-073">هر دو</td><td data-t="ch34-074">فاصله افقی و عمودی</td></tr>
+            </tbody>
+        </table>
+    </div>
+
+    <h2 id="s6" data-t="ch34-075">۶. فرم با grid</h2>
+
+    <pre class="code"><code>'''grid() places the widgets in a table of rows and columns.
+
+It is the right manager for a form. Never use pack() and grid() on widgets
+that share the same parent: the program then freezes.
+'''
+
+def main() -&gt; None:
+    root = tk.Tk()
+    root.title('Login form')
+    root.geometry('400x300')
+
+    # sticky='e' pushes the label to the East (the right) of its cell.
+    tk.Label(root, text='Username:').grid(row=0, column=0,
+                                          padx=10, pady=5, sticky='e')
+    entry_user = tk.Entry(root, width=25)
+    entry_user.grid(row=0, column=1, padx=10, pady=5)
+
+    tk.Label(root, text='Password:').grid(row=1, column=0,
+                                          padx=10, pady=5, sticky='e')
+    # show='*' hides what is typed.
+    entry_pass = tk.Entry(root, width=25, show='*')
+    entry_pass.grid(row=1, column=1, padx=10, pady=5)
+
+    label_result = tk.Label(root, text='')
+    label_result.grid(row=3, column=0, columnspan=2)
+
+    def login() -&gt; None:
+        username = entry_user.get().strip()
+        password = entry_pass.get()
+
+        if not username or not password:
+            label_result.config(text='Both fields are required.', fg='red')
+            return
+
+        if username == 'admin' and password == '1234':
+            label_result.config(text=f'Welcome, {username}!', fg='green')
+        else:
+            label_result.config(text='Wrong username or password.', fg='red')
+
+    # columnspan=2 makes the button as wide as the two columns.
+    tk.Button(root, text='Login', command=login).grid(row=2, column=0,
+                                                      columnspan=2, pady=10)
+
+    root.mainloop()</code></pre>
+    <p class="code-caption" data-t="ch34-076">فرم ورود: نمونه 05_grid_login/app.py</p>
+
+    <h3 data-t="ch34-077">شرح مثال</h3>
+
+    <ul>
+        <li data-t="ch34-078">ساختار فرم همیشه همین است: ستون صفر برچسب‌ها، ستون یک فیلدها.</li>
+        <li data-t="ch34-079"><code>sticky='e'</code> برچسب را به سمت شرق خانه‌اش می‌چسباند تا برچسب‌ها با هم تراز شوند.</li>
+        <li data-t="ch34-080"><code>show='*'</code> کاراکترهای تایپ‌شده را پنهان می‌کند. برای رمز عبور لازم است.</li>
+        <li data-t="ch34-081">نتیجه در یک برچسب داخل پنجره نشان داده می‌شود، نه با <code>print</code>. در برنامه گرافیکی، کاربر ترمینال را نمی‌بیند.</li>
+        <li data-t="ch34-082">این فقط یک نمونه آموزشی است: رمز عبور را هرگز در کد ننویسید. روش درست را در فصل سی و هشتم با درهم‌سازی رمز می‌بینید.</li>
+    </ul>
+
+    <h2 id="s7" data-t="ch34-083">۷. قاب‌ها</h2>
+
+    <p data-t="ch34-084">
+        <strong>قاب</strong> یک جعبه نامرئی برای گروه‌بندی ویجت‌هاست. هر قاب
+        مدیر چیدمان مخصوص خودش را دارد، پس یک بخش پنجره می‌تواند
+        <code>pack</code> باشد و بخش دیگر <code>grid</code>.
+    </p>
+
+    <pre class="code"><code>def main() -&gt; None:
+    root = tk.Tk()
+    root.title('Using frames')
+    root.geometry('400x300')
+
+    # fill='x' -&gt; the frame takes the whole width.
+    top_frame = tk.Frame(root, bg='lightblue', height=100)
+    top_frame.pack(fill='x')
+
+    tk.Label(top_frame, text='Top section', bg='lightblue').pack(pady=30)
+
+    # fill='both' + expand=True -&gt; the frame takes all the remaining space.
+    bottom_frame = tk.Frame(root, bg='darkred')
+    bottom_frame.pack(fill='both', expand=True)
+
+    # side= decides where pack() puts the widget inside its parent.
+    tk.Button(bottom_frame, text='Left button').pack(side='left',
+                                                     padx=10, pady=10)
+    tk.Button(bottom_frame, text='Right button').pack(side='right',
+                                                      padx=10, pady=10)
+
+    root.mainloop()</code></pre>
+    <p class="code-caption" data-t="ch34-085">قاب: نمونه 06_frame/app.py</p>
+
+    <p data-t="ch34-086">
+        قاب‌بندی، کلید ساختن رابط‌های بزرگ است. هر بخش منطقی برنامه یک قاب
+        می‌شود و بعد قاب‌ها کنار هم چیده می‌شوند. ترکیب
+        <code>fill='both'</code> با <code>expand=True</code> یعنی «همه فضای
+        باقی‌مانده را بگیر» و پرکاربردترین ترکیب <code>pack</code> است.
+    </p>
+
+    <h2 id="s8" data-t="ch34-087">۸. تیک و دکمه رادیویی</h2>
+
+    <pre class="code"><code>'''Checkbutton (several independent choices) and Radiobutton (one choice).
+
+Both need a CONTROL VARIABLE - IntVar, StringVar, BooleanVar - which holds the
+current value and is read with get().
+
+Every radio button of a group shares the SAME variable; what tells them apart
+is their `value`.
+'''
+
+def main() -&gt; None:
+    root = tk.Tk()
+    root.title('Options')
+    root.geometry('400x300')
+
+    label_status = tk.Label(root, text='')
+    label_color = tk.Label(root, text='')
+
+    var_check = tk.IntVar()                    # 0 or 1
+    var_radio = tk.StringVar(value='red')      # the selected value
+
+    def show_selection() -&gt; None:
+        'Called every time one of the widgets changes.'
+        if var_check.get():
+            label_status.config(text='Enabled')
+        else:
+            label_status.config(text='Disabled')
+
+        label_color.config(text='Selected colour: ' + var_radio.get())
+
+    tk.Checkbutton(root, text='Enable', variable=var_check,
+                   command=show_selection).pack(pady=(10, 5))
+
+    for colour in ('red', 'blue', 'green'):
+        tk.Radiobutton(root, text=colour, variable=var_radio, value=colour,
+                       command=show_selection).pack(anchor='w', padx=140)
+
+    label_status.pack(pady=(15, 0))
+    label_color.pack()
+
+    show_selection()          # show the initial state
+
+    root.mainloop()</code></pre>
+    <p class="code-caption" data-t="ch34-088">تیک و رادیویی: نمونه 07_check_radio/app.py</p>
+
+    <h3 data-t="ch34-089">شرح مثال</h3>
+
+    <ul>
+        <li data-t="ch34-090">تفاوت دو ویجت: <strong>تیک</strong> چند انتخاب مستقل است (هر کدام متغیر خودش)، <strong>رادیویی</strong> یک انتخاب از چند تا.</li>
+        <li data-t="ch34-091">همه دکمه‌های رادیویی یک گروه، <strong>یک متغیر مشترک</strong> دارند. چیزی که از هم جدایشان می‌کند <code>value</code> است. اگر هر کدام متغیر جدا بگیرند، همه با هم انتخاب می‌شوند: یک باگ رایج.</li>
+        <li data-t="ch34-092">دکمه‌های رادیویی با یک حلقه ساخته شده‌اند. سه خط تقریباً یکسان نوشتن کار خوبی نیست.</li>
+        <li data-t="ch34-093">در انتها <code>show_selection()</code> یک بار مستقیم صدا زده می‌شود تا وضعیت اولیه هم نمایش داده شود. وگرنه کاربر تا اولین کلیک، پنجره‌ای نیمه‌خالی می‌بیند.</li>
+    </ul>
+
+    <h2 id="s9" data-t="ch34-094">۹. فهرست انتخاب</h2>
+
+    <pre class="code"><code>'''A Listbox shows a list the user can choose from.
+
+    insert(tk.END, item)  -&gt; add at the end
+    curselection()        -&gt; a TUPLE of the selected indexes (empty when none)
+    get(index)            -&gt; the text of one line
+    delete(index)         -&gt; remove a line
+'''
+
+def main() -&gt; None:
+    root = tk.Tk()
+    root.title('Listbox')
+    root.geometry('400x350')
+
+    listbox = tk.Listbox(root, height=6)
+    for item in ['Tehran', 'Isfahan', 'Shiraz', 'Tabriz', 'Mashhad', 'Rasht']:
+        listbox.insert(tk.END, item)
+    listbox.pack(pady=10)
+
+    label = tk.Label(root, text='')
+    label.pack()
+
+    def show_selected() -&gt; None:
+        selected = listbox.curselection()
+
+        # curselection() gives an empty tuple when nothing is selected -
+        # reading selected[0] without this test raises IndexError.
+        if selected:
+            label.config(text='Your choice: ' + listbox.get(selected[0]))
+        else:
+            label.config(text='Nothing is selected')
+
+    def delete_selected() -&gt; None:
+        selected = listbox.curselection()
+        if selected:
+            listbox.delete(selected[0])
+
+    tk.Button(root, text='Show the selection', command=show_selected).pack(pady=5)
+    tk.Button(root, text='Delete the selection', command=delete_selected).pack()
+
+    # A double click also shows the selection.
+    listbox.bind('&lt;Double-Button-1&gt;', lambda event: show_selected())
+
+    root.mainloop()</code></pre>
+    <p class="code-caption" data-t="ch34-095">فهرست: نمونه 08_listbox/app.py</p>
+
+    <p data-t="ch34-096">
+        <code>curselection()</code> یک <strong>تاپل</strong> از شماره‌های
+        انتخاب‌شده می‌دهد و وقتی چیزی انتخاب نشده، تاپل خالی است. خواندن
+        <code>selected[0]</code> بدون بررسی، مستقیم به <code>IndexError</code>
+        می‌رسد. این دقیقاً همان درس فصل نهم است که حالا در دنیای گرافیکی تکرار
+        می‌شود.
+    </p>
+
+    <h2 id="s10" data-t="ch34-097">۱۰. متغیر کنترلی و شمارنده</h2>
+
+    <p data-t="ch34-098">
+        تا اینجا هر بار متن برچسب را با <code>config()</code> عوض می‌کردیم.
+        راه تمیزتر <strong>متغیر کنترلی</strong> است: برچسب به متغیر وصل
+        می‌شود و هر وقت متغیر عوض شود، برچسب <strong>خودش</strong> به‌روز
+        می‌شود.
+    </p>
+
+    <pre class="code"><code>'''Control variables: the clean way to keep a widget and a value in agreement.
+
+With `textvariable=`, the label updates ITSELF whenever the variable changes:
+we never call label.config() again.
+'''
+
+def main() -&gt; None:
+    root = tk.Tk()
+    root.title('Counter')
+    root.geometry('400x300')
+
+    counter_var = tk.IntVar(value=0)
+
+    def increment() -&gt; None:
+        counter_var.set(counter_var.get() + 1)
+
+    def decrement() -&gt; None:
+        counter_var.set(counter_var.get() - 1)
+
+    def reset() -&gt; None:
+        counter_var.set(0)
+
+    tk.Label(root, textvariable=counter_var,
+             font=('Arial', 24)).pack(pady=20)
+
+    button_frame = tk.Frame(root)
+    button_frame.pack()
+
+    tk.Button(button_frame, text='+', command=increment,
+              width=5).pack(side='left', padx=5)
+    tk.Button(button_frame, text='-', command=decrement,
+              width=5).pack(side='left', padx=5)
+    tk.Button(button_frame, text='Reset', command=reset,
+              width=6).pack(side='left', padx=5)
+
+    root.mainloop()</code></pre>
+    <p class="code-caption" data-t="ch34-099">شمارنده: نمونه 09_counter/app.py</p>
+
+    <div class="table-scroll">
+        <table>
+            <thead>
+                <tr><th data-t="ch34-100">متغیر کنترلی</th><th data-t="ch34-101">برای چه</th></tr>
+            </thead>
+            <tbody>
+                <tr><td><code>tk.StringVar()</code></td><td data-t="ch34-102">متن</td></tr>
+                <tr><td><code>tk.IntVar()</code></td><td data-t="ch34-103">عدد صحیح</td></tr>
+                <tr><td><code>tk.DoubleVar()</code></td><td data-t="ch34-104">عدد اعشاری</td></tr>
+                <tr><td><code>tk.BooleanVar()</code></td><td data-t="ch34-105">درست یا نادرست</td></tr>
+                <tr><td data-t="ch34-106"><code>.get()</code> و <code>.set(x)</code></td><td data-t="ch34-107">خواندن و نوشتن مقدار</td></tr>
+                <tr><td><code>textvariable=</code></td><td data-t="ch34-108">گره زدن ویجت به متغیر</td></tr>
+            </tbody>
+        </table>
+    </div>
+
+    <p data-t="ch34-109">
+        دکمه‌های <code>+</code> و <code>-</code> داخل یک قاب جداگانه گذاشته
+        شده‌اند تا در یک ردیف افقی بنشینند، در حالی که بقیه پنجره عمودی چیده
+        شده است. این همان فایده قاب است که در بخش هفتم گفتیم.
+    </p>
+
+    <h2 id="s11" data-t="ch34-110">۱۱. پنجره‌های پیام</h2>
+
+    <pre class="code"><code>'''messagebox: the standard dialog boxes.
+
+    showinfo / showwarning / showerror  -&gt; just an OK button
+    askyesno / askokcancel              -&gt; return True or False
+    askquestion                         -&gt; returns 'yes' or 'no'
+'''
+
+import tkinter as tk
+from tkinter import messagebox
+
+
+def main() -&gt; None:
+    root = tk.Tk()
+    root.title('Message boxes')
+    root.geometry('400x300')
+
+    def show_info() -&gt; None:
+        messagebox.showinfo('Information', 'This is an information message')
+
+    def ask_question() -&gt; None:
+        # The answer is used to decide what to do next.
+        if messagebox.askyesno('Question', 'Do you want to close the program?'):
+            root.destroy()
+
+    tk.Button(root, text='Show information', command=show_info).pack(pady=5)
+    tk.Button(root, text='Ask and quit', command=ask_question).pack(pady=5)
+
+    root.mainloop()</code></pre>
+    <p class="code-caption" data-t="ch34-111">پنجره پیام: نمونه 10_messagebox/app.py</p>
+
+    <p data-t="ch34-112">
+        توجه کنید که <code>messagebox</code> باید جداگانه
+        <code>import</code> شود؛ با <code>import tkinter as tk</code> به تنهایی
+        در دسترس نیست. پنجره‌های پرسشی <code>True</code> یا
+        <code>False</code> برمی‌گردانند و همان‌جا در <code>if</code> به کار
+        می‌روند. پیش از هر کار برگشت‌ناپذیر مثل حذف، حتماً یک
+        <code>askyesno</code> بگذارید.
+    </p>
+
+    <h2 id="s12" data-t="ch34-113">۱۲. نوار منو</h2>
+
+    <pre class="code"><code>'''A menu bar.
+
+    Menu(root)                 -&gt; the bar itself
+    root.config(menu=menubar)  -&gt; attach it to the window
+    add_cascade                -&gt; a menu that opens a sub-menu
+    add_command                -&gt; an entry that runs a function
+    tearoff=0                  -&gt; remove the old dashed line at the top
+'''
+
+def main() -&gt; None:
+    root = tk.Tk()
+    root.title('A program with a menu')
+    root.geometry('400x300')
+
+    label = tk.Label(root, text='Use the menu above', font=('Arial', 14))
+    label.pack(pady=50)
+
+    def new_file() -&gt; None:
+        label.config(text='New file')
+
+    def show_about() -&gt; None:
+        messagebox.showinfo('About', 'This program is a teaching example.')
+
+    menubar = tk.Menu(root)
+    root.config(menu=menubar)
+
+    file_menu = tk.Menu(menubar, tearoff=0)
+    menubar.add_cascade(label='File', menu=file_menu)
+    file_menu.add_command(label='New', command=new_file)
+    file_menu.add_separator()
+    # root.destroy() closes the window properly; root.quit() only stops the loop.
+    file_menu.add_command(label='Exit', command=root.destroy)
+
+    help_menu = tk.Menu(menubar, tearoff=0)
+    menubar.add_cascade(label='Help', menu=help_menu)
+    help_menu.add_command(label='About', command=show_about)
+
+    root.mainloop()</code></pre>
+    <p class="code-caption" data-t="ch34-114">منو: نمونه 11_menu/app.py</p>
+
+    <h3 data-t="ch34-115">شرح مثال</h3>
+
+    <ul>
+        <li data-t="ch34-116">ساخت منو سه قدم دارد: نوار را بساز، با <code>root.config(menu=...)</code> به پنجره بچسبان، و بعد زیرمنوها را اضافه کن.</li>
+        <li data-t="ch34-117"><code>tearoff=0</code> آن خط‌چین قدیمی بالای منو را حذف می‌کند. تقریباً همیشه لازم است.</li>
+        <li data-t="ch34-118">تفاوت <code>destroy()</code> با <code>quit()</code> را بدانید: <code>destroy</code> پنجره را درست می‌بندد، ولی <code>quit</code> فقط حلقه رویداد را متوقف می‌کند و گاهی برنامه را نیمه‌باز رها می‌کند. همیشه <code>destroy</code> را انتخاب کنید.</li>
+    </ul>
+
+    <h2 id="s13" data-t="ch34-119">۱۳. فرم با اعتبارسنجی</h2>
+
+    <p data-t="ch34-120">
+        مهم‌ترین بخش هر برنامه گرافیکی، رسیدگی به ورودی اشتباه است. هر چیزی که
+        از <code>Entry</code> بیرون می‌آید متن است و <code>float()</code>
+        می‌تواند شکست بخورد.
+    </p>
+
+    <pre class="code"><code>def calculate() -&gt; None:
+    try:
+        length = float(entry_length.get())
+        width = float(entry_width.get())
+    except ValueError:
+        result.config(text='Please enter two numbers.', fg='red')
+        return
+
+    if length &lt;= 0 or width &lt;= 0:
+        result.config(text='The values must be positive.', fg='red')
+        return
+
+    area = length * width
+    perimeter = (length + width) * 2
+    result.config(text=f'Area: {area:g}   Perimeter: {perimeter:g}',
+                  fg='green')</code></pre>
+    <p class="code-caption" data-t="ch34-121">اعتبارسنجی: نمونه 12_rectangle/app.py</p>
+
+    <h3 data-t="ch34-122">شرح مثال</h3>
+
+    <ul>
+        <li data-t="ch34-123">دو لایه بررسی داریم: اول <strong>عدد بودن</strong> با <code>try/except</code>، بعد <strong>منطقی بودن</strong> مقدار.</li>
+        <li data-t="ch34-124">الگوی <code>return</code> زودهنگام، کد را تخت نگه می‌دارد و از <code>if</code>های تودرتو جلوگیری می‌کند.</li>
+        <li data-t="ch34-125">رنگ پیام هم پیام می‌دهد: قرمز برای خطا، سبز برای موفقیت.</li>
+        <li data-t="ch34-126">قالب <code>:g</code> عدد را بدون صفرهای اضافه نشان می‌دهد، پس <code>12.0</code> می‌شود <code>12</code>.</li>
+    </ul>
+
+    <h2 id="s14" data-t="ch34-127">۱۴. ماشین‌حساب کامل</h2>
+
+    <pre class="code"><code>import tkinter as tk
+
+ALLOWED_CHARACTERS = set('0123456789+-*/(). ')
+
+BUTTONS = [
+    ('7', 1, 0), ('8', 1, 1), ('9', 1, 2), ('/', 1, 3),
+    ('4', 2, 0), ('5', 2, 1), ('6', 2, 2), ('*', 2, 3),
+    ('1', 3, 0), ('2', 3, 1), ('3', 3, 2), ('-', 3, 3),
+    ('0', 4, 0), ('.', 4, 1), ('=', 4, 2), ('+', 4, 3),
+]
+
+
+def main() -&gt; None:
+    root = tk.Tk()
+    root.title('Calculator')
+    root.geometry('300x400')
+
+    display = tk.Entry(root, font=('Arial', 18), justify='right')
+    display.grid(row=0, column=0, columnspan=4, sticky='we', padx=5, pady=5)
+
+    def press(key: str) -&gt; None:
+        'Add one character at the end of the display.'
+        display.insert(tk.END, str(key))
+
+    def calculate() -&gt; None:
+        expression = display.get()
+
+        # Refuse anything that is not a number or an operator.
+        if not expression or not set(expression) &lt;= ALLOWED_CHARACTERS:
+            display.delete(0, tk.END)
+            display.insert(tk.END, 'Error')
+            return
+
+        try:
+            result = eval(expression)
+        except (SyntaxError, ZeroDivisionError, ValueError):
+            display.delete(0, tk.END)
+            display.insert(tk.END, 'Error')
+            return
+
+        display.delete(0, tk.END)
+        display.insert(tk.END, str(result))
+
+    for text, row, column in BUTTONS:
+        if text == '=':
+            button = tk.Button(root, text=text, width=5, height=2,
+                               command=calculate)
+        else:
+            # t=text captures the CURRENT value of text.
+            button = tk.Button(root, text=text, width=5, height=2,
+                               command=lambda t=text: press(t))
+        button.grid(row=row, column=column, padx=2, pady=2)
+
+    # The columns share the extra space when the window is resized.
+    for column in range(4):
+        root.grid_columnconfigure(column, weight=1)
+
+    root.mainloop()</code></pre>
+    <p class="code-caption" data-t="ch34-128">ماشین‌حساب: نمونه 13_calculator/app.py</p>
+
+    <h3 data-t="ch34-129">سه درس این برنامه</h3>
+
+    <ul>
+        <li data-t="ch34-130">
+            <strong>دکمه‌ها با حلقه ساخته می‌شوند.</strong> نوشتن شانزده خط
+            تقریباً یکسان اتلاف وقت است و هر تغییری باید شانزده بار تکرار شود.
+        </li>
+        <li data-t="ch34-131">
+            <strong>دام اتصال دیرهنگام.</strong> در
+            <code>lambda t=text: press(t)</code> آن <code>t=text</code> حیاتی
+            است. بدون آن، همه لامبداها به یک متغیر مشترک نگاه می‌کنند و همه
+            دکمه‌ها <strong>آخرین</strong> کاراکتر حلقه را تایپ می‌کنند. این
+            باگ در هر زبانی که closure دارد وجود دارد و دیدنش یک بار، برای
+            همیشه یادتان می‌ماند.
+        </li>
+        <li data-t="ch34-132">
+            <strong><code>eval</code> خطرناک است.</strong> این تابع
+            <strong>هر</strong> کد پایتونی را اجرا می‌کند. اینجا پیش از اجرا
+            بررسی می‌شود که متن فقط رقم و عملگر دارد. مقایسه
+            <code>set(expression) &lt;= ALLOWED_CHARACTERS</code> یعنی «همه
+            کاراکترها در مجموعه مجاز هستند» و از فصل چهاردهم می‌آید.
+        </li>
+    </ul>
+
+    <p data-t="ch34-133">
+        <code>grid_columnconfigure(column, weight=1)</code> باعث می‌شود با
+        بزرگ شدن پنجره، ستون‌ها فضای اضافه را بین خودشان تقسیم کنند. بدون آن،
+        دکمه‌ها گوشه بالا چپ جمع می‌شوند و پنجره زشت می‌شود.
+    </p>
+
+    <div class="folder-ref">
+        <span class="box-title" data-t="ch34-134">فایل‌های تمرینی این فصل</span>
+        <p data-t="ch34-135">پوشه <code>S34-tkinter-basics</code> شامل سیزده پوشه از <code>01_window</code> تا <code>13_calculator</code> است. در هر پوشه یک <code>app.py</code> هست که با <code>python app.py</code> اجرا می‌شود. هیچ نصبی ضرورتی ندارد، چون tkinter جزو خود پایتون است.</p>
+    </div>
+
+    <h2 data-t="ch34-136">خلاصه فصل</h2>
+
+    <div class="table-scroll">
+        <table>
+            <thead>
+                <tr><th data-t="ch34-137">ابزار</th><th data-t="ch34-138">وظیفه آن</th></tr>
+            </thead>
+            <tbody>
+                <tr><td><code>tk.Tk()</code></td><td data-t="ch34-139">پنجره اصلی، یکی در هر برنامه</td></tr>
+                <tr><td data-t="ch34-140"><code>title</code> و <code>geometry</code></td><td data-t="ch34-141">عنوان و اندازه پنجره</td></tr>
+                <tr><td><code>mainloop()</code></td><td data-t="ch34-142">شروع حلقه رویداد</td></tr>
+                <tr><td><code>Label</code></td><td data-t="ch34-143">نمایش متن</td></tr>
+                <tr><td><code>Button</code></td><td data-t="ch34-144">دکمه، با <code>command=func</code> بدون پرانتز</td></tr>
+                <tr><td><code>Entry</code></td><td data-t="ch34-145">فیلد یک‌خطی. <code>get</code> همیشه رشته می‌دهد</td></tr>
+                <tr><td><code>Frame</code></td><td data-t="ch34-146">گروه‌بندی ویجت‌ها</td></tr>
+                <tr><td data-t="ch34-147"><code>Checkbutton</code> و <code>Radiobutton</code></td><td data-t="ch34-148">انتخاب چندگانه و انتخاب یگانه</td></tr>
+                <tr><td><code>Listbox</code></td><td data-t="ch34-149">فهرست. <code>curselection</code> ممکن است خالی باشد</td></tr>
+                <tr><td data-t="ch34-150"><code>pack</code> و <code>grid</code> و <code>place</code></td><td data-t="ch34-151">سه مدیر چیدمان. در یک ظرف فقط یکی</td></tr>
+                <tr><td data-t="ch34-152"><code>IntVar</code> و <code>StringVar</code></td><td data-t="ch34-153">متغیر کنترلی، با <code>textvariable</code></td></tr>
+                <tr><td><code>config()</code></td><td data-t="ch34-154">تغییر گزینه یک ویجت موجود</td></tr>
+                <tr><td><code>bind('&lt;Return&gt;', f)</code></td><td data-t="ch34-155">اتصال رویداد به تابع</td></tr>
+                <tr><td><code>messagebox</code></td><td data-t="ch34-156">پنجره‌های پیام و پرسش</td></tr>
+                <tr><td data-t="ch34-157"><code>Menu</code> و <code>add_cascade</code></td><td data-t="ch34-158">نوار منو</td></tr>
+                <tr><td><code>root.destroy()</code></td><td data-t="ch34-159">بستن درست برنامه</td></tr>
+            </tbody>
+        </table>
+    </div>
+
+    <div class="exercise">
+        <h3 data-t="ch34-160">تمرین‌های فصل سی و چهار</h3>
+        <ol>
+            <li data-t="ch34-161">پنجره‌ای بسازید که نام شما در عنوانش باشد و یک برچسب خوشامد داشته باشد.</li>
+            <li data-t="ch34-162">فرمی بسازید که نام بپرسد و در یک برچسب بنویسد <code>Hello &lt;name&gt;!</code>.</li>
+            <li data-t="ch34-163">مبدل دما از سلسیوس به فارنهایت بسازید، با اعتبارسنجی کامل ورودی.</li>
+            <li data-t="ch34-164">پنجره‌ای با سه دکمه رادیویی بسازید که رنگ پس‌زمینه را عوض کنند.</li>
+            <li data-t="ch34-165">فهرست خرید بسازید: یک <code>Entry</code>، دکمه افزودن، یک <code>Listbox</code> و دکمه حذف.</li>
+            <li data-t="ch34-166">به یکی از برنامه‌هایتان منوی <code>File &gt; Exit</code> و <code>Help &gt; About</code> اضافه کنید.</li>
+            <li data-t="ch34-167">پیش از بسته شدن برنامه، با <code>askyesno</code> از کاربر تأیید بگیرید.</li>
+            <li data-t="ch34-168">بازی حدس عدد را با رابط گرافیکی بنویسید.</li>
+            <li data-t="ch34-169">به ماشین‌حساب، دکمه پاک کردن و دکمه حذف آخرین کاراکتر اضافه کنید.</li>
+        </ol>
+    </div>
+
+    <div class="pager">
+        <a href="chapter-33.html">فصل قبل: الگوهای طراحی</a>
+        <a href="chapter-35.html">فصل بعد: tkinter پیشرفته</a>
+    </div>
+
+</main>
+
+</body>
+</html>

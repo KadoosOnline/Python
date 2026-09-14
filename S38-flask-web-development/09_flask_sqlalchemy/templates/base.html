@@ -1,0 +1,17 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>{% block title %}Library{% endblock %}</title>
+    <style>
+        body { font-family: Tahoma, Arial, sans-serif; max-width: 700px;
+               margin: 30px auto; line-height: 1.7; }
+        li { margin: 4px 0; }
+        .summary { color: #555; font-size: 0.92em; }
+    </style>
+</head>
+<body>
+    <h1><a href="{{ url_for('home') }}">Library</a></h1>
+    {% block content %}{% endblock %}
+</body>
+</html>

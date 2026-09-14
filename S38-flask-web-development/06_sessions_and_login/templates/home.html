@@ -1,0 +1,14 @@
+{% extends 'base.html' %}
+
+{% block content %}
+    <h1>Welcome</h1>
+    {% if user %}
+        <p>You are logged in as <strong>{{ user.name }}</strong>.</p>
+    {% else %}
+        <p>You are not logged in.</p>
+        <p>Try to open <a href="{{ url_for('profile') }}">My profile</a>
+           anyway and see what the decorator does.</p>
+        <p>Accounts for the classroom: <code>sara / python123</code> and
+           <code>ali / kadoos456</code>.</p>
+    {% endif %}
+{% endblock %}

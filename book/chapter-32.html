@@ -1,0 +1,1031 @@
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="فصل سی و دو: ORM چیست، ساختن یک ORM دست‌ساز، و سپس SQLAlchemy با مدل‌ها، نشست، رابطه‌ها و حذف آبشاری">
+    <title>فصل ۳۲: ORM و SQLAlchemy</title>
+    <link rel="icon" href="logokm.png" type="image/png">
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<header class="book-bar">
+    <a class="name" href="index.html">برنامه‌نویسی پایتون</a>
+    <a href="index.html">فهرست مطالب</a>
+</header>
+
+<main class="paper">
+
+    <div class="chapter-head">
+        <span class="chapter-num">فصل ۳۲</span>
+        <h1 data-t="ch32-001">ORM و SQLAlchemy</h1>
+        <p class="lead" data-t="ch32-002">
+            در دو فصل گذشته SQL نوشتیم و بعد همان SQL را از داخل پایتون اجرا
+            کردیم. حالا یک قدم بالاتر می‌رویم: دیگر SQL نمی‌نویسیم. با
+            <strong>شیء</strong> کار می‌کنیم و کتابخانه، SQL را به جای ما
+            می‌سازد. برای اینکه این جادو راز نماند، اول یک ORM کوچک را
+            <strong>خودمان</strong> می‌سازیم و بعد سراغ SQLAlchemy می‌رویم.
+        </p>
+    </div>
+
+    <div class="mini-toc">
+        <span class="box-title" data-t="ch32-003">در این فصل می‌خوانید</span>
+        <ol>
+            <li data-t="ch32-004"><a href="#s1">ORM یعنی چه</a></li>
+            <li data-t="ch32-005"><a href="#s2">یک کار، دو نوشتن</a></li>
+            <li data-t="ch32-006"><a href="#s3">کلاس پایه: قلب ORM دست‌ساز</a></li>
+            <li data-t="ch32-007"><a href="#s4">خواندن و نوشتن در کلاس پایه</a></li>
+            <li data-t="ch32-008"><a href="#s5">اولین مدل: Student</a></li>
+            <li data-t="ch32-009"><a href="#s6">مدل دوم تقریباً رایگان است</a></li>
+            <li data-t="ch32-010"><a href="#s7">برنامه‌ای بدون یک خط SQL</a></li>
+            <li data-t="ch32-011"><a href="#s8">SQLAlchemy: نصب و موتور</a></li>
+            <li data-t="ch32-012"><a href="#s9">تعریف مدل‌ها</a></li>
+            <li data-t="ch32-013"><a href="#s10">نشست: درج داده</a></li>
+            <li data-t="ch32-014"><a href="#s11">خواندن، تغییر و حذف</a></li>
+            <li data-t="ch32-015"><a href="#s12">رابطه‌ها و حذف آبشاری</a></li>
+            <li data-t="ch32-016"><a href="#s13">تراکنش و IntegrityError</a></li>
+            <li data-t="ch32-017"><a href="#s14">کی ORM، کی SQL خام</a></li>
+        </ol>
+    </div>
+
+    <h2 id="s1" data-t="ch32-018">۱. ORM یعنی چه</h2>
+
+    <p data-t="ch32-019">
+        <strong>ORM</strong> کوتاه‌شده
+        <span dir="ltr">Object Relational Mapper</span> است: نگاشت‌دهنده شیء به
+        رابطه. کار آن یک ترجمه ساده است و کل ایده در سه سطر جا می‌شود.
+    </p>
+
+    <div class="table-scroll">
+        <table>
+            <thead>
+                <tr><th data-t="ch32-020">در پایگاه داده</th><th data-t="ch32-021">در پایتون</th></tr>
+            </thead>
+            <tbody>
+                <tr><td data-t="ch32-022">جدول</td><td data-t="ch32-023">کلاس</td></tr>
+                <tr><td data-t="ch32-024">سطر</td><td data-t="ch32-025">شیء (نمونه کلاس)</td></tr>
+                <tr><td data-t="ch32-026">ستون</td><td data-t="ch32-027">صفت شیء</td></tr>
+                <tr><td data-t="ch32-028">کلید خارجی</td><td data-t="ch32-029">ارجاع مستقیم به شیء دیگر</td></tr>
+                <tr><td><code>INSERT</code></td><td data-t="ch32-030">ساختن شیء و ذخیره کردنش</td></tr>
+                <tr><td><code>SELECT</code></td><td data-t="ch32-031">صدا زدن یک متد جست‌وجو</td></tr>
+                <tr><td><code>UPDATE</code></td><td data-t="ch32-032">تغییر دادن یک صفت</td></tr>
+                <tr><td><code>DELETE</code></td><td data-t="ch32-033">صدا زدن <code>delete()</code></td></tr>
+            </tbody>
+        </table>
+    </div>
+
+    <p data-t="ch32-034">
+        یعنی همه چیزهایی که در فصل بیست و یکم تا بیست و چهارم درباره شیءگرایی
+        یاد گرفتید، حالا به کارتان می‌آید. یک ORM چیزی جز یک لایه شیءگرای
+        هوشمند روی <code>sqlite3</code> نیست.
+    </p>
+
+    <h2 id="s2" data-t="ch32-035">۲. یک کار، دو نوشتن</h2>
+
+    <p data-t="ch32-036">
+        بهترین راه دیدن فایده ORM این است که یک کار کاملاً یکسان را دو بار
+        بنویسیم. نمونه <code>01_why_orm/app.py</code> دقیقاً همین کار را
+        می‌کند: یک دانشجو را درج می‌کند و بعد پیدایش می‌کند.
+    </p>
+
+    <pre class="code"><code>def with_raw_sql() -&gt; None:
+    '''The way of session 31.
+
+    Problems:
+      * the SQL is spread all over the program;
+      * a row is a tuple, so we read it with row[2] and nobody knows what
+        column 2 is;
+      * every table needs its own copy-pasted insert/select/update/delete;
+      * changing a column name means hunting through the whole project.
+    '''
+    conn = sqlite3.connect(DB)
+    cursor = conn.cursor()
+    cursor.execute('''CREATE TABLE IF NOT EXISTS students (
+                        student_id INTEGER PRIMARY KEY AUTOINCREMENT,
+                        first_name TEXT NOT NULL,
+                        last_name  TEXT NOT NULL,
+                        email      TEXT UNIQUE NOT NULL)''')
+
+    cursor.execute(
+        'INSERT OR IGNORE INTO students (first_name, last_name, email) '
+        'VALUES (?, ?, ?)',
+        ('Ali', 'Rezaei', 'ali@kadoosedu.ir'),
+    )
+    conn.commit()
+
+    cursor.execute('SELECT * FROM students WHERE email = ?',
+                   ('ali@kadoosedu.ir',))
+    row = cursor.fetchone()
+    print('raw SQL  -&gt;', row, '| the name is', row[1])   # row[1]... which one?
+
+    conn.close()</code></pre>
+    <p class="code-caption" data-t="ch32-037">روش فصل قبل: نمونه 01_why_orm/app.py</p>
+
+    <pre class="code"><code>def with_an_orm() -&gt; None:
+    '''The same thing, with the tiny ORM of folder 02.
+
+    The SQL lives in ONE place (the model), and the rest of the program only
+    ever talks about objects and attributes.
+    '''
+    from models import Student
+
+    Student.create_table()
+
+    student = Student.get_or_create(
+        email='ali@kadoosedu.ir',
+        first_name='Ali',
+        last_name='Rezaei',
+    )
+    print('ORM      -&gt;', student, '| the name is', student.first_name)</code></pre>
+    <p class="code-caption" data-t="ch32-038">همان کار با ORM</p>
+
+    <h3 data-t="ch32-039">شرح مثال</h3>
+
+    <ul>
+        <li data-t="ch32-040">نسخه دوم کوتاه‌تر است، ولی مهم‌تر از کوتاهی، <strong>خوانایی</strong> است: <code>student.first_name</code> در برابر <code>row[1]</code>.</li>
+        <li data-t="ch32-041">در نسخه اول اگر روزی ستونی به جدول اضافه شود، شماره‌ها جابه‌جا می‌شوند و کد بی‌سروصدا غلط می‌شود. در نسخه دوم هیچ اتفاقی نمی‌افتد.</li>
+        <li data-t="ch32-042">در نسخه اول SQL در سراسر برنامه پخش است. در نسخه دوم SQL فقط در یک جا زندگی می‌کند: داخل مدل.</li>
+        <li data-t="ch32-043">چون همه پرس‌وجوها از یک جا رد می‌شوند، امن بودنشان هم یک بار تضمین می‌شود، نه صد بار.</li>
+    </ul>
+
+    <div class="note">
+        <span class="box-title" data-t="ch32-044">ORM جادو نیست</span>
+        <p data-t="ch32-045">
+            هر ORM در نهایت همان <code>INSERT</code> و <code>SELECT</code> را
+            می‌سازد و به پایگاه داده می‌فرستد. اگر SQL بلد نباشید، ORM را هم
+            نمی‌توانید درست به کار ببرید و وقتی کند شود نمی‌فهمید چرا. به همین
+            دلیل فصل سی‌ام قبل از این فصل آمده است.
+        </p>
+    </div>
+
+    <h2 id="s3" data-t="ch32-046">۳. کلاس پایه: قلب ORM دست‌ساز</h2>
+
+    <p data-t="ch32-047">
+        حالا خودمان یک ORM کوچک می‌سازیم. فکر اصلی این است: هر مدل فقط باید
+        بگوید نامش چیست و چه ستون‌هایی دارد؛ بقیه کارها را یک
+        <strong>کلاس پایه</strong> انجام می‌دهد که همه از آن ارث می‌برند.
+    </p>
+
+    <pre class="code"><code>'''The shared part of every model.
+
+This is the heart of the tiny ORM: the connection handling and the generic
+CRUD helpers live here ONCE, and every model inherits them.
+'''
+
+import sqlite3
+
+DATABASE_PATH = 'database.db'
+
+
+class Model:
+    '''Base class of every model.
+
+    A subclass only has to define:
+        table       the name of the table
+        pk          the name of its primary key column
+        columns     the other columns, in order
+        SCHEMA      the CREATE TABLE statement
+    '''
+
+    table: str = ''
+    pk: str = 'id'
+    columns: list[str] = []
+    SCHEMA: str = ''
+
+    @classmethod
+    def connect(cls) -&gt; sqlite3.Connection:
+        'Return a configured connection. Everything goes through here.'
+        conn = sqlite3.connect(DATABASE_PATH)
+        conn.execute('PRAGMA foreign_keys = ON')
+        conn.row_factory = sqlite3.Row      # rows readable by column name
+        return conn
+
+    @classmethod
+    def create_table(cls) -&gt; None:
+        'Create the table of this model.'
+        with cls.connect() as conn:
+            conn.executescript(cls.SCHEMA)</code></pre>
+    <p class="code-caption" data-t="ch32-048">کلاس پایه: نمونه 02_simple_orm/models/base.py</p>
+
+    <h3 data-t="ch32-049">شرح مثال</h3>
+
+    <ul>
+        <li data-t="ch32-050">چهار صفت کلاسی <code>table</code> و <code>pk</code> و <code>columns</code> و <code>SCHEMA</code> تنها چیزی هستند که یک مدل جدید باید پر کند.</li>
+        <li data-t="ch32-051"><code>connect</code> همان تابع کمکی اتصال فصل قبل است، فقط این بار به شکل یک متد کلاسی. <code>PRAGMA</code> و <code>row_factory</code> برای همیشه حل شده‌اند.</li>
+        <li data-t="ch32-052">تفاوت <code>@classmethod</code> با متد معمولی را از فصل بیست و دوم به یاد بیاورید: این متدها روی خود کلاس کار می‌کنند، نه روی یک شیء خاص، چون هنوز هیچ شیئی وجود ندارد.</li>
+        <li data-t="ch32-053"><code>cls</code> در زمان اجرا به <strong>کلاس فرزند</strong> اشاره می‌کند. یعنی وقتی <code>Student.create_table()</code> را صدا می‌زنید، <code>cls.SCHEMA</code> همان اسکیمای دانشجو است. این دقیقاً همان چندریختی فصل بیست و سوم است.</li>
+    </ul>
+
+    <h2 id="s4" data-t="ch32-054">۴. خواندن و نوشتن در کلاس پایه</h2>
+
+    <p data-t="ch32-055">
+        حالا چهار عمل اصلی را یک بار برای همیشه در همین کلاس پایه می‌نویسیم.
+        اول خواندن:
+    </p>
+
+    <pre class="code"><code>    @classmethod
+    def all(cls) -&gt; list['Model']:
+        'Return every row as a list of objects.'
+        conn = cls.connect()
+        try:
+            rows = conn.execute(
+                f'SELECT * FROM {cls.table} ORDER BY {cls.pk}'
+            ).fetchall()
+        finally:
+            conn.close()
+        return [cls.from_row(row) for row in rows]
+
+    @classmethod
+    def get(cls, **where) -&gt; 'Model | None':
+        '''Return the first row matching the given columns, or None.
+
+        Example:  Student.get(email='ali@kadoosedu.ir')
+        '''
+        # The column NAMES come from our own code, the VALUES from the caller,
+        # so only the values become '?' parameters.
+        conditions = ' AND '.join(f'{column} = ?' for column in where)
+        values = tuple(where.values())
+
+        conn = cls.connect()
+        try:
+            row = conn.execute(
+                f'SELECT * FROM {cls.table} WHERE {conditions}', values
+            ).fetchone()
+        finally:
+            conn.close()
+
+        return cls.from_row(row) if row else None
+
+    @classmethod
+    def from_row(cls, row: sqlite3.Row) -&gt; 'Model':
+        'Build an object out of a database row.'
+        obj = cls.__new__(cls)                 # create it without __init__
+        for key in row.keys():
+            setattr(obj, key, row[key])
+        return obj</code></pre>
+    <p class="code-caption" data-t="ch32-056">خواندن: ادامه base.py</p>
+
+    <h3 data-t="ch32-057">شرح مثال</h3>
+
+    <ul>
+        <li data-t="ch32-058"><code>**where</code> از فصل سیزدهم می‌آید: <code>Student.get(email='...')</code> را می‌شود با هر ستونی صدا زد و کد شرط را خودش می‌سازد.</li>
+        <li data-t="ch32-059">به نکته امنیتی دقت کنید: <strong>نام</strong> ستون‌ها از کد خودمان می‌آید و داخل f-string می‌نشیند، ولی <strong>مقدارها</strong> همیشه به شکل پارامتر <code>?</code> فرستاده می‌شوند. این همان قاعده فصل قبل است.</li>
+        <li data-t="ch32-060"><code>from_row</code> با <code>cls.__new__(cls)</code> یک شیء خالی می‌سازد و <code>__init__</code> را دور می‌زند، چون داده‌ها از پایگاه داده می‌آیند و نباید دوباره اعتبارسنجی یا مقداردهی شوند.</li>
+        <li data-t="ch32-061"><code>setattr(obj, key, row[key])</code> ستون‌ها را یکی‌یکی به صفت تبدیل می‌کند. همین یک خط، بخش «نگاشت» ORM است.</li>
+    </ul>
+
+    <p data-t="ch32-062">و حالا نوشتن:</p>
+
+    <pre class="code"><code>    def save(self) -&gt; None:
+        'Insert this object, and store the id it received.'
+        columns = ', '.join(self.columns)
+        placeholders = ', '.join('?' for _ in self.columns)
+        values = tuple(getattr(self, column) for column in self.columns)
+
+        with self.connect() as conn:
+            cursor = conn.execute(
+                f'INSERT INTO {self.table} ({columns}) VALUES ({placeholders})',
+                values,
+            )
+            setattr(self, self.pk, cursor.lastrowid)
+
+    def update(self, **changes) -&gt; None:
+        '''Change some columns of this object AND of its row.'''
+        for column in changes:
+            if column not in self.columns:
+                raise ValueError(f'unknown column: {column}')
+
+        assignments = ', '.join(f'{column} = ?' for column in changes)
+        values = tuple(changes.values()) + (getattr(self, self.pk),)
+
+        with self.connect() as conn:
+            conn.execute(
+                f'UPDATE {self.table} SET {assignments} WHERE {self.pk} = ?',
+                values,
+            )
+
+        # Keep the object and the row in agreement.
+        for column, value in changes.items():
+            setattr(self, column, value)
+
+    def delete(self) -&gt; None:
+        'Delete the row of this object.'
+        with self.connect() as conn:
+            conn.execute(
+                f'DELETE FROM {self.table} WHERE {self.pk} = ?',
+                (getattr(self, self.pk),),
+            )</code></pre>
+    <p class="code-caption" data-t="ch32-063">نوشتن: ادامه base.py</p>
+
+    <h3 data-t="ch32-064">شرح مثال</h3>
+
+    <ul>
+        <li data-t="ch32-065">جای علامت‌های سؤال با <code>', '.join('?' for _ in self.columns)</code> ساخته می‌شود، یعنی به تعداد ستون‌ها. مدل هر تعداد ستون داشته باشد کار می‌کند.</li>
+        <li data-t="ch32-066">بعد از درج، شناسه تولیدشده با <code>cursor.lastrowid</code> روی خود شیء نوشته می‌شود. از آن لحظه شیء «می‌داند» کدام سطر است.</li>
+        <li data-t="ch32-067"><code>update</code> اول نام ستون‌ها را اعتبارسنجی می‌کند. این خط ظاهراً کوچک، جلوی نوشتن نام دلخواه داخل SQL را می‌گیرد.</li>
+        <li data-t="ch32-068">نکته‌ای که خیلی‌ها فراموش می‌کنند: بعد از <code>UPDATE</code> باید <strong>خود شیء</strong> هم به‌روز شود، وگرنه شیء و سطر با هم اختلاف پیدا می‌کنند.</li>
+    </ul>
+
+    <div class="tip">
+        <span class="box-title" data-t="ch32-069">ساختن شیء با ذخیره کردنش فرق دارد</span>
+        <p data-t="ch32-070">
+            <code>Student(...)</code> فقط یک شیء در حافظه می‌سازد و هیچ چیزی در
+            پایگاه داده نمی‌نویسد. تا وقتی <code>save()</code> را صدا نزنید،
+            چیزی ذخیره نشده است. همین جدایی را در SQLAlchemy هم می‌بینید، آنجا
+            با نام <code>add()</code> و <code>commit()</code>.
+        </p>
+    </div>
+
+    <h2 id="s5" data-t="ch32-071">۵. اولین مدل: Student</h2>
+
+    <p data-t="ch32-072">
+        حالا ببینید یک مدل واقعی چقدر کم کد دارد. هر چه تا اینجا نوشتیم، اینجا
+        رایگان به ارث می‌رسد.
+    </p>
+
+    <pre class="code"><code>'''The Student model: CRUD operations on the students table.'''
+
+from .base import Model
+
+
+class Student(Model):
+    'One row of the students table.'
+
+    table = 'students'
+    pk = 'student_id'
+    columns = ['first_name', 'last_name', 'email']
+
+    SCHEMA = '''
+        CREATE TABLE IF NOT EXISTS students (
+            student_id INTEGER PRIMARY KEY AUTOINCREMENT,
+            first_name TEXT NOT NULL,
+            last_name  TEXT NOT NULL,
+            email      TEXT UNIQUE NOT NULL
+        );
+    '''
+
+    def __init__(self,
+                 email: str,
+                 first_name: str = 'New',
+                 last_name: str = 'Student') -&gt; None:
+        # Creating the OBJECT does not touch the database; save() does.
+        self.student_id: int | None = None
+        self.email = email
+        self.first_name = first_name
+        self.last_name = last_name
+
+    def __str__(self) -&gt; str:
+        return f'{self.first_name} {self.last_name} &lt;{self.email}&gt;'
+
+    def __repr__(self) -&gt; str:
+        return f'Student({self.email!r})'
+
+    @property
+    def full_name(self) -&gt; str:
+        'The two names together.'
+        return f'{self.first_name} {self.last_name}'</code></pre>
+    <p class="code-caption" data-t="ch32-073">مدل دانشجو: نمونه 02_simple_orm/models/students.py</p>
+
+    <h3 data-t="ch32-074">شرح مثال</h3>
+
+    <ul>
+        <li data-t="ch32-075">چهار صفت بالای کلاس، همه چیزی است که کلاس پایه برای ساختن SQL لازم دارد.</li>
+        <li data-t="ch32-076"><code>student_id</code> در ابتدا <code>None</code> است، چون هنوز سطری وجود ندارد. بعد از <code>save()</code> مقدار می‌گیرد.</li>
+        <li data-t="ch32-077"><code>__str__</code> و <code>__repr__</code> و <code>@property</code> همان چیزهای فصل بیست و دوم و بیست و چهارم هستند. یک مدل هم بالاخره یک کلاس معمولی است و می‌تواند رفتار دلخواه داشته باشد.</li>
+        <li data-t="ch32-078"><code>full_name</code> نمونه یک ویژگی است که در پایگاه داده ستونی ندارد و فقط محاسبه می‌شود. این یکی از سودهای بزرگ ORM است: منطق کنار داده می‌نشیند.</li>
+    </ul>
+
+    <h2 id="s6" data-t="ch32-079">۶. مدل دوم تقریباً رایگان است</h2>
+
+    <pre class="code"><code>'''The Teacher model.
+
+Notice how little code a new model needs: everything else is inherited.
+'''
+
+from .base import Model
+
+
+class Teacher(Model):
+    'One row of the teachers table.'
+
+    table = 'teachers'
+    pk = 'teacher_id'
+    columns = ['first_name', 'last_name', 'department']
+
+    SCHEMA = '''
+        CREATE TABLE IF NOT EXISTS teachers (
+            teacher_id INTEGER PRIMARY KEY AUTOINCREMENT,
+            first_name TEXT NOT NULL,
+            last_name  TEXT NOT NULL,
+            department TEXT DEFAULT 'General'
+        );
+    '''
+
+    def __init__(self,
+                 first_name: str,
+                 last_name: str,
+                 department: str = 'General') -&gt; None:
+        self.teacher_id: int | None = None
+        self.first_name = first_name
+        self.last_name = last_name
+        self.department = department
+
+    def __str__(self) -&gt; str:
+        return f'{self.first_name} {self.last_name} ({self.department})'</code></pre>
+    <p class="code-caption" data-t="ch32-080">مدل استاد: نمونه 02_simple_orm/models/teachers.py</p>
+
+    <p data-t="ch32-081">
+        این مدل حدود سی خط است و با همان سی خط، متدهای
+        <code>all</code> و <code>get</code> و <code>save</code> و
+        <code>update</code> و <code>delete</code> و
+        <code>get_or_create</code> را دارد. اگر بدون ORM می‌نوشتیم، باید همه
+        آنها را برای جدول دوم دوباره کپی می‌کردیم. این پاسخ تمرین چهارم این
+        فصل است.
+    </p>
+
+    <pre class="code"><code>'''The models package: one module per table, re-exported here.'''
+
+from .base import Model
+from .students import Student
+from .teachers import Teacher
+
+__all__ = ['Model', 'Student', 'Teacher']</code></pre>
+    <p class="code-caption" data-t="ch32-082">بسته مدل‌ها: models/__init__.py</p>
+
+    <p data-t="ch32-083">
+        ساختار بسته دقیقاً همان چیزی است که در فصل هفدهم یاد گرفتید: هر جدول یک
+        ماژول، و <code>__init__.py</code> همه را در یک جا در معرض دید می‌گذارد
+        تا بقیه برنامه فقط بنویسد <code>from models import Student</code>.
+    </p>
+
+    <h2 id="s7" data-t="ch32-084">۷. برنامه‌ای بدون یک خط SQL</h2>
+
+    <pre class="code"><code>'''A menu-driven program using our own tiny ORM.
+
+Not one line of SQL in this file: everything goes through the models.
+'''
+
+from models import Student, Teacher
+
+
+def students_section() -&gt; None:
+    'Everything about the students.'
+    while True:
+        clear()
+        student_menu()
+        choice = input('Enter the number: ').strip()
+
+        if choice == '1':
+            students = Student.all()
+            if not students:
+                print('(no student yet)')
+            for student in students:
+                print(f'{student.student_id:&lt;5}{student}')
+            pause()
+
+        elif choice == '3':
+            email = input('Enter the email: ').strip()
+            if Student.get(email=email) is not None:
+                print('That email is already used.')
+                pause()
+                continue
+
+            student = Student(email=email,
+                              first_name=input('First name: ').strip() or 'New',
+                              last_name=input('Last name: ').strip() or 'Student')
+            student.save()
+            print(f'Student added with the id {student.student_id}.')
+            pause()
+
+        elif choice == '4':
+            student = Student.get(email=input('Enter the email: ').strip())
+            if student is None:
+                print('No student with that email.')
+            else:
+                student.update(first_name=input('New first name: ').strip())
+                print('Updated:', student)
+            pause()
+
+        elif choice == '9':
+            return</code></pre>
+    <p class="code-caption" data-t="ch32-085">برنامه منویی: نمونه 02_simple_orm/app.py</p>
+
+    <p data-t="ch32-086">
+        در کل این فایل حتی یک کلمه <code>SELECT</code> یا
+        <code>INSERT</code> پیدا نمی‌کنید. این همان هدف ORM است: لایه رابط
+        کاربر درباره پایگاه داده چیزی نمی‌داند. اگر فردا تصمیم بگیرید داده‌ها
+        را در PostgreSQL نگه دارید، فقط کلاس پایه عوض می‌شود و این فایل دست
+        نمی‌خورد.
+    </p>
+
+    <div class="folder-ref">
+        <span class="box-title" data-t="ch32-087">فایل‌های تمرینی بخش اول</span>
+        <p data-t="ch32-088">
+            پوشه <code>S32-orm-and-sqlalchemy/02_simple_orm</code> را باز کنید
+            و <code>app.py</code> را اجرا کنید. بعد سعی کنید یک مدل سوم به نام
+            <code>Course</code> اضافه کنید و ببینید چقدر کم کد لازم دارد.
+        </p>
+    </div>
+
+    <h2 id="s8" data-t="ch32-089">۸. SQLAlchemy: نصب و موتور</h2>
+
+    <p data-t="ch32-090">
+        ORM دست‌ساز ما برای فهمیدن ایده عالی بود، ولی برای یک پروژه واقعی کم
+        می‌آورد: پیوند، بارگذاری تنبل، مهاجرت ساختار جدول‌ها و پشتیبانی از
+        پایگاه‌های داده دیگر. ابزار استاندارد دنیای پایتون
+        <strong>SQLAlchemy</strong> است.
+    </p>
+
+    <pre class="out">pip install -r requirements.txt
+
+# requirements.txt
+SQLAlchemy==2.0.50</pre>
+
+    <pre class="code"><code>from sqlalchemy import create_engine, event
+from sqlalchemy.exc import IntegrityError
+from sqlalchemy.orm import sessionmaker
+
+from models import Base, Course, Enrollment, Student, Teacher
+
+DATABASE_URL = 'sqlite:///database.db'
+
+# The engine is the connection pool: ONE per application.
+# echo=True prints every SQL statement - switch it on to see what the ORM does.
+engine = create_engine(DATABASE_URL, echo=False, future=True)
+
+
+@event.listens_for(engine, 'connect')
+def set_sqlite_pragma(dbapi_connection, connection_record) -&gt; None:
+    '''Turn the foreign keys on for every new connection.
+
+    Exactly the "PRAGMA foreign_keys = ON" of session 31, but done once here
+    instead of in every function.
+    '''
+    cursor = dbapi_connection.cursor()
+    cursor.execute('PRAGMA foreign_keys=ON')
+    cursor.close()
+
+
+# A factory that produces sessions. A Session is one "conversation" with the
+# database: it collects the changes and writes them at commit().
+SessionLocal = sessionmaker(bind=engine, future=True)</code></pre>
+    <p class="code-caption" data-t="ch32-091">موتور و کارخانه نشست: نمونه 03_sqlalchemy/app.py</p>
+
+    <h3 data-t="ch32-092">شرح مثال</h3>
+
+    <ul>
+        <li data-t="ch32-093"><strong>موتور</strong> (<span dir="ltr">engine</span>) استخر اتصال‌هاست و در کل برنامه فقط <strong>یکی</strong> ساخته می‌شود. ساختن موتور در هر تابع، اشتباه رایج تازه‌کارهاست.</li>
+        <li data-t="ch32-094">نشانی پایگاه داده یک URL است. برای عوض کردن پایگاه داده معمولاً فقط همین رشته تغییر می‌کند، مثلاً <code dir="ltr">postgresql://user:pass@host/db</code>.</li>
+        <li data-t="ch32-095"><code>echo=True</code> هر دستور SQL تولیدشده را چاپ می‌کند. برای یادگیری حتماً یک بار روشنش کنید تا ببینید ORM پشت پرده چه می‌نویسد.</li>
+        <li data-t="ch32-096">همان <code>PRAGMA foreign_keys</code> فصل قبل، این بار به شکل یک رویداد که در هر اتصال تازه خودکار اجرا می‌شود. بدون آن، حذف آبشاری در SQLite کار نمی‌کند.</li>
+        <li data-t="ch32-097"><code>sessionmaker</code> یک کارخانه است؛ هر بار که به پایگاه داده کار داریم، یک <strong>نشست</strong> تازه از آن می‌گیریم.</li>
+    </ul>
+
+    <h2 id="s9" data-t="ch32-098">۹. تعریف مدل‌ها</h2>
+
+    <p data-t="ch32-099">
+        در SQLAlchemy نسخه ۲، مدل‌ها را با راهنمای نوع تعریف می‌کنیم. کتابخانه
+        از روی <code>Mapped[int]</code> و <code>Mapped[str]</code> نوع ستون را
+        می‌فهمد. همان راهنمای نوعی که در فصل سیزدهم خواندید، اینجا کار واقعی
+        انجام می‌دهد.
+    </p>
+
+    <pre class="code"><code>from typing import List, Optional
+
+from sqlalchemy import Float, ForeignKey, String
+from sqlalchemy.orm import (
+    DeclarativeBase,
+    Mapped,
+    mapped_column,
+    relationship,
+)
+
+
+class Base(DeclarativeBase):
+    'Every model inherits from this; it collects the metadata of the tables.'
+
+
+class Teacher(Base):
+    __tablename__ = 'teacher'
+
+    id: Mapped[int] = mapped_column(primary_key=True)
+    name: Mapped[str] = mapped_column(String(100), nullable=False)
+    email: Mapped[str] = mapped_column(String(100), unique=True, nullable=False)
+
+    # One teacher -&gt; many courses.
+    # back_populates links the two sides so that both stay in agreement.
+    courses: Mapped[List['Course']] = relationship(
+        back_populates='teacher',
+        cascade='all, delete-orphan',   # deleting a teacher deletes the courses
+        passive_deletes=True,           # let the DATABASE do the cascade
+    )
+
+    def __repr__(self) -&gt; str:
+        return f'&lt;Teacher(id={self.id}, name={self.name!r})&gt;'
+
+
+class Course(Base):
+    __tablename__ = 'course'
+
+    id: Mapped[int] = mapped_column(primary_key=True)
+    title: Mapped[str] = mapped_column(String(200), nullable=False)
+
+    # The foreign key column itself ...
+    teacher_id: Mapped[int] = mapped_column(
+        ForeignKey('teacher.id', ondelete='CASCADE'), nullable=False
+    )
+    # ... and the Python side of the relation.
+    teacher: Mapped['Teacher'] = relationship(back_populates='courses')
+
+    enrollments: Mapped[List['Enrollment']] = relationship(
+        back_populates='course',
+        cascade='all, delete-orphan',
+        passive_deletes=True,
+    )</code></pre>
+    <p class="code-caption" data-t="ch32-100">مدل‌ها: نمونه 03_sqlalchemy/models.py</p>
+
+    <h3 data-t="ch32-101">شرح مثال</h3>
+
+    <ul>
+        <li data-t="ch32-102"><code>Base</code> از <code>DeclarativeBase</code> ارث می‌برد و فهرست همه جدول‌ها را جمع می‌کند. دقیقاً همان نقشی که کلاس <code>Model</code> در ORM دست‌ساز داشت.</li>
+        <li data-t="ch32-103"><code>__tablename__</code> نام جدول است، مثل صفت <code>table</code> ما.</li>
+        <li data-t="ch32-104"><code>mapped_column</code> جزئیات ستون را می‌گوید: کلید اصلی، طول، یکتا بودن و اجازه خالی ماندن.</li>
+        <li data-t="ch32-105">دو چیز متفاوت کنار هم نشسته‌اند: <code>teacher_id</code> یک <strong>ستون</strong> واقعی است، و <code>teacher</code> یک <strong>رابطه</strong> پایتونی که ستون نیست و در جدول وجود ندارد.</li>
+        <li data-t="ch32-106"><code>back_populates</code> دو سر رابطه را به هم گره می‌زند. اگر درسی را به فهرست <code>teacher.courses</code> اضافه کنید، خودبه‌خود <code>course.teacher</code> هم پر می‌شود.</li>
+    </ul>
+
+    <p data-t="ch32-107">
+        جدول <code>Enrollment</code> نمونه مهمی است: رابطه چندبه‌چند بین دانشجو
+        و درس، به‌علاوه یک داده اضافه یعنی نمره. هر وقت رابطه چندبه‌چند شما
+        داده اضافه دارد، باید جدول جداگانه‌ای با مدل خودش داشته باشد.
+    </p>
+
+    <pre class="code"><code>class Enrollment(Base):
+    '''The link between a student and a course.
+
+    It is a table of its own because it carries extra data: the grade.
+    '''
+
+    __tablename__ = 'enrollment'
+
+    id: Mapped[int] = mapped_column(primary_key=True)
+    grade: Mapped[Optional[float]] = mapped_column(Float, nullable=True)
+
+    student_id: Mapped[int] = mapped_column(
+        ForeignKey('student.id', ondelete='CASCADE'), nullable=False
+    )
+    course_id: Mapped[int] = mapped_column(
+        ForeignKey('course.id', ondelete='CASCADE'), nullable=False
+    )
+
+    student: Mapped['Student'] = relationship(back_populates='enrollments')
+    course: Mapped['Course'] = relationship(back_populates='enrollments')</code></pre>
+    <p class="code-caption" data-t="ch32-108">جدول واسط با داده اضافه</p>
+
+    <h2 id="s10" data-t="ch32-109">۱۰. نشست: درج داده</h2>
+
+    <p data-t="ch32-110">
+        <strong>نشست</strong> (<span dir="ltr">Session</span>) یک گفت‌وگوی
+        کامل با پایگاه داده است: تغییرها را جمع می‌کند و در
+        <code>commit()</code> همه را با هم می‌نویسد. این همان تراکنش فصل قبل
+        است، فقط با چهره شیءگرا.
+    </p>
+
+    <pre class="code"><code>def example_1_create_tables() -&gt; None:
+    'Example 1: create every table described by the models.'
+    Base.metadata.create_all(engine)
+    print('Tables created successfully.')
+
+
+def example_2_insert_data() -&gt; None:
+    'Example 2: insert teachers, courses and students.'
+    with SessionLocal() as session:
+        t1 = Teacher(name='Dr. Smith', email='smith@edu.com')
+        t2 = Teacher(name='Prof. Johnson', email='johnson@edu.com')
+        session.add_all([t1, t2])
+
+        # flush() sends the INSERTs so that the ids exist, but does NOT commit.
+        session.flush()
+
+        session.add_all([
+            Course(title='Mathematics 101', teacher_id=t1.id),
+            Course(title='Physics 101', teacher_id=t1.id),
+            Course(title='History 101', teacher_id=t2.id),
+        ])
+
+        session.add_all([
+            Student(name='Alice', email='alice@student.edu'),
+            Student(name='Bob', email='bob@student.edu'),
+            Student(name='Charlie', email='charlie@student.edu'),
+        ])
+
+        session.commit()
+        print('Data inserted and committed.')</code></pre>
+    <p class="code-caption" data-t="ch32-111">ساخت جدول‌ها و درج: نمونه 03_sqlalchemy/app.py</p>
+
+    <h3 data-t="ch32-112">شرح مثال</h3>
+
+    <ul>
+        <li data-t="ch32-113"><code>create_all</code> از روی مدل‌ها همه جدول‌ها را می‌سازد. جدولی که از قبل باشد دست نمی‌خورد، پس اجرای دوباره بی‌خطر است.</li>
+        <li data-t="ch32-114"><code>add</code> و <code>add_all</code> شیء را فقط به نشست می‌سپارند؛ هنوز هیچ چیزی ذخیره نشده.</li>
+        <li data-t="ch32-115"><code>flush()</code> دستورهای <code>INSERT</code> را می‌فرستد تا شناسه‌ها ساخته شوند، ولی تراکنش را نمی‌بندد. به همین دلیل بلافاصله بعد از آن <code>t1.id</code> مقدار دارد.</li>
+        <li data-t="ch32-116"><code>commit()</code> تراکنش را می‌بندد و همه چیز را ماندگار می‌کند.</li>
+        <li data-t="ch32-117"><code>with SessionLocal() as session</code> تضمین می‌کند نشست بسته شود، حتی اگر خطایی رخ دهد. این همان مدیر زمینه فصل بیست و پنجم است.</li>
+    </ul>
+
+    <div class="warn">
+        <span class="box-title" data-t="ch32-118">یک دام رایج</span>
+        <p data-t="ch32-119">
+            برخلاف <code>sqlite3</code>، بستن نشست به معنی <code>commit</code>
+            نیست. اگر <code>commit()</code> را فراموش کنید، هیچ چیزی نوشته
+            نمی‌شود و هیچ خطایی هم نمی‌گیرید؛ فقط داده‌ها غیبشان می‌زند.
+        </p>
+    </div>
+
+    <h2 id="s11" data-t="ch32-120">۱۱. خواندن، تغییر و حذف</h2>
+
+    <pre class="code"><code>def example_3_read_data() -&gt; None:
+    'Example 3: read every teacher and every student.'
+    with SessionLocal() as session:
+        for teacher in session.query(Teacher).all():
+            print(f'  {teacher.name} ({teacher.email})')
+
+
+def example_4_update_record() -&gt; None:
+    'Example 4: change the email of a student.'
+    with SessionLocal() as session:
+        student = session.query(Student).filter_by(name='Alice').first()
+
+        if student is None:
+            print('Alice not found.')
+            return
+
+        old_email = student.email
+        # Simply assigning to the attribute is enough: the session notices it.
+        student.email = 'alice.new@student.edu'
+        session.commit()
+        print(f'Alice email updated from {old_email} to {student.email}')
+
+
+def example_5_delete_course() -&gt; None:
+    'Example 5: delete a course.'
+    with SessionLocal() as session:
+        course = session.query(Course).filter_by(title='History 101').first()
+
+        if course is None:
+            print('Course not found.')
+            return
+
+        session.delete(course)
+        session.commit()</code></pre>
+    <p class="code-caption" data-t="ch32-121">خواندن، تغییر و حذف</p>
+
+    <h3 data-t="ch32-122">شرح مثال</h3>
+
+    <ul>
+        <li data-t="ch32-123"><code>session.query(Student)</code> یک پرس‌وجو می‌سازد و <code>filter_by</code> شرط آن را تعیین می‌کند. مقایسه کنید با <code>WHERE</code>: همان است، فقط پایتونی.</li>
+        <li data-t="ch32-124"><code>first()</code> یک شیء یا <code>None</code> می‌دهد و <code>all()</code> یک لیست. همان تله فصل قبل اینجا هم هست: <strong>حتماً</strong> نتیجه <code>first()</code> را با <code>None</code> بسنجید.</li>
+        <li data-t="ch32-125">برای به‌روزرسانی هیچ دستور <code>UPDATE</code>ی نمی‌نویسید. فقط صفت را عوض می‌کنید و <code>commit</code> می‌زنید. نشست خودش می‌فهمد چه چیزی تغییر کرده و SQL را می‌سازد.</li>
+        <li data-t="ch32-126"><code>session.delete(obj)</code> جای <code>DELETE FROM</code> را می‌گیرد.</li>
+    </ul>
+
+    <h2 id="s12" data-t="ch32-127">۱۲. رابطه‌ها و حذف آبشاری</h2>
+
+    <p data-t="ch32-128">اینجاست که ORM واقعاً برنده می‌شود. برای برداشتن نام دانشجو از روی یک ثبت‌نام، ضرورتی ندارد <code>JOIN</code> بنویسید: کافی است نقطه بگذارید.</p>
+
+    <pre class="code"><code>def example_6_enroll_students() -&gt; None:
+    'Example 6: create enrolments (many-to-many with an extra grade).'
+    with SessionLocal() as session:
+        alice = session.query(Student).filter_by(name='Alice').first()
+        bob = session.query(Student).filter_by(name='Bob').first()
+        math = session.query(Course).filter_by(title='Mathematics 101').first()
+        physics = session.query(Course).filter_by(title='Physics 101').first()
+
+        if not all([alice, bob, math, physics]):
+            print('Required records missing. Run example 2 first.')
+            return
+
+        # The objects are given directly: SQLAlchemy fills the ids in for us.
+        session.add_all([
+            Enrollment(student=alice, course=math, grade=85.5),
+            Enrollment(student=bob, course=math, grade=79.0),
+            Enrollment(student=alice, course=physics, grade=92.0),
+        ])
+        session.commit()
+
+
+def example_7_query_enrollments() -&gt; None:
+    'Example 7: read the enrolments through the relations.'
+    with SessionLocal() as session:
+        for e in session.query(Enrollment).all():
+            # e.student and e.course are real objects: no JOIN to write.
+            print(f'{e.student.name} enrolled in {e.course.title} '
+                  f'- Grade: {e.grade}')
+
+        # Navigating the other way round is just as easy.
+        alice = session.query(Student).filter_by(name='Alice').first()
+        if alice:
+            print(f'Alice follows {len(alice.enrollments)} course(s):',
+                  [e.course.title for e in alice.enrollments])</code></pre>
+    <p class="code-caption" data-t="ch32-129">رابطه‌ها در عمل</p>
+
+    <pre class="out">Alice enrolled in Mathematics 101 - Grade: 85.5
+Bob enrolled in Mathematics 101 - Grade: 79.0
+Alice enrolled in Physics 101 - Grade: 92.0
+Alice follows 2 course(s): ['Mathematics 101', 'Physics 101']</pre>
+
+    <h3 data-t="ch32-130">شرح مثال</h3>
+
+    <ul>
+        <li data-t="ch32-131">در <code>Enrollment(student=alice, course=math)</code> خود شیءها را می‌دهیم، نه شناسه‌ها را. SQLAlchemy شناسه‌ها را در زمان نوشتن پر می‌کند.</li>
+        <li data-t="ch32-132"><code>e.student.name</code> پشت پرده یک <code>SELECT</code> جداگانه می‌زند و آن را در حافظه نگه می‌دارد. به این می‌گویند <strong>بارگذاری تنبل</strong>.</li>
+        <li data-t="ch32-133">رفتن در هر دو جهت ممکن است: از ثبت‌نام به دانشجو، و از دانشجو به فهرست ثبت‌نام‌هایش. این هدیه <code>back_populates</code> است.</li>
+    </ul>
+
+    <div class="warn">
+        <span class="box-title" data-t="ch32-134">مسئله N+1</span>
+        <p data-t="ch32-135">
+            راحتی بارگذاری تنبل یک هزینه دارد. اگر روی صد ثبت‌نام حلقه بزنید و
+            هر بار <code>e.student.name</code> را بخوانید، ممکن است صد و یک
+            پرس‌وجوی جداگانه به پایگاه داده برود. نامش مسئله
+            <span dir="ltr">N+1</span> است. راه حلش
+            <code>joinedload</code> یا <code>selectinload</code> است که یک
+            <code>JOIN</code> می‌زنند و همه چیز را یک‌جا می‌آورند. برای دیدنش،
+            یک بار <code>echo=True</code> را روشن کنید و تعداد پرس‌وجوها را
+            بشمارید.
+        </p>
+    </div>
+
+    <p data-t="ch32-136">
+        حذف آبشاری هم بدون یک خط SQL انجام می‌شود. حذف یک دانشجو، ثبت‌نام‌هایش
+        را هم می‌برد:
+    </p>
+
+    <pre class="code"><code>def example_8_cascade_delete_student() -&gt; None:
+    'Example 8: deleting a student also deletes their enrolments.'
+    with SessionLocal() as session:
+        bob = session.query(Student).filter_by(name='Bob').first()
+
+        if bob is None:
+            print('Bob not found.')
+            return
+
+        bob_id = bob.id
+        before = session.query(Enrollment).filter_by(student_id=bob_id).count()
+        print(f'Bob has {before} enrollment(s).')
+
+        session.delete(bob)
+        session.commit()
+
+        after = session.query(Enrollment).filter_by(student_id=bob_id).count()
+        print(f"After deletion, Bob's enrollments: {after}")</code></pre>
+    <p class="code-caption" data-t="ch32-137">حذف آبشاری: نمونه 03_sqlalchemy/app.py</p>
+
+    <pre class="out">Bob has 1 enrollment(s).
+After deletion, Bob's enrollments: 0</pre>
+
+    <div class="table-scroll">
+        <table>
+            <thead>
+                <tr><th data-t="ch32-138">تنظیم</th><th data-t="ch32-139">کجا نوشته می‌شود</th><th data-t="ch32-140">وظیفه آن</th></tr>
+            </thead>
+            <tbody>
+                <tr><td><code>ondelete='CASCADE'</code></td><td data-t="ch32-141">روی <code>ForeignKey</code></td><td data-t="ch32-142">قانون واقعی در خود پایگاه داده</td></tr>
+                <tr><td><code>cascade='all, delete-orphan'</code></td><td data-t="ch32-143">روی <code>relationship</code></td><td data-t="ch32-144">قانون در سمت پایتون و نشست</td></tr>
+                <tr><td><code>passive_deletes=True</code></td><td data-t="ch32-145">روی <code>relationship</code></td><td data-t="ch32-146">کار را به پایگاه داده بسپار، سطرها را بیخود نخوان</td></tr>
+                <tr><td><code>PRAGMA foreign_keys=ON</code></td><td data-t="ch32-147">در رویداد اتصال</td><td data-t="ch32-148">بدون آن، SQLite اصلاً آبشار نمی‌کند</td></tr>
+            </tbody>
+        </table>
+    </div>
+
+    <h2 id="s13" data-t="ch32-149">۱۳. تراکنش و IntegrityError</h2>
+
+    <pre class="code"><code>def example_10_transaction_rollback() -&gt; None:
+    'Example 10: a failed transaction is rolled back.'
+    with SessionLocal() as session:
+        try:
+            # The email already belongs to Alice, and the column is UNIQUE.
+            session.add(Student(name='Duplicate',
+                                email='alice.new@student.edu'))
+            session.commit()
+        except IntegrityError:
+            session.rollback()
+            print('IntegrityError caught! Transaction rolled back.')
+
+            duplicate = session.query(Student).filter_by(name='Duplicate').first()
+            print(f"Duplicate student in DB? {'Yes' if duplicate else 'No'}")</code></pre>
+    <p class="code-caption" data-t="ch32-150">برگرداندن تراکنش: نمونه 03_sqlalchemy/app.py</p>
+
+    <pre class="out">IntegrityError caught! Transaction rolled back.
+Duplicate student in DB? No</pre>
+
+    <h3 data-t="ch32-151">شرح مثال</h3>
+
+    <ul>
+        <li data-t="ch32-152">ساختار همان ساختار فصل قبل است: <code>try</code> با <code>commit</code>، و <code>except</code> با <code>rollback</code>.</li>
+        <li data-t="ch32-153"><code>IntegrityError</code> یعنی محدودیتی مثل <code>UNIQUE</code> یا <code>NOT NULL</code> نقض شده است. این یک اتفاق عادی است، نه باگ، و باید مدیریت شود.</li>
+        <li data-t="ch32-154">نکته‌ای که حتماً باید بدانید: بعد از یک خطای <code>commit</code>، نشست در وضعیت خراب است و تا وقتی <code>rollback()</code> نزنید، هر پرس‌وجوی بعدی هم خطا ایجاد می‌کند.</li>
+    </ul>
+
+    <h2 id="s14" data-t="ch32-155">۱۴. کی ORM، کی SQL خام</h2>
+
+    <div class="table-scroll">
+        <table>
+            <thead>
+                <tr><th data-t="ch32-156">موقعیت</th><th data-t="ch32-157">انتخاب بهتر</th></tr>
+            </thead>
+            <tbody>
+                <tr><td data-t="ch32-158">کارهای روزمره: درج، ویرایش، حذف، نمایش فهرست</td><td>ORM</td></tr>
+                <tr><td data-t="ch32-159">برنامه‌ای که ممکن است پایگاه داده‌اش عوض شود</td><td>ORM</td></tr>
+                <tr><td data-t="ch32-160">پروژه‌ای که چند نفر رویش کار می‌کنند</td><td>ORM</td></tr>
+                <tr><td data-t="ch32-161">گزارش تحلیلی سنگین با چند پیوند و زیرپرس‌وجو</td><td data-t="ch32-162">SQL خام</td></tr>
+                <tr><td data-t="ch32-163">پرس‌وجویی که باید تا آخرین ذره بهینه باشد</td><td data-t="ch32-164">SQL خام</td></tr>
+                <tr><td data-t="ch32-165">یک اسکریپت ده‌خطی یک‌بارمصرف</td><td data-t="ch32-166">SQL خام</td></tr>
+            </tbody>
+        </table>
+    </div>
+
+    <p data-t="ch32-167">
+        در عمل بیشتر پروژه‌ها هر دو را به کار می‌برند و این کاملاً طبیعی است.
+        SQLAlchemy اجازه می‌دهد هر وقت لازم شد، با <code>text()</code> یک
+        پرس‌وجوی خام را در همان نشست اجرا کنید.
+    </p>
+
+    <div class="tip">
+        <span class="box-title" data-t="ch32-168">این فصل کجا به کارتان می‌آید</span>
+        <p data-t="ch32-169">
+            در فصل سی و هشتم همین مدل‌ها را زیر Flask می‌بینید و در فصل سی و
+            نهم، پروژه پایانی روی SQLAlchemy ساخته می‌شود. هر چه اینجا خوب یاد
+            بگیرید، دو فصل آینده را ساده‌تر می‌کند.
+        </p>
+    </div>
+
+    <div class="folder-ref">
+        <span class="box-title" data-t="ch32-170">فایل‌های تمرینی این فصل</span>
+        <p data-t="ch32-171">
+            پوشه <code>S32-orm-and-sqlalchemy</code> شامل سه بخش است:
+            <code>01_why_orm</code> برای مقایسه،
+            <code>02_simple_orm</code> برای ORM دست‌ساز، و
+            <code>03_sqlalchemy</code> برای کتابخانه واقعی. بخش سوم نصب لازم
+            دارد: <code>pip install -r requirements.txt</code>. اگر خواستید از
+            صفر شروع کنید، فایل <code>database.db</code> را پاک کنید.
+        </p>
+    </div>
+
+    <h2 data-t="ch32-172">خلاصه فصل</h2>
+
+    <div class="table-scroll">
+        <table>
+            <thead>
+                <tr><th data-t="ch32-173">ابزار</th><th data-t="ch32-174">وظیفه آن</th></tr>
+            </thead>
+            <tbody>
+                <tr><td>ORM</td><td data-t="ch32-175">جدول به کلاس، سطر به شیء، ستون به صفت</td></tr>
+                <tr><td><code>create_engine(url)</code></td><td data-t="ch32-176">موتور، یکی برای کل برنامه</td></tr>
+                <tr><td><code>echo=True</code></td><td data-t="ch32-177">نمایش SQL تولیدشده، برای یادگیری و اشکال‌زدایی</td></tr>
+                <tr><td><code>DeclarativeBase</code></td><td data-t="ch32-178">کلاس پایه همه مدل‌ها</td></tr>
+                <tr><td><code>__tablename__</code></td><td data-t="ch32-179">نام جدول</td></tr>
+                <tr><td><code>mapped_column(...)</code></td><td data-t="ch32-180">تعریف یک ستون</td></tr>
+                <tr><td><code>ForeignKey('t.id')</code></td><td data-t="ch32-181">کلید خارجی</td></tr>
+                <tr><td><code>relationship(back_populates=...)</code></td><td data-t="ch32-182">رابطه دوطرفه بین دو مدل</td></tr>
+                <tr><td><code>Base.metadata.create_all(engine)</code></td><td data-t="ch32-183">ساخت همه جدول‌ها</td></tr>
+                <tr><td><code>sessionmaker(bind=engine)</code></td><td data-t="ch32-184">کارخانه نشست</td></tr>
+                <tr><td data-t="ch32-185"><code>session.add</code> و <code>add_all</code></td><td data-t="ch32-186">سپردن شیء به نشست</td></tr>
+                <tr><td><code>session.flush()</code></td><td data-t="ch32-187">گرفتن شناسه‌ها بدون بستن تراکنش</td></tr>
+                <tr><td><code>session.commit()</code></td><td data-t="ch32-188">نوشتن همه تغییرها</td></tr>
+                <tr><td><code>session.rollback()</code></td><td data-t="ch32-189">برگرداندن تراکنش شکست‌خورده</td></tr>
+                <tr><td><code>query(M).filter_by(...)</code></td><td data-t="ch32-190">پرس‌وجو با شرط</td></tr>
+                <tr><td data-t="ch32-191"><code>first()</code> و <code>all()</code> و <code>count()</code></td><td data-t="ch32-192">گرفتن نتیجه</td></tr>
+                <tr><td><code>session.delete(obj)</code></td><td data-t="ch32-193">حذف یک رکورد</td></tr>
+                <tr><td><code>cascade='all, delete-orphan'</code></td><td data-t="ch32-194">حذف آبشاری فرزندان</td></tr>
+                <tr><td><code>IntegrityError</code></td><td data-t="ch32-195">نقض محدودیت. باید گرفته شود</td></tr>
+            </tbody>
+        </table>
+    </div>
+
+    <div class="exercise">
+        <h3 data-t="ch32-196">تمرین‌های فصل سی و دو</h3>
+        <ol>
+            <li data-t="ch32-197">به ORM دست‌ساز یک مدل <code>Course</code> با ستون‌های <code>title</code> و <code>credit</code> و <code>teacher_id</code> اضافه کنید.</li>
+            <li data-t="ch32-198">متد <code>Student.enroll(course)</code> را بنویسید که یک سطر در جدول <code>enrollments</code> بسازد.</li>
+            <li data-t="ch32-199">متد کلاسی <code>Student.search(text)</code> را بنویسید که با <code>LIKE</code> و پارامتر <code>?</code> جست‌وجو کند.</li>
+            <li data-t="ch32-200">توضیح دهید وقتی مدل چهارم را اضافه می‌کنید، کلاس پایه <code>Model</code> دقیقاً چند متد را برایتان ذخیره کرده است.</li>
+            <li data-t="ch32-201">در بخش SQLAlchemy یک مدل <code>Department</code> بسازید و <code>Teacher</code> را با رابطه یک‌به‌چند به آن وصل کنید.</li>
+            <li data-t="ch32-202">پرس‌وجویی بنویسید که همه درس‌های یک استاد مشخص را برگرداند.</li>
+            <li data-t="ch32-203">پرس‌وجویی بنویسید که میانگین نمره هر درس را بدهد.</li>
+            <li data-t="ch32-204">روی موتور <code>echo=True</code> بگذارید و SQL تولیدشده برای تمرین هفتم را بخوانید و توضیح دهید.</li>
+            <li data-t="ch32-205">یک استاد را حذف کنید و بگویید بر سر درس‌هایش چه می‌آید و چرا.</li>
+            <li data-t="ch32-206">روی <code>Enrollment</code> یک محدودیت یکتا روی زوج <code>(student_id, course_id)</code> بگذارید و <code>IntegrityError</code> ثبت‌نام تکراری را بگیرید.</li>
+        </ol>
+    </div>
+
+    <div class="pager">
+        <a href="chapter-31.html">فصل قبل: sqlite3 در پایتون</a>
+        <a href="chapter-33.html">فصل بعد: الگوهای طراحی</a>
+    </div>
+
+</main>
+
+</body>
+</html>

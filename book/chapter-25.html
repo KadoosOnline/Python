@@ -1,0 +1,658 @@
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="فصل بیست و پنج: کد پایتونی، باز کردن مقادیر، enumerate و zip، درک لیستی، for-else، with، عملگر گردالی و درستی‌پذیری">
+    <title>فصل ۲۵: کد پایتونی، بخش اول</title>
+    <link rel="icon" href="logokm.png" type="image/png">
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<header class="book-bar">
+    <a class="name" href="index.html">برنامه‌نویسی پایتون</a>
+    <a href="index.html">فهرست مطالب</a>
+</header>
+
+<main class="paper">
+
+    <div class="chapter-head">
+        <span class="chapter-num">فصل ۲۵</span>
+        <h1 data-t="ch25-001">کد پایتونی، بخش اول</h1>
+        <p class="lead" data-t="ch25-002">
+            تا اینجا کد شما کار می‌کرد. از این فصل به بعد، کدتان
+            <strong>پایتونی</strong> می‌شود: کوتاه‌تر، خواناتر و شبیه چیزی که
+            یک برنامه‌نویس حرفه‌ای می‌نویسد، نه شبیه زبان دیگری که به پایتون
+            ترجمه شده باشد.
+        </p>
+    </div>
+
+    <div class="mini-toc">
+        <span class="box-title" data-t="ch25-003">در این فصل می‌خوانید</span>
+        <ol>
+            <li data-t="ch25-004"><a href="#s1">برگرداندن چند مقدار</a></li>
+            <li data-t="ch25-005"><a href="#s2">باز کردن پیشرفته</a></li>
+            <li data-t="ch25-006"><a href="#s3">ستاره در محل صدا زدن</a></li>
+            <li data-t="ch25-007"><a href="#s4">تابع enumerate</a></li>
+            <li data-t="ch25-008"><a href="#s5">تابع zip</a></li>
+            <li data-t="ch25-009"><a href="#s6">درک لیستی</a></li>
+            <li data-t="ch25-010"><a href="#s7">شرط در درک لیستی</a></li>
+            <li data-t="ch25-011"><a href="#s8">درک تودرتو</a></li>
+            <li data-t="ch25-012"><a href="#s9">درک دیکشنری و مجموعه</a></li>
+            <li data-t="ch25-013"><a href="#s10">for و else</a></li>
+            <li data-t="ch25-014"><a href="#s11">دستور with</a></li>
+            <li data-t="ch25-015"><a href="#s12">عملگر گردالی</a></li>
+            <li data-t="ch25-016"><a href="#s13">توابع any و all</a></li>
+            <li data-t="ch25-017"><a href="#s14">درستی‌پذیری</a></li>
+        </ol>
+    </div>
+
+    <h2 id="s1" data-t="ch25-018">۱. برگرداندن چند مقدار</h2>
+
+    <pre class="code"><code># A function returns one value - but that value can be a tuple,
+# which looks exactly like "returning several values".
+def min_max(numbers: list[int]) -&gt; tuple[int, int]:
+    return min(numbers), max(numbers)      # the parentheses are optional
+
+
+def statistics(numbers: list[int] | list[float]) -&gt; tuple[float, float, float]:
+    return sum(numbers), sum(numbers) / len(numbers), max(numbers)
+
+
+def main() -&gt; None:
+    my_list = [3, 77, -6, 14, 31]
+
+    low, high = min_max(my_list)
+    print(f'Min: {low}, Max: {high}')
+
+    total, average, biggest = statistics(my_list)
+
+    # '_' is the usual name for a value we do not care about.
+    _, average, _ = statistics(my_list)
+    print(average)</code></pre>
+    <p class="code-caption" data-t="ch25-019">چند خروجی: نمونه 01_multiple_return.py</p>
+
+    <p data-t="ch25-020">
+        زیرخط تنها، نامی است که همه برنامه‌نویس‌های پایتون برای «مقداری که
+        لازمش ندارم» به کار می‌برند. کاملاً یک متغیر عادی است ولی به خواننده
+        علامت می‌دهد که نادیده‌اش بگیرد.
+    </p>
+
+    <h2 id="s2" data-t="ch25-021">۲. باز کردن پیشرفته</h2>
+
+    <pre class="code"><code>def main() -&gt; None:
+    # Swapping without a temporary variable.
+    a, b = 1, 2
+    a, b = b, a
+    print(a, b)
+
+    # '*' collects the rest into a list.
+    first, *rest = [1, 2, 3, 4, 5]
+    print(first, rest)
+
+    *start, last = [1, 2, 3, 4, 5]
+    print(start, last)
+
+    first, *middle, last = [1, 2, 3, 4, 5]
+    print(first, middle, last)
+
+    # Nested unpacking.
+    name, (city, code) = ('Ali', ('Rasht', 41))
+    print(name, city, code)
+
+    # Very common on a list of pairs.
+    pairs = [('math', 20), ('physics', 18)]
+    for subject, score in pairs:
+        print(subject, score)
+
+    # Merging containers with * and **.
+    list1 = [1, 2]
+    list2 = [3, 4]
+    print([*list1, *list2])
+
+    dict1 = {'a': 1}
+    dict2 = {'b': 2}
+    print({**dict1, **dict2})</code></pre>
+    <p class="code-caption" data-t="ch25-022">باز کردن: نمونه 02_unpacking.py</p>
+
+    <pre class="out">2 1
+1 [2, 3, 4, 5]
+[1, 2, 3, 4] 5
+1 [2, 3, 4] 5
+Ali Rasht 41
+[1, 2, 3, 4]
+{'a': 1, 'b': 2}</pre>
+
+    <p data-t="ch25-023">
+        ستاره فقط یک بار در هر باز کردن مجاز است و «بقیه» را همیشه در یک
+        <strong>لیست</strong> جمع می‌کند، حتی اگر خالی باشد. ادغام دو لیست یا
+        دو دیکشنری با ستاره، تمیزترین راه موجود است.
+    </p>
+
+    <h2 id="s3" data-t="ch25-024">۳. ستاره در محل صدا زدن</h2>
+
+    <pre class="code"><code># In a DEFINITION, * and ** collect the arguments.
+def print_all(*args, **kwargs):
+    print('args:', args)
+    print('kwargs:', kwargs)
+
+
+def main() -&gt; None:
+    print_all(1, 2, 3, name='Ali', age=20)
+
+    # In a CALL, * and ** do the opposite: they spread a container.
+    data = [1, 2, 3]
+    info = {'name': 'Ali', 'age': 20}
+    print_all(*data, **info)          # exactly the same call as above
+
+    # A very frequent use: passing the items of a list to print().
+    words = ['Kadoos', 'Institute', 'Rasht']
+    print(*words)                     # Kadoos Institute Rasht
+    print(*words, sep=' - ')
+
+    # And to hand a configuration dictionary to a function.
+    def connect(host: str, port: int, timeout: float = 5.0):
+        print(f'connecting to {host}:{port} (timeout {timeout})')
+
+    settings = {'host': 'localhost', 'port': 5432}
+    connect(**settings)</code></pre>
+    <p class="code-caption" data-t="ch25-025">ستاره در صدا زدن: نمونه 03_star_args_at_call.py</p>
+
+    <div class="note">
+        <span class="box-title" data-t="ch25-026">یک علامت، دو معنی</span>
+        <p data-t="ch25-027">
+            ستاره در <strong>تعریف</strong> تابع، آرگومان‌ها را
+            <strong>جمع</strong> می‌کند. ستاره در <strong>صدا زدن</strong>
+            تابع، یک ظرف را <strong>باز</strong> می‌کند. دقیقاً برعکس هم.
+            یادآوری‌اش ساده است: ستاره همیشه بین «چند چیز جدا» و «یک ظرف»
+            تبدیل انجام می‌دهد.
+        </p>
+    </div>
+
+    <h2 id="s4" data-t="ch25-028">۴. تابع enumerate</h2>
+
+    <pre class="code"><code>names = ['Ali', 'Sara', 'Reza']
+
+
+# The C way - it works, but it is not Python.
+for i in range(len(names)):
+    print(i, names[i])
+
+print('---')
+
+# enumerate() gives the index AND the item.
+for index, name in enumerate(names):
+    print(index, name)
+
+print('---')
+
+# 'start' changes the first index - perfect for a numbered menu.
+for number, name in enumerate(names, start=1):
+    print(f'{number}) {name}')
+
+print('---')
+
+# enumerate() works on anything we can loop over.
+for index, letter in enumerate('Kadoos'):
+    print(index, letter)</code></pre>
+    <p class="code-caption" data-t="ch25-029">تابع enumerate: نمونه 04_enumerate.py</p>
+
+    <div class="tip">
+        <span class="box-title" data-t="ch25-030">قانون ساده</span>
+        <p data-t="ch25-031">
+            هر بار که دیدید <code>for i in range(len(x))</code> نوشته‌اید،
+            بدانید که <code>enumerate</code> راه درست است. این
+            پرتکرارترین نشانه‌ای است که کد از زبان دیگری ترجمه شده است.
+            پارامتر <code>start=1</code> هم برای منوها که از یک شماره‌گذاری
+            می‌شوند عالی است.
+        </p>
+    </div>
+
+    <h2 id="s5" data-t="ch25-032">۵. تابع zip</h2>
+
+    <pre class="code"><code>subjects = ['math', 'physics', 'english']
+scores = [20, 18, 19]
+teachers = ['Ahmadi', 'Rezaei', 'Karimi']
+
+# zip() walks several sequences at the same time.
+for subject, score in zip(subjects, scores):
+    print(f'{subject}: {score}')
+
+# It accepts more than two.
+for subject, score, teacher in zip(subjects, scores, teachers):
+    print(f'{subject:&lt;10}{score:&gt;3}  ({teacher})')
+
+# zip() stops at the SHORTEST sequence.
+print(list(zip([1, 2, 3], 'ab')))
+
+# strict=True (Python 3.10+) raises an error when the lengths differ,
+# which catches a bug instead of hiding it.
+try:
+    print(list(zip([1, 2, 3], 'ab', strict=True)))
+except ValueError as e:
+    print('strict zip:', e)
+
+# Building a dictionary out of two lists.
+print(dict(zip(subjects, scores)))
+
+# zip(*matrix) transposes a matrix - a classic trick.
+matrix = [[1, 2, 3], [4, 5, 6]]
+print([list(row) for row in zip(*matrix)])</code></pre>
+    <p class="code-caption" data-t="ch25-033">تابع zip: نمونه 05_zip.py</p>
+
+    <p data-t="ch25-034">پارامتر <code>strict=True</code> از پایتون ۳٫۱۰ اضافه شده و ارزش دانستن دارد: به جای اینکه بی‌سروصدا اعضای اضافی را دور بیندازد، خطا ایجاد می‌کند. اگر دو لیست شما <strong>باید</strong> هم‌طول باشند، همیشه بنویسیدش.</p>
+
+    <p data-t="ch25-035">
+        ترفند <code>zip(*matrix)</code> ماتریس را ترانهاده می‌کند: ستاره سطرها
+        را باز می‌کند و <code>zip</code> ستون به ستون جفتشان می‌کند.
+    </p>
+
+    <h2 id="s6" data-t="ch25-036">۶. درک لیستی</h2>
+
+    <p data-t="ch25-037">
+        <strong>درک لیستی</strong> شاید معروف‌ترین ویژگی پایتون باشد: ساختن یک
+        لیست در یک عبارت.
+    </p>
+
+    <pre class="code"><code># A comprehension builds a list in one expression.
+#   [ WHAT      for ITEM in SEQUENCE ]
+
+# The long way:
+squares = []
+for x in range(10):
+    squares.append(x ** 2)
+print(squares)
+
+# The Pythonic way:
+squares = [x ** 2 for x in range(10)]
+print(squares)
+
+# It works on anything we can loop over.
+names = ['ali', 'sara', 'reza']
+print([name.capitalize() for name in names])
+print([len(name) for name in names])
+
+# Turning the lines of a file into numbers (see session 18).
+lines = ['22\n', '-7\n', '13\n']
+print([int(line.strip()) for line in lines])</code></pre>
+    <p class="code-caption" data-t="ch25-038">درک لیستی: نمونه 06_list_comprehension.py</p>
+
+    <h3 data-t="ch25-039">چطور بخوانیمش</h3>
+
+    <p data-t="ch25-040">
+        قالبش این است: <code>[چه چیزی for هر عضو in دنباله]</code>. از وسط شروع
+        کنید: «برای هر <code>x</code> در بازه ده‌تایی»، بعد به اول برگردید:
+        «مربعش را بگذار».
+    </p>
+
+    <div class="warn">
+        <span class="box-title" data-t="ch25-041">کجا به وظیفه آن نبرید</span>
+        <p data-t="ch25-042">
+            درک لیستی برای <strong>ساختن</strong> لیست است. اگر فقط می‌خواهید
+            کاری انجام دهید (مثلاً چاپ کنید) و نتیجه‌ای نمی‌خواهید، حلقه عادی
+            بنویسید. نوشتن <code>[print(x) for x in items]</code> یک لیست
+            بی‌فایده از <code>None</code> ها می‌سازد و بد است. همچنین اگر درک
+            لیستی‌تان از یک خط بلندتر شد یا سه شرط داشت، حلقه عادی خواناتر است.
+        </p>
+    </div>
+
+    <h2 id="s7" data-t="ch25-043">۷. شرط در درک لیستی</h2>
+
+    <pre class="code"><code># A condition at the END filters: it decides WHICH items are kept.
+squares_of_even = [x ** 2 for x in range(10) if x % 2 == 0]
+print(squares_of_even)
+
+names = ['Ali', 'Sara', 'Reza', 'Arad']
+print([name for name in names if name.startswith('A')])
+
+# A ternary at the BEGINNING transforms: it decides WHAT is stored.
+print(['even' if x % 2 == 0 else 'odd' for x in range(6)])
+
+# Both at the same time.
+print([x * 2 if x &gt; 0 else 0 for x in [-3, 1, -5, 7] if x != 1])
+
+# Remember the two positions:
+#   [ &lt;expression, may use a ternary&gt;  for x in seq  if &lt;filter&gt; ]
+
+# A realistic example: the passing students of a list of dictionaries.
+students = [
+    {'name': 'Ali', 'score': 18},
+    {'name': 'Sara', 'score': 8},
+    {'name': 'Reza', 'score': 12},
+]
+print([s['name'] for s in students if s['score'] &gt;= 10])</code></pre>
+    <p class="code-caption" data-t="ch25-044">شرط: نمونه 07_comprehension_conditions.py</p>
+
+    <div class="table-scroll">
+        <table>
+            <thead>
+                <tr><th data-t="ch25-045">جای شرط</th><th data-t="ch25-046">وظیفه آن</th><th data-t="ch25-047">شکل</th></tr>
+            </thead>
+            <tbody>
+                <tr><td data-t="ch25-048">آخر</td><td data-t="ch25-049">فیلتر: کدام اعضا بمانند</td><td><code>[x for x in s if cond]</code></td></tr>
+                <tr><td data-t="ch25-050">اول</td><td data-t="ch25-051">تبدیل: چه چیزی ذخیره شود</td><td><code>[a if cond else b for x in s]</code></td></tr>
+            </tbody>
+        </table>
+    </div>
+
+    <p data-t="ch25-052">
+        تفاوت مهم: شرط آخر <code>else</code> ندارد، چون فقط فیلتر می‌کند. شرط
+        اول <strong>حتماً</strong> باید <code>else</code> داشته باشد، چون عملگر
+        شرطی است و باید همیشه مقداری تولید کند.
+    </p>
+
+    <h2 id="s8" data-t="ch25-053">۸. درک تودرتو</h2>
+
+    <pre class="code"><code>VALUE = 1
+LENGTH = 4
+
+# A 2-D list: the inner comprehension builds one row,
+# the outer one repeats it.
+two_d = [[VALUE for _ in range(LENGTH)] for _ in range(LENGTH)]
+print(two_d)
+
+# NEVER write [[0] * 4] * 4 : every row would be the SAME list.
+wrong = [[0] * 4] * 4
+wrong[0][0] = 9
+print(wrong)          # every row changed!
+
+right = [[0] * 4 for _ in range(4)]
+right[0][0] = 9
+print(right)          # only the first row changed
+
+# A multiplication table.
+table = [[i * j for j in range(1, 5)] for i in range(1, 5)]
+
+# Flattening a 2-D list: the two 'for' are read from left to right,
+# exactly like nested loops.
+matrix = [[1, 2, 3], [4, 5, 6]]
+flat = [value for row in matrix for value in row]
+print(flat)</code></pre>
+    <p class="code-caption" data-t="ch25-054">درک تودرتو: نمونه 08_nested_comprehension.py</p>
+
+    <div class="warn">
+        <span class="box-title" data-t="ch25-055">دام ساختن ماتریس با ضرب</span>
+        <p data-t="ch25-056">
+            <code>[[0] * 4] * 4</code> چهار <strong>ارجاع به یک لیست</strong>
+            می‌سازد، نه چهار لیست. تغییر یک خانه، همه سطرها را عوض می‌کند. این
+            همان دام «ارجاع در برابر کپی» فصل نهم است. راه درست همیشه
+            <code>[[0] * 4 for _ in range(4)]</code> است.
+        </p>
+    </div>
+
+    <p data-t="ch25-057">
+        برای صاف کردن ماتریس، دو <code>for</code> پشت سر هم می‌آیند و از
+        <strong>چپ به راست</strong> خوانده می‌شوند، دقیقاً به همان ترتیبی که
+        اگر حلقه تودرتو می‌نوشتید.
+    </p>
+
+    <h2 id="s9" data-t="ch25-058">۹. درک دیکشنری و مجموعه</h2>
+
+    <pre class="code"><code>names = ['Ali', 'Sara', 'Reza']
+scores = [18, 20, 12]
+
+# Dictionary comprehension: { KEY: VALUE for ... }
+print({name: len(name) for name in names})
+print({name: score for name, score in zip(names, scores)})
+print({name: score for name, score in zip(names, scores) if score &gt;= 15})
+
+# Reversing a dictionary.
+original = {'a': 1, 'b': 2}
+print({value: key for key, value in original.items()})
+
+# Set comprehension: { VALUE for ... } - duplicates disappear.
+sentence = 'kadoos institute rasht'
+print({letter for letter in sentence if letter != ' '})
+
+# A generator expression uses ( ) and computes the values one by one,
+# without building the whole list in memory (see session 26).
+total = sum(x ** 2 for x in range(1_000_000))
+print(total)</code></pre>
+    <p class="code-caption" data-t="ch25-059">درک دیکشنری و مجموعه: نمونه 09_dict_set_comprehension.py</p>
+
+    <p data-t="ch25-060">
+        همان نحو با پرانتزهای متفاوت: کروشه لیست می‌سازد، آکولاد با دونقطه
+        دیکشنری، آکولاد بدون دونقطه مجموعه، و پرانتز یک
+        <strong>مولد</strong> که موضوع فصل بعد است. مولد چیزی در حافظه نمی‌سازد
+        و مقدارها را یکی‌یکی تولید می‌کند؛ برای یک میلیون عدد، تفاوتش با لیست،
+        تفاوت چند مگابایت حافظه است.
+    </p>
+
+    <h2 id="s10" data-t="ch25-061">۱۰. for و else</h2>
+
+    <pre class="code"><code># The 'else' of a loop runs only when the loop was NOT stopped by a break.
+def main() -&gt; None:
+    for num in range(2, 30):
+        for x in range(2, num):
+            if num % x == 0:
+                print(f'{num} = {x} * {num // x}')
+                break
+        else:
+            print(f'{num} is prime!')
+
+    # The same idea on a search.
+    names = ['Ali', 'Sara', 'Reza']
+    target = 'Omid'
+
+    for name in names:
+        if name == target:
+            print('found!')
+            break
+    else:
+        print(f'{target} is not in the list')</code></pre>
+    <p class="code-caption" data-t="ch25-062">for و else: نمونه 10_for_else.py</p>
+
+    <p data-t="ch25-063">
+        این را در فصل هشتم دیدیم. الگویش همیشه یکی است: «جست‌وجو کن؛ اگر
+        چیزی پیدا نشد، این کار را بکن». جایگزینش، یک متغیر پرچم است که کد را
+        شلوغ‌تر می‌کند.
+    </p>
+
+    <h2 id="s11" data-t="ch25-064">۱۱. دستور with</h2>
+
+    <pre class="code"><code># Before 'with', closing a file safely needed a try/finally.
+def the_old_way() -&gt; str:
+    f1 = open('data.txt', 'r', encoding='utf-8')
+    try:
+        return f1.read()
+    finally:
+        f1.close()          # runs even when read() raises
+
+
+# 'with' does exactly the same thing, in one line.
+def the_pythonic_way() -&gt; str:
+    with open('data.txt', 'r', encoding='utf-8') as f2:
+        return f2.read()
+    # the file is already closed here
+
+
+def main() -&gt; None:
+    # Several context managers in one 'with'.
+    with open('data.txt', encoding='utf-8') as source, \
+         open('copy.txt', 'w', encoding='utf-8') as target:
+        target.write(source.read())
+
+    print('copied')</code></pre>
+    <p class="code-caption" data-t="ch25-065">دستور with: نمونه 11_with_statement.py</p>
+
+    <p data-t="ch25-066">
+        حالا که فصل بیست و چهارم را خوانده‌اید، می‌دانید <code>with</code>
+        چطور کار می‌کند: با <code>__enter__</code> و <code>__exit__</code>.
+        دو مدیر زمینه را می‌شود در یک <code>with</code> با ویرگول نوشت.
+        بک‌اسلش انتهای خط فقط برای ادامه دادن دستور در خط بعد است.
+    </p>
+
+    <h2 id="s12" data-t="ch25-067">۱۲. عملگر گردالی</h2>
+
+    <pre class="code"><code># The walrus operator ':=' assigns AND returns the value at the same time.
+
+# Without it:
+numbers = [1, 2, 3, 4, 5]
+total = sum(numbers)
+if total &gt; 10:
+    print(f'the total {total} is big')
+
+# With it:
+if (total := sum(numbers)) &gt; 10:
+    print(f'the total {total} is big')
+
+# Its best use: a read-until loop written without 'while True'.
+while (answer := input('Say something (or "exit"): ')) != 'exit':
+    print('You said:', answer)
+
+# And inside a comprehension, to avoid computing the same thing twice.
+words = ['python', 'is', 'wonderful']
+print([length for word in words if (length := len(word)) &gt; 3])</code></pre>
+    <p class="code-caption" data-t="ch25-068">عملگر گردالی: نمونه 12_walrus.py</p>
+
+    <p data-t="ch25-069">نامش از شباهت <code>:=</code> به چشم و عاج شیر دریایی می‌آید. وظیفه آن این است که همزمان مقدار بدهد و همان مقدار را برگرداند. بهترین کاربردش، همان حلقه خواندن ورودی است که در فصل هشتم مجبور بودیم با <code>while True</code> و <code>break</code> بنویسیم.</p>
+
+    <div class="warn">
+        <span class="box-title" data-t="ch25-070">زیاده‌روی نکنید</span>
+        <p data-t="ch25-071">
+            گردالی وقتی خوب است که یک تکرار را حذف کند. اگر خط را شلوغ و
+            سخت‌خوان کرد، همان انتساب عادی در خط جدا بهتر است. پرانتز دورش هم
+            تقریباً همیشه لازم است.
+        </p>
+    </div>
+
+    <h2 id="s13" data-t="ch25-072">۱۳. توابع any و all</h2>
+
+    <pre class="code"><code>scores = [18, 12, 9, 20]
+
+# any() -&gt; True when AT LEAST ONE item is true
+# all() -&gt; True when EVERY item is true
+print(any(score &lt; 10 for score in scores))     # True: somebody failed
+print(all(score &gt;= 10 for score in scores))    # False
+
+# The long version needed a loop and a flag:
+has_failure = False
+for score in scores:
+    if score &lt; 10:
+        has_failure = True
+        break
+print(has_failure)
+
+# sum() with a condition counts.
+print(sum(1 for score in scores if score &gt;= 10))   # how many passed
+print(sum(score for score in scores if score &gt;= 10))
+
+# min/max with a key.
+students = [{'name': 'Ali', 'score': 18}, {'name': 'Sara', 'score': 20}]
+print(max(students, key=lambda s: s['score'])['name'])
+
+# any()/all() stop as soon as the answer is known - they do not read the rest.
+print(any(x &gt; 2 for x in range(1_000_000)))</code></pre>
+    <p class="code-caption" data-t="ch25-073">any و all: نمونه 13_any_all.py</p>
+
+    <p data-t="ch25-074">
+        شش خط حلقه و پرچم، تبدیل می‌شود به یک خط خوانا. و
+        <code>sum(1 for ... if ...)</code> اصطلاح استاندارد شمردن اعضایی است
+        که شرطی دارند. هر دو تابع <strong>تنبل</strong> هستند: به محض معلوم
+        شدن جواب متوقف می‌شوند و بقیه دنباله را نمی‌خوانند.
+    </p>
+
+    <h2 id="s14" data-t="ch25-075">۱۴. درستی‌پذیری</h2>
+
+    <pre class="code"><code># In a condition, Python treats these values as False:
+#   False, None, 0, 0.0, '', [], (), {}, set(), range(0)
+# Everything else is True.
+
+for value in [0, 1, '', 'a', [], [0], {}, {'a': 1}, None, set()]:
+    print(repr(value), '-&gt;', bool(value))
+
+names: list[str] = []
+
+# Not Pythonic:
+if len(names) == 0:
+    print('empty (long version)')
+
+# Pythonic:
+if not names:
+    print('empty (short version)')
+
+names.append('Ali')
+if names:
+    print('there is at least one name')</code></pre>
+    <p class="code-caption" data-t="ch25-076">درستی‌پذیری: نمونه 14_truthiness.py</p>
+
+    <div class="table-scroll">
+        <table>
+            <thead>
+                <tr><th data-t="ch25-077">مقدارهایی که نادرست حساب می‌شوند</th></tr>
+            </thead>
+            <tbody>
+                <tr><td><code>False</code> <code>None</code> <code>0</code> <code>0.0</code> <code>''</code> <code>[]</code> <code>()</code> <code>{}</code> <code>set()</code></td></tr>
+            </tbody>
+        </table>
+    </div>
+
+    <div class="warn">
+        <span class="box-title" data-t="ch25-078">یک تفاوت مهم</span>
+        <p data-t="ch25-079">
+            <code>if x:</code> و <code>if x is not None:</code> یکی
+            <strong>نیستند</strong>. اگر <code>x</code> برابر صفر یا رشته خالی
+            باشد، اولی نادرست است ولی دومی درست. وقتی می‌خواهید بین «مقدار
+            نداده» و «مقدار صفر داده» تفاوت بگذارید، حتماً
+            <code>is not None</code> بنویسید. این دقیقاً همان جایی است که
+            پیش‌فرض <code>None</code> در فصل سیزدهم به کار می‌آمد.
+        </p>
+    </div>
+
+    <div class="folder-ref">
+        <span class="box-title" data-t="ch25-080">فایل‌های تمرینی این فصل</span>
+        <p data-t="ch25-081">
+            پوشه <code>S25-pythonic-code-1</code> شامل نمونه‌های
+            <code>01_multiple_return.py</code> تا
+            <code>14_truthiness.py</code>.
+        </p>
+    </div>
+
+    <h2 data-t="ch25-082">خلاصه فصل</h2>
+
+    <div class="table-scroll">
+        <table>
+            <thead>
+                <tr><th data-t="ch25-083">به جای این</th><th data-t="ch25-084">این را بنویسید</th></tr>
+            </thead>
+            <tbody>
+                <tr><td><code>for i in range(len(x))</code></td><td><code>for i, item in enumerate(x)</code></td></tr>
+                <tr><td data-t="ch25-085">حلقه روی اندیس دو لیست</td><td><code>zip(a, b)</code></td></tr>
+                <tr><td data-t="ch25-086">حلقه با <code>append</code></td><td data-t="ch25-087">درک لیستی</td></tr>
+                <tr><td data-t="ch25-088">حلقه با پرچم بولی</td><td data-t="ch25-089"><code>any()</code> یا <code>all()</code></td></tr>
+                <tr><td data-t="ch25-090">حلقه شمارنده با شرط</td><td><code>sum(1 for ... if ...)</code></td></tr>
+                <tr><td><code>if len(x) == 0:</code></td><td><code>if not x:</code></td></tr>
+                <tr><td data-t="ch25-091"><code>try / finally</code> برای بستن</td><td><code>with</code></td></tr>
+                <tr><td data-t="ch25-092"><code>while True</code> با <code>break</code></td><td data-t="ch25-093">گاهی عملگر گردالی</td></tr>
+                <tr><td data-t="ch25-094">متغیر موقت برای جابه‌جایی</td><td><code>a, b = b, a</code></td></tr>
+                <tr><td><code>[[0] * 4] * 4</code></td><td><code>[[0] * 4 for _ in range(4)]</code></td></tr>
+            </tbody>
+        </table>
+    </div>
+
+    <div class="exercise">
+        <h3 data-t="ch25-095">تمرین‌های فصل بیست و پنج</h3>
+        <ol>
+            <li data-t="ch25-096">حلقه‌ای که مکعب اعداد ۱ تا ۲۰ را می‌سازد، با درک لیستی بازنویسی کنید.</li>
+            <li data-t="ch25-097">لیست کلمه‌های بلندتر از چهار حرف یک جمله را بسازید.</li>
+            <li data-t="ch25-098">دیکشنری <code>{کلمه: طولش}</code> را برای همه کلمات یک جمله بسازید.</li>
+            <li data-t="ch25-099">مجموعه حروف اول متمایز یک لیست از نام‌ها را بسازید.</li>
+            <li data-t="ch25-100">یکی از حلقه‌های <code>range(len(...))</code> فصل‌های قبل را با <code>enumerate()</code> بازنویسی کنید.</li>
+            <li data-t="ch25-101">با <code>enumerate</code> و <code>zip</code> یک جدول شماره‌دار از نام‌ها و نمره‌ها چاپ کنید.</li>
+            <li data-t="ch25-102">با <code>for/else</code> جست‌وجویی بنویسید که اگر چیزی پیدا نشد بگوید «پیدا نشد».</li>
+            <li data-t="ch25-103">با <code>any()</code> و <code>all()</code> جواب دهید: «کسی مردود شده؟» و «همه قبول شده‌اند؟»</li>
+            <li data-t="ch25-104">یک حلقه <code>while True</code> با <code>break</code> را با عملگر گردالی بازنویسی کنید.</li>
+            <li data-t="ch25-105">جدول ضرب پنج در پنج را با درک تودرتو بسازید.</li>
+        </ol>
+    </div>
+
+    <div class="pager">
+        <a href="chapter-24.html">فصل قبل: متدهای جادویی</a>
+        <a href="chapter-26.html">فصل بعد: کد پایتونی، بخش دوم</a>
+    </div>
+
+</main>
+
+</body>
+</html>

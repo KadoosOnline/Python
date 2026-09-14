@@ -1,0 +1,342 @@
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="فصل بیست و نه: جلسه ارزشیابی میان‌ترم، مرور فصل ۲۱ تا ۲۸، چک‌لیست آمادگی و یک نمونه آزمون کامل">
+    <title>فصل ۲۹: ارزشیابی میان‌ترم</title>
+    <link rel="icon" href="logokm.png" type="image/png">
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<header class="book-bar">
+    <a class="name" href="index.html">برنامه‌نویسی پایتون</a>
+    <a href="index.html">فهرست مطالب</a>
+</header>
+
+<main class="paper">
+
+    <div class="chapter-head">
+        <span class="chapter-num">فصل ۲۹</span>
+        <h1 data-t="ch29-001">ارزشیابی میان‌ترم</h1>
+        <p class="lead" data-t="ch29-002">
+            این جلسه، جلسه آزمون است و <strong>مطلب تازه‌ای ندارد</strong>. این
+            فصل فقط برای مرور نوشته شده است: خلاصه فصل ۲۱ تا ۲۸، یک چک‌لیست
+            آمادگی، و یک نمونه آزمون کامل که می‌توانید خودتان را با آن بسنجید.
+        </p>
+    </div>
+
+    <div class="mini-toc">
+        <span class="box-title" data-t="ch29-003">در این فصل می‌خوانید</span>
+        <ol>
+            <li data-t="ch29-004"><a href="#s1">چه چیزهایی ارزشیابی می‌شود</a></li>
+            <li data-t="ch29-005"><a href="#s2">مرور شیءگرایی</a></li>
+            <li data-t="ch29-006"><a href="#s3">مرور کد پایتونی</a></li>
+            <li data-t="ch29-007"><a href="#s4">مرور داده و اینترنت</a></li>
+            <li data-t="ch29-008"><a href="#s5">چک‌لیست آمادگی</a></li>
+            <li data-t="ch29-009"><a href="#s6">اشتباه‌های پرتکرار</a></li>
+            <li data-t="ch29-010"><a href="#s7">نمونه آزمون تشریحی</a></li>
+            <li data-t="ch29-011"><a href="#s8">نمونه آزمون عملی</a></li>
+            <li data-t="ch29-012"><a href="#s9">پاسخ کوتاه سؤال‌های مفهومی</a></li>
+        </ol>
+    </div>
+
+    <h2 id="s1" data-t="ch29-013">۱. چه چیزهایی ارزشیابی می‌شود</h2>
+
+    <div class="table-scroll">
+        <table>
+            <thead>
+                <tr><th data-t="ch29-014">فصل</th><th data-t="ch29-015">موضوع</th><th data-t="ch29-016">وزن تقریبی</th></tr>
+            </thead>
+            <tbody>
+                <tr><td data-t="ch29-017">۲۱</td><td data-t="ch29-018">کلاس، شیء، سازنده، self</td><td data-t="ch29-019">زیاد</td></tr>
+                <tr><td data-t="ch29-020">۲۲</td><td data-t="ch29-021">کپسوله‌سازی، property، dataclass</td><td data-t="ch29-022">زیاد</td></tr>
+                <tr><td data-t="ch29-023">۲۳</td><td data-t="ch29-024">وراثت، چندریختی، کلاس انتزاعی</td><td data-t="ch29-025">زیاد</td></tr>
+                <tr><td data-t="ch29-026">۲۴</td><td data-t="ch29-027">متدهای جادویی، استثنای سفارشی</td><td data-t="ch29-028">متوسط</td></tr>
+                <tr><td data-t="ch29-029">۲۵</td><td data-t="ch29-030">درک لیستی، enumerate، zip، unpacking</td><td data-t="ch29-031">زیاد</td></tr>
+                <tr><td data-t="ch29-032">۲۶</td><td data-t="ch29-033">lambda، دکوراتور، مولد</td><td data-t="ch29-034">متوسط</td></tr>
+                <tr><td data-t="ch29-035">۲۷</td><td data-t="ch29-036">CSV و JSON</td><td data-t="ch29-037">متوسط</td></tr>
+                <tr><td data-t="ch29-038">۲۸</td><td data-t="ch29-039">pip، requests، XML</td><td data-t="ch29-040">کم</td></tr>
+            </tbody>
+        </table>
+    </div>
+
+    <h2 id="s2" data-t="ch29-041">۲. مرور شیءگرایی</h2>
+
+    <p data-t="ch29-042">چهار ستون شیءگرایی و اینکه هر کدام در کدام فصل بودند:</p>
+
+    <div class="table-scroll">
+        <table>
+            <thead>
+                <tr><th data-t="ch29-043">ستون</th><th data-t="ch29-044">یعنی</th><th data-t="ch29-045">ابزار پایتون</th></tr>
+            </thead>
+            <tbody>
+                <tr><td data-t="ch29-046">انتزاع</td><td data-t="ch29-047">نمایش سادگی، پنهان کردن پیچیدگی</td><td data-t="ch29-048">کلاس، متد، <code>ABC</code></td></tr>
+                <tr><td data-t="ch29-049">کپسوله‌سازی</td><td data-t="ch29-050">محافظت از داده</td><td data-t="ch29-051"><code>_x</code>، <code>@property</code></td></tr>
+                <tr><td data-t="ch29-052">وراثت</td><td data-t="ch29-053">استفاده دوباره از یک کلاس</td><td data-t="ch29-054"><code>class B(A)</code>، <code>super()</code></td></tr>
+                <tr><td data-t="ch29-055">چندریختی</td><td data-t="ch29-056">یک پیام، رفتارهای متفاوت</td><td data-t="ch29-057">بازنویسی متد، تایپ اردکی</td></tr>
+            </tbody>
+        </table>
+    </div>
+
+    <p data-t="ch29-058">و پرسش‌هایی که باید بتوانید فوری جوابشان را بدهید:</p>
+
+    <ul>
+        <li data-t="ch29-059"><code>self</code> چیست و چرا در تعریف نوشته می‌شود ولی موقع صدا زدن نه.</li>
+        <li data-t="ch29-060">فرق صفت کلاس و صفت نمونه، و چرا لیست در بدنه کلاس خطرناک است.</li>
+        <li data-t="ch29-061">فرق <code>@staticmethod</code>، <code>@classmethod</code> و متد عادی.</li>
+        <li data-t="ch29-062">فرق «است» و «دارد»، یعنی وراثت در برابر ترکیب.</li>
+        <li data-t="ch29-063">فرق <code>__str__</code> و <code>__repr__</code>.</li>
+        <li data-t="ch29-064">چرا بعد از تعریف <code>__eq__</code> باید <code>__hash__</code> هم بنویسید.</li>
+        <li data-t="ch29-065">چرا کلاس انتزاعی به درد می‌خورد و چه چیزی را ممکن نمی‌کند.</li>
+    </ul>
+
+    <h2 id="s3" data-t="ch29-066">۳. مرور کد پایتونی</h2>
+
+    <div class="table-scroll">
+        <table>
+            <thead>
+                <tr><th data-t="ch29-067">به جای این</th><th data-t="ch29-068">این را بنویسید</th><th data-t="ch29-069">فصل</th></tr>
+            </thead>
+            <tbody>
+                <tr><td><code>for i in range(len(x))</code></td><td><code>enumerate(x)</code></td><td data-t="ch29-070">۲۵</td></tr>
+                <tr><td data-t="ch29-071">حلقه روی اندیس دو لیست</td><td><code>zip(a, b)</code></td><td data-t="ch29-072">۲۵</td></tr>
+                <tr><td data-t="ch29-073">حلقه با <code>append</code></td><td data-t="ch29-074">درک لیستی</td><td data-t="ch29-075">۲۵</td></tr>
+                <tr><td><code>if len(x) == 0:</code></td><td><code>if not x:</code></td><td data-t="ch29-076">۲۵</td></tr>
+                <tr><td data-t="ch29-077">حلقه با پرچم بولی</td><td data-t="ch29-078"><code>any()</code> یا <code>all()</code></td><td data-t="ch29-079">۲۵</td></tr>
+                <tr><td data-t="ch29-080">کپی و تکرار کد قبل و بعد تابع</td><td data-t="ch29-081">دکوراتور</td><td data-t="ch29-082">۲۶</td></tr>
+                <tr><td data-t="ch29-083">ساختن لیست بزرگ در حافظه</td><td data-t="ch29-084">مولد با <code>yield</code></td><td data-t="ch29-085">۲۶</td></tr>
+                <tr><td data-t="ch29-086">محاسبه تکراری در بازگشت</td><td><code>@lru_cache</code></td><td data-t="ch29-087">۲۶</td></tr>
+            </tbody>
+        </table>
+    </div>
+
+    <h2 id="s4" data-t="ch29-088">۴. مرور داده و اینترنت</h2>
+
+    <ul>
+        <li data-t="ch29-089">هنگام باز کردن CSV، <code>newline=''</code> اجباری است.</li>
+        <li data-t="ch29-090">هر چیزی که از CSV می‌خوانید <strong>متن</strong> است.</li>
+        <li data-t="ch29-091"><code>DictReader</code> بهتر از <code>reader</code> است، چون به نام ستون تکیه می‌کند نه به جایگاهش.</li>
+        <li data-t="ch29-092">در JSON، حرف <code>s</code> یعنی رشته: <code>load</code> فایل، <code>loads</code> رشته.</li>
+        <li data-t="ch29-093">برای فارسی، <code>ensure_ascii=False</code>. برای خوانایی، <code>indent=2</code>.</li>
+        <li data-t="ch29-094">هر درخواست وب باید <code>timeout</code> داشته باشد.</li>
+        <li data-t="ch29-095"><code>find</code> در XML ممکن است <code>None</code> بدهد؛ همیشه با <code>is not None</code> بررسی کنید.</li>
+    </ul>
+
+    <h2 id="s5" data-t="ch29-096">۵. چک‌لیست آمادگی</h2>
+
+    <div class="try">
+        <span class="box-title" data-t="ch29-097">اگر بتوانید این موارد را بدون نگاه کردن به کتاب بنویسید، آماده‌اید</span>
+        <ol>
+            <li data-t="ch29-098">یک کلاس با سازنده، دو صفت و یک متد.</li>
+            <li data-t="ch29-099">همان کلاس با <code>@property</code> که مقدار نامعتبر را رد کند.</li>
+            <li data-t="ch29-100">همان کلاس به شکل <code>@dataclass</code>.</li>
+            <li data-t="ch29-101">یک کلاس والد و دو فرزند که یک متد را بازنویسی می‌کنند، و حلقه‌ای که روی هر دو کار کند.</li>
+            <li data-t="ch29-102">یک کلاس انتزاعی با یک متد انتزاعی.</li>
+            <li data-t="ch29-103"><code>__str__</code> و <code>__eq__</code> و <code>__len__</code> برای یک کلاس دلخواه.</li>
+            <li data-t="ch29-104">یک استثنای سفارشی و صدا زدنش با <code>try</code>.</li>
+            <li data-t="ch29-105">درک لیستی با فیلتر و با عملگر شرطی.</li>
+            <li data-t="ch29-106">درک دیکشنری از روی دو لیست.</li>
+            <li data-t="ch29-107">یک دکوراتور ساده با <code>@wraps</code>.</li>
+            <li data-t="ch29-108">یک مولد با <code>yield</code>.</li>
+            <li data-t="ch29-109">خواندن CSV و تبدیلش به لیستی از دیکشنری.</li>
+            <li data-t="ch29-110">نوشتن یک دیکشنری در فایل JSON با پشتیبانی فارسی.</li>
+        </ol>
+    </div>
+
+    <h2 id="s6" data-t="ch29-111">۶. اشتباه‌های پرتکرار</h2>
+
+    <div class="table-scroll">
+        <table>
+            <thead>
+                <tr><th data-t="ch29-112">اشتباه</th><th data-t="ch29-113">نتیجه</th><th data-t="ch29-114">درست</th></tr>
+            </thead>
+            <tbody>
+                <tr><td data-t="ch29-115">فراموش کردن <code>self.</code> داخل متد</td><td data-t="ch29-116">متغیر محلی به جای صفت</td><td><code>self.x = ...</code></td></tr>
+                <tr><td data-t="ch29-117">لیست در بدنه کلاس</td><td data-t="ch29-118">مشترک بین همه اشیاء</td><td data-t="ch29-119">داخل <code>__init__</code></td></tr>
+                <tr><td data-t="ch29-120">فراموش کردن <code>super().__init__()</code></td><td data-t="ch29-121">صفت‌های والد ساخته نمی‌شوند</td><td data-t="ch29-122">اول سازنده فرزند</td></tr>
+                <tr><td data-t="ch29-123"><code>__add__</code> که چاپ می‌کند</td><td data-t="ch29-124">نتیجه <code>None</code> می‌شود</td><td data-t="ch29-125"><code>return</code> شیء تازه</td></tr>
+                <tr><td data-t="ch29-126">دکوراتوری که نتیجه را برنمی‌گرداند</td><td data-t="ch29-127">تابع همیشه <code>None</code> می‌دهد</td><td><code>return func(...)</code></td></tr>
+                <tr><td data-t="ch29-128"><code>except:</code> خالی</td><td data-t="ch29-129">باگ نامرئی می‌شود</td><td data-t="ch29-130">نوع خطا را بنویسید</td></tr>
+                <tr><td data-t="ch29-131">باز کردن CSV بدون <code>newline=''</code></td><td data-t="ch29-132">خط خالی بین سطرها</td><td data-t="ch29-133">همیشه بنویسیدش</td></tr>
+                <tr><td data-t="ch29-134">مقایسه رشته‌ای عددهای CSV</td><td data-t="ch29-135">نتیجه غلط بدون خطا</td><td data-t="ch29-136"><code>int()</code> بزنید</td></tr>
+                <tr><td data-t="ch29-137">درخواست وب بدون <code>timeout</code></td><td data-t="ch29-138">برنامه تا ابد منتظر می‌ماند</td><td><code>timeout=10</code></td></tr>
+                <tr><td data-t="ch29-139"><code>if element:</code> روی عنصر XML</td><td data-t="ch29-140">عنصر بدون فرزند نادرست حساب می‌شود</td><td><code>if element is not None:</code></td></tr>
+            </tbody>
+        </table>
+    </div>
+
+    <h2 id="s7" data-t="ch29-141">۷. نمونه آزمون تشریحی</h2>
+
+    <div class="exercise">
+        <h3 data-t="ch29-142">بخش اول: مفهومی، هر سؤال یک نمره</h3>
+        <ol>
+            <li data-t="ch29-143">فرق کلاس و شیء را در یک جمله بگویید.</li>
+            <li data-t="ch29-144"><code>self</code> از کجا مقدار می‌گیرد؟</li>
+            <li data-t="ch29-145">چرا نوشتن <code>items = []</code> در بدنه کلاس خطرناک است؟</li>
+            <li data-t="ch29-146">فرق <code>@staticmethod</code> و <code>@classmethod</code> چیست؟</li>
+            <li data-t="ch29-147">سه چیزی که <code>@dataclass</code> رایگان می‌سازد را نام ببرید.</li>
+            <li data-t="ch29-148">در چه صورتی وراثت به کار می‌رود و در چه صورتی ترکیب؟</li>
+            <li data-t="ch29-149">MRO چیست و چطور می‌شود دیدش؟</li>
+            <li data-t="ch29-150">تایپ اردکی یعنی چه؟</li>
+            <li data-t="ch29-151">فرق <code>__str__</code> و <code>__repr__</code> چیست؟ اگر فقط یکی را بنویسیم، کدام؟</li>
+            <li data-t="ch29-152">چرا <code>except:</code> خالی بد است؟</li>
+            <li data-t="ch29-153">خروجی این کد چیست و چرا: <code>[x for x in range(5) if x % 2]</code></li>
+            <li data-t="ch29-154">فرق درک لیستی و عبارت مولد در مصرف حافظه چیست؟</li>
+            <li data-t="ch29-155">دکوراتور چیست و <code>@wraps</code> چه مشکلی را حل می‌کند؟</li>
+            <li data-t="ch29-156">چرا مولد را نمی‌شود دو بار پیمایش کرد؟</li>
+            <li data-t="ch29-157">چرا هنگام باز کردن فایل CSV باید <code>newline=''</code> نوشت؟</li>
+            <li data-t="ch29-158">چرا مجموعه را نمی‌شود مستقیم در JSON ذخیره کرد؟</li>
+            <li data-t="ch29-159">محیط مجازی چه مشکلی را حل می‌کند؟</li>
+            <li data-t="ch29-160">سه کد وضعیت HTTP را با معنایشان بنویسید.</li>
+        </ol>
+
+        <h3 data-t="ch29-161">بخش دوم: خروجی کد را بنویسید</h3>
+        <ol start="19">
+            <li>
+<pre class="code"><code>class A:
+    x = 0
+
+a = A()
+b = A()
+a.x = 5
+A.x = 9
+print(a.x, b.x)</code></pre>
+            </li>
+            <li>
+<pre class="code"><code>class Base:
+    def hello(self):
+        print('Base')
+
+class Child(Base):
+    def hello(self):
+        print('Child')
+        super().hello()
+
+Child().hello()</code></pre>
+            </li>
+            <li>
+<pre class="code"><code>def gen():
+    yield 1
+    yield 2
+
+g = gen()
+print(list(g))
+print(list(g))</code></pre>
+            </li>
+            <li>
+<pre class="code"><code>def f(items=[]):
+    items.append(1)
+    return items
+
+print(f())
+print(f())</code></pre>
+            </li>
+        </ol>
+    </div>
+
+    <h2 id="s8" data-t="ch29-162">۸. نمونه آزمون عملی</h2>
+
+    <div class="exercise">
+        <h3 data-t="ch29-163">سؤال یک: کتابخانه (۶ نمره)</h3>
+        <p data-t="ch29-164">یک برنامه بنویسید که این ساختار را داشته باشد:</p>
+        <ol>
+            <li data-t="ch29-165">کلاس <code>Book</code> با صفت‌های <code>title</code> و <code>author</code> و <code>year</code> و <code>isbn</code>.</li>
+            <li data-t="ch29-166">property به نام <code>age</code> که سن کتاب را حساب کند.</li>
+            <li data-t="ch29-167">متد <code>__str__</code> و <code>__eq__</code> بر اساس شابک.</li>
+            <li data-t="ch29-168">کلاس <code>Library</code> که لیستی از کتاب‌ها را <strong>دارد</strong>، با متدهای <code>add</code> و <code>remove</code> و <code>find_by_author</code>.</li>
+            <li data-t="ch29-169">استثنای سفارشی <code>BookNotFound</code> که وقتی کتاب پیدا نشد انداخته شود.</li>
+            <li data-t="ch29-170">متدی که همه کتاب‌ها را در فایل JSON ذخیره کند و متدی که از همان فایل بخواندشان.</li>
+        </ol>
+
+        <h3 data-t="ch29-171">سؤال دو: بازنویسی پایتونی (۴ نمره)</h3>
+        <p data-t="ch29-172">کد زیر را با ابزارهای فصل ۲۵ بازنویسی کنید:</p>
+<pre class="code"><code>result = []
+i = 0
+while i &lt; len(names):
+    if len(names[i]) &gt; 3:
+        result.append(names[i].upper())
+    i = i + 1
+
+found = False
+for r in result:
+    if r.startswith('A'):
+        found = True
+        break
+
+if len(result) == 0:
+    print('empty')</code></pre>
+
+        <h3 data-t="ch29-173">سؤال سه: گزارش‌گیری (۵ نمره)</h3>
+        <p data-t="ch29-174">
+            فایل <code>students.csv</code> با ستون‌های نام، شهر و سه نمره
+            داده شده است. برنامه‌ای بنویسید که:
+        </p>
+        <ol>
+            <li data-t="ch29-175">فایل را با <code>DictReader</code> بخواند و ستون‌های عددی را تبدیل کند.</li>
+            <li data-t="ch29-176">میانگین هر دانشجو را حساب کند.</li>
+            <li data-t="ch29-177">دانشجویان را بر اساس شهر گروه‌بندی کند.</li>
+            <li data-t="ch29-178">نام سه دانشجوی برتر را پیدا کند.</li>
+            <li data-t="ch29-179">نتیجه را در فایل JSON با پشتیبانی فارسی ذخیره کند.</li>
+        </ol>
+        <p data-t="ch29-180">هر جا ممکن است از درک لیستی و از توابع آماده استفاده کنید.</p>
+
+        <h3 data-t="ch29-181">سؤال چهار: دکوراتور (۳ نمره)</h3>
+        <p data-t="ch29-182">
+            دکوراتور <code>@log_errors</code> بنویسید که اگر تابع خطایی
+            انداخت، نام تابع و نوع خطا را چاپ کند و بعد همان خطا را دوباره
+            بالا بفرستد. حتماً از <code>@wraps</code> استفاده کنید.
+        </p>
+
+        <h3 data-t="ch29-183">سؤال پنج: مولد (۲ نمره)</h3>
+        <p data-t="ch29-184">
+            مولدی بنویسید که یک فایل متنی را بخواند و فقط خط‌هایی را بدهد که
+            بلندتر از ۱۰ کاراکترند. بعد با آن، تعداد چنین خط‌هایی را بشمارید
+            بدون اینکه کل فایل در حافظه بیاید.
+        </p>
+    </div>
+
+    <h2 id="s9" data-t="ch29-185">۹. پاسخ کوتاه سؤال‌های مفهومی</h2>
+
+    <div class="note">
+        <span class="box-title" data-t="ch29-186">اول خودتان جواب دهید</span>
+        <p data-t="ch29-187">
+            این بخش را فقط بعد از اینکه سؤال‌های بالا را جواب دادید بخوانید.
+            خواندن جواب پیش از تلاش، هیچ چیزی یاد نمی‌دهد.
+        </p>
+    </div>
+
+    <div class="table-scroll">
+        <table>
+            <thead>
+                <tr><th data-t="ch29-188">سؤال</th><th data-t="ch29-189">پاسخ کوتاه</th></tr>
+            </thead>
+            <tbody>
+                <tr><td data-t="ch29-190">۱۹</td><td data-t="ch29-191"><code>5 9</code>. صفت نمونه <code>a</code> صفت کلاس را پنهان کرده، ولی <code>b</code> هنوز به کلاس نگاه می‌کند.</td></tr>
+                <tr><td data-t="ch29-192">۲۰</td><td data-t="ch29-193"><code>Child</code> سپس <code>Base</code>.</td></tr>
+                <tr><td data-t="ch29-194">۲۱</td><td data-t="ch29-195"><code>[1, 2]</code> سپس <code>[]</code>. مولد یک‌بار مصرف است.</td></tr>
+                <tr><td data-t="ch29-196">۲۲</td><td data-t="ch29-197"><code>[1]</code> سپس <code>[1, 1]</code>. دام پیش‌فرض تغییرپذیر.</td></tr>
+                <tr><td data-t="ch29-198">۱۱</td><td data-t="ch29-199"><code>[1, 3]</code>. عدد ناصفر درست حساب می‌شود، پس شرط یعنی فرد بودن.</td></tr>
+            </tbody>
+        </table>
+    </div>
+
+    <div class="folder-ref">
+        <span class="box-title" data-t="ch29-200">درباره این جلسه</span>
+        <p data-t="ch29-201">
+            پوشه <code>S29-evaluation</code> فقط یک <code>README.md</code>
+            دارد و هیچ فایل تمرینی ندارد، چون این جلسه، جلسه آزمون است. برای
+            تمرین، به پوشه‌های <code>S21</code> تا <code>S28</code> برگردید.
+        </p>
+    </div>
+
+    <div class="pager">
+        <a href="chapter-28.html">فصل قبل: بسته‌ها، REST API و XML</a>
+        <a href="chapter-30.html">فصل بعد: پایگاه داده و زبان SQL</a>
+    </div>
+
+</main>
+
+</body>
+</html>

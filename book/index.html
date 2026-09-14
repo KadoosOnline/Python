@@ -1,0 +1,421 @@
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="کتاب آموزش برنامه‌نویسی پایتون در چهل و یک فصل، بر پایه دوره چهل جلسه‌ای مؤسسه کادوس، نوشته علیرضا م. احمدی">
+    <title>برنامه‌نویسی پایتون</title>
+    <link rel="icon" href="logokm.png" type="image/png">
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<header class="book-bar">
+    <a class="name" href="index.html">برنامه‌نویسی پایتون</a>
+    <a href="#toc">فهرست مطالب</a>
+</header>
+
+<main class="paper">
+
+    <div class="cover">
+        <h1 data-t="index-001">برنامه‌نویسی پایتون</h1>
+        <p class="subtitle" data-t="index-002">از اولین دستور تا یک برنامه کامل، در چهل جلسه</p>
+        <span class="author" data-t="index-003"><a href="https://lordarma.com" target="_blank">علیرضا م. احمدی</a></span>
+    </div>
+
+    <h2 data-t="index-004">درباره این کتاب</h2>
+
+    <p data-t="index-005">
+        این کتاب حاصل یک دوره چهل جلسه‌ای برنامه‌نویسی پایتون است که در
+        <a href="https://kadoosedu.ir" target="_blank">مؤسسه فنی و آموزشی کادوس</a>
+        رشت برگزار شده است. دوره از دو ترم تشکیل شده است: ترم اول با نام
+        «مقدمه‌ای بر پایتون» و ترم دوم با نام «پایتون پیشرفته»، هر کدام بیست جلسه
+        سه ساعته. هر فصل این کتاب دقیقاً برابر با یک جلسه از آن دوره است،
+        به‌علاوه یک فصل مقدماتی در ابتدا که پیش از جلسه اول باید خوانده شود.
+    </p>
+
+    <p data-t="index-006">
+        هدف کتاب این است که خواننده بدون هیچ دانش قبلی شروع کند و در پایان بتواند
+        یک برنامه واقعی بنویسد: برنامه‌ای با رابط گرافیکی، با پایگاه داده، با
+        اتصال به اینترنت و آماده تحویل به کاربر. هیچ فصلی از چیزی استفاده نمی‌کند
+        که در فصل‌های قبل توضیح داده نشده باشد. ترتیب فصل‌ها از ساده به دشوار
+        چیده شده است و پریدن از روی فصل‌ها توصیه نمی‌شود.
+    </p>
+
+    <h2 data-t="index-007">ساختار هر فصل</h2>
+
+    <p data-t="index-008">هر فصل از چهار قسمت تشکیل شده است:</p>
+
+    <ol>
+        <li data-t="index-009"><strong>توضیح موضوع:</strong> اینکه این جلسه درباره چیست و چرا به آن نیاز داریم.</li>
+        <li data-t="index-010"><strong>مثال‌ها:</strong> کد کامل و قابل اجرا برای هر مفهوم.</li>
+        <li data-t="index-011"><strong>شرح مثال:</strong> بررسی خط به خط کدی که دیدیم و خروجی‌اش.</li>
+        <li data-t="index-012"><strong>جمع‌بندی و تمرین:</strong> جدول خلاصه و چند تمرین عملی.</li>
+    </ol>
+
+    <div class="tip">
+        <span class="box-title" data-t="index-013">پیشنهاد</span>
+        <p data-t="index-014">کد مثال‌ها را فقط نخوانید. آنها را در یک فایل بنویسید و اجرا کنید، بعد یک موضوع کوچک را عوض کنید و دوباره اجرا کنید. برنامه‌نویسی با انگشت یاد گرفته می‌شود، نه با چشم.</p>
+    </div>
+
+    <h2 data-t="index-015">چه چیزی لازم دارید</h2>
+
+    <ul>
+        <li data-t="index-016">یک کامپیوتر با ویندوز، لینوکس یا مک. سخت‌افزار خاصی ضرورتی ندارد.</li>
+        <li data-t="index-017"><strong>پایتون ۳</strong>، نسخه ۳.۱۰ یا بالاتر. نصبش در فصل صفر توضیح داده شده است.</li>
+        <li data-t="index-018">یک ویرایشگر کد. پیشنهاد ما <strong>VS Code</strong> است و رایگان است.</li>
+        <li data-t="index-019">برای فصل‌های پایانی، اتصال به اینترنت برای نصب چند کتابخانه.</li>
+    </ul>
+
+    <h2 id="toc" data-t="index-020">فهرست مطالب</h2>
+
+    <div class="toc-list">
+
+        <a class="toc-item" href="chapter-00.html">
+            <span class="num">۰</span>
+            <span>
+                <span class="t" data-t="index-021">مقدمه: برنامه‌نویسی، نصب پایتون و اولین اجرا</span>
+                <span class="d" data-t="index-022">برنامه چیست، چرا پایتون، نصب پایتون و VS Code، اجرای اولین فایل، خطاهای اولیه</span>
+            </span>
+        </a>
+
+        <p class="term-head" data-t="index-023">ترم اول: مقدمه‌ای بر پایتون، جلسه ۱ تا ۲۰</p>
+
+        <a class="toc-item" href="chapter-01.html">
+            <span class="num">۱</span>
+            <span>
+                <span class="t" data-t="index-024">اولین قدم‌ها</span>
+                <span class="d" data-t="index-025">دستور print، متغیرها، چهار نوع داده پایه، تابع input و تبدیل نوع</span>
+            </span>
+        </a>
+
+        <a class="toc-item" href="chapter-02.html">
+            <span class="num">۲</span>
+            <span>
+                <span class="t" data-t="index-026">عملگرها</span>
+                <span class="d" data-t="index-027">عملگرهای ریاضی، تقسیم صحیح و باقیمانده، توان، اولویت عملگرها و انتساب ترکیبی</span>
+            </span>
+        </a>
+
+        <a class="toc-item" href="chapter-03.html">
+            <span class="num">۳</span>
+            <span>
+                <span class="t" data-t="index-028">رشته‌ها</span>
+                <span class="d" data-t="index-029">دنباله‌های فرار، اندیس و برش، طول رشته، متدهای رشته و f-string</span>
+            </span>
+        </a>
+
+        <a class="toc-item" href="chapter-04.html">
+            <span class="num">۴</span>
+            <span>
+                <span class="t" data-t="index-030">شرط‌ها</span>
+                <span class="d" data-t="index-031">نوع bool، عملگرهای مقایسه‌ای، دستور if و else، and و or و not</span>
+            </span>
+        </a>
+
+        <a class="toc-item" href="chapter-05.html">
+            <span class="num">۵</span>
+            <span>
+                <span class="t" data-t="index-032">elif و شرط‌های تودرتو</span>
+                <span class="d" data-t="index-033">چند حالتی با elif، شرط داخل شرط، عملگر سه‌تایی و دستور match</span>
+            </span>
+        </a>
+
+        <a class="toc-item" href="chapter-06.html">
+            <span class="num">۶</span>
+            <span>
+                <span class="t" data-t="index-034">حلقه for</span>
+                <span class="d" data-t="index-035">تکرار با for، تابع range، متغیر انباره و شمارنده، پارامترهای end و sep</span>
+            </span>
+        </a>
+
+        <a class="toc-item" href="chapter-07.html">
+            <span class="num">۷</span>
+            <span>
+                <span class="t" data-t="index-036">حلقه‌های تودرتو و الگوها</span>
+                <span class="d" data-t="index-037">حلقه داخل حلقه، جدول ضرب، چاپ الگوهای ستاره‌ای و مثلث‌ها</span>
+            </span>
+        </a>
+
+        <a class="toc-item" href="chapter-08.html">
+            <span class="num">۸</span>
+            <span>
+                <span class="t" data-t="index-038">حلقه while</span>
+                <span class="d" data-t="index-039">تکرار تا وقتی شرط برقرار است، break و continue، حلقه نگهبان و اعتبارسنجی ورودی</span>
+            </span>
+        </a>
+
+        <a class="toc-item" href="chapter-09.html">
+            <span class="num">۹</span>
+            <span>
+                <span class="t" data-t="index-040">لیست‌ها</span>
+                <span class="d" data-t="index-041">ساختن لیست، اندیس و برش، append و pop و insert و remove، عملگر in</span>
+            </span>
+        </a>
+
+        <a class="toc-item" href="chapter-10.html">
+            <span class="num">۱۰</span>
+            <span>
+                <span class="t" data-t="index-042">الگوریتم‌های لیست</span>
+                <span class="d" data-t="index-043">مجموع و میانگین، کمینه و بیشینه، جست‌وجو، مرتب‌سازی و لیست دوبعدی</span>
+            </span>
+        </a>
+
+        <a class="toc-item" href="chapter-11.html">
+            <span class="num">۱۱</span>
+            <span>
+                <span class="t" data-t="index-044">توابع</span>
+                <span class="d" data-t="index-045">تعریف تابع با def، پارامتر و آرگومان، دستور return و مقدار None</span>
+            </span>
+        </a>
+
+        <a class="toc-item" href="chapter-12.html">
+            <span class="num">۱۲</span>
+            <span>
+                <span class="t" data-t="index-046">آرگومان‌ها و حوزه متغیر</span>
+                <span class="d" data-t="index-047">مقدار پیش‌فرض، آرگومان کلیدواژه‌ای، متغیر محلی و سراسری، تابع main و نگهبان اجرا</span>
+            </span>
+        </a>
+
+        <a class="toc-item" href="chapter-13.html">
+            <span class="num">۱۳</span>
+            <span>
+                <span class="t" data-t="index-048">توابع پیشرفته</span>
+                <span class="d" data-t="index-049">آرگومان‌های ستاره‌دار، راهنمای نوع، مستندنویسی، دام پیش‌فرض تغییرپذیر و بازگشت</span>
+            </span>
+        </a>
+
+        <a class="toc-item" href="chapter-14.html">
+            <span class="num">۱۴</span>
+            <span>
+                <span class="t" data-t="index-050">دیکشنری، تاپل و مجموعه</span>
+                <span class="d" data-t="index-051">سه ساختمان داده دیگر پایتون، متدهایشان و اینکه هر کدام کجا به کار می‌آیند</span>
+            </span>
+        </a>
+
+        <a class="toc-item" href="chapter-15.html">
+            <span class="num">۱۵</span>
+            <span>
+                <span class="t" data-t="index-052">ساختارهای داده تودرتو</span>
+                <span class="d" data-t="index-053">لیستی از دیکشنری‌ها، ماتریس، تبدیل ساختارها به هم و ماژول collections</span>
+            </span>
+        </a>
+
+        <a class="toc-item" href="chapter-16.html">
+            <span class="num">۱۶</span>
+            <span>
+                <span class="t" data-t="index-054">کتابخانه استاندارد</span>
+                <span class="d" data-t="index-055">دستور import و ماژول‌های random و math و datetime و time و sys</span>
+            </span>
+        </a>
+
+        <a class="toc-item" href="chapter-17.html">
+            <span class="num">۱۷</span>
+            <span>
+                <span class="t" data-t="index-056">ماژول‌ها و بسته‌ها</span>
+                <span class="d" data-t="index-057">ساختن ماژول خودمان، شکل‌های مختلف import، بسته و فایل __init__.py</span>
+            </span>
+        </a>
+
+        <a class="toc-item" href="chapter-18.html">
+            <span class="num">۱۸</span>
+            <span>
+                <span class="t" data-t="index-058">فایل‌ها و سیستم‌عامل</span>
+                <span class="d" data-t="index-059">باز کردن و خواندن و نوشتن فایل، دستور with، ماژول‌های os و pathlib</span>
+            </span>
+        </a>
+
+        <a class="toc-item" href="chapter-19.html">
+            <span class="num">۱۹</span>
+            <span>
+                <span class="t" data-t="index-060">خطاها و استثناها</span>
+                <span class="d" data-t="index-061">ساختار try و except و else و finally، دستور raise، assert و ماژول logging</span>
+            </span>
+        </a>
+
+        <a class="toc-item" href="chapter-20.html">
+            <span class="num">۲۰</span>
+            <span>
+                <span class="t" data-t="index-062">پروژه‌های ترم اول</span>
+                <span class="d" data-t="index-063">حدس عدد، سنگ کاغذ قیچی، وردل، دوز و یک بازی آزمون که سؤال‌هایش از فایل می‌آید</span>
+            </span>
+        </a>
+
+        <p class="term-head" data-t="index-064">ترم دوم: پایتون پیشرفته، جلسه ۲۱ تا ۴۰</p>
+
+        <a class="toc-item" href="chapter-21.html">
+            <span class="num">۲۱</span>
+            <span>
+                <span class="t" data-t="index-065">شیءگرایی: کلاس و شیء</span>
+                <span class="d" data-t="index-066">کلاس، شیء، متد __init__، پارامتر self و تفاوت صفت کلاس با صفت نمونه</span>
+            </span>
+        </a>
+
+        <a class="toc-item" href="chapter-22.html">
+            <span class="num">۲۲</span>
+            <span>
+                <span class="t" data-t="index-067">کپسوله‌سازی و dataclass</span>
+                <span class="d" data-t="index-068">صفت خصوصی، property، متد ایستا و متد کلاس، ترکیب و دکوراتور dataclass</span>
+            </span>
+        </a>
+
+        <a class="toc-item" href="chapter-23.html">
+            <span class="num">۲۳</span>
+            <span>
+                <span class="t" data-t="index-069">وراثت و چندریختی</span>
+                <span class="d" data-t="index-070">ارث‌بری، تابع super، ترتیب MRO، تایپ اردکی و کلاس انتزاعی</span>
+            </span>
+        </a>
+
+        <a class="toc-item" href="chapter-24.html">
+            <span class="num">۲۴</span>
+            <span>
+                <span class="t" data-t="index-071">متدهای جادویی و استثناهای سفارشی</span>
+                <span class="d" data-t="index-072">متدهای دو زیرخطی، سربارگذاری عملگرها، مدیر زمینه و ساختن کلاس خطای خودمان</span>
+            </span>
+        </a>
+
+        <a class="toc-item" href="chapter-25.html">
+            <span class="num">۲۵</span>
+            <span>
+                <span class="t" data-t="index-073">کد پایتونی، بخش اول</span>
+                <span class="d" data-t="index-074">باز کردن مقادیر، enumerate و zip، درک لیستی، for-else، عملگر شرطی و گردالی</span>
+            </span>
+        </a>
+
+        <a class="toc-item" href="chapter-26.html">
+            <span class="num">۲۶</span>
+            <span>
+                <span class="t" data-t="index-075">کد پایتونی، بخش دوم</span>
+                <span class="d" data-t="index-076">تابع lambda، map و filter و کلید مرتب‌سازی، دکوراتور، مولد و ماژول itertools</span>
+            </span>
+        </a>
+
+        <a class="toc-item" href="chapter-27.html">
+            <span class="num">۲۷</span>
+            <span>
+                <span class="t" data-t="index-077">CSV و JSON</span>
+                <span class="d" data-t="index-078">خواندن و نوشتن فایل‌های داده‌ای، ماژول csv، ماژول json و یک گزارش‌گیر کامل</span>
+            </span>
+        </a>
+
+        <a class="toc-item" href="chapter-28.html">
+            <span class="num">۲۸</span>
+            <span>
+                <span class="t" data-t="index-079">بسته‌ها، REST API و XML</span>
+                <span class="d" data-t="index-080">محیط مجازی و pip، فایل requirements.txt، کتابخانه requests، وب‌سرویس و XML</span>
+            </span>
+        </a>
+
+        <a class="toc-item eval" href="chapter-29.html">
+            <span class="num">۲۹</span>
+            <span>
+                <span class="t" data-t="index-081">ارزشیابی میان‌ترم</span>
+                <span class="d" data-t="index-082">جلسه آزمون. مرور فصل ۲۱ تا ۲۸، چک‌لیست آمادگی و یک نمونه آزمون کامل</span>
+            </span>
+        </a>
+
+        <a class="toc-item" href="chapter-30.html">
+            <span class="num">۳۰</span>
+            <span>
+                <span class="t" data-t="index-083">پایگاه داده و زبان SQL</span>
+                <span class="d" data-t="index-084">جدول و ستون، ساخت و درج و به‌روزرسانی، شرط و مرتب‌سازی، توابع تجمعی و JOIN</span>
+            </span>
+        </a>
+
+        <a class="toc-item" href="chapter-31.html">
+            <span class="num">۳۱</span>
+            <span>
+                <span class="t" data-t="index-085">sqlite3 در پایتون</span>
+                <span class="d" data-t="index-086">اتصال به پایگاه داده، چهار عمل اصلی، پرس‌وجوی پارامتری و تراکنش</span>
+            </span>
+        </a>
+
+        <a class="toc-item" href="chapter-32.html">
+            <span class="num">۳۲</span>
+            <span>
+                <span class="t" data-t="index-087">ORM و SQLAlchemy</span>
+                <span class="d" data-t="index-088">چرا ORM لازم است، ساختن یک ORM دست‌ساز و سپس مدل و رابطه در SQLAlchemy</span>
+            </span>
+        </a>
+
+        <a class="toc-item" href="chapter-33.html">
+            <span class="num">۳۳</span>
+            <span>
+                <span class="t" data-t="index-089">الگوهای طراحی</span>
+                <span class="d" data-t="index-090">تک‌نمونه، کارخانه، سازنده، مبدل، دکوراتور، استراتژی و ناظر</span>
+            </span>
+        </a>
+
+        <a class="toc-item" href="chapter-34.html">
+            <span class="num">۳۴</span>
+            <span>
+                <span class="t" data-t="index-091">رابط گرافیکی با tkinter</span>
+                <span class="d" data-t="index-092">پنجره و ویجت‌ها، سه مدیر چیدمان، رویدادها، متغیرهای کنترلی و یک ماشین‌حساب</span>
+            </span>
+        </a>
+
+        <a class="toc-item" href="chapter-35.html">
+            <span class="num">۳۵</span>
+            <span>
+                <span class="t" data-t="index-093">tkinter پیشرفته</span>
+                <span class="d" data-t="index-094">کار با فایل و تصویر، ویجت‌های ttk، پنجره دوم، بوم نقاشی و یک برنامه دیتابیسی</span>
+            </span>
+        </a>
+
+        <a class="toc-item" href="chapter-36.html">
+            <span class="num">۳۶</span>
+            <span>
+                <span class="t" data-t="index-095">PySide6 و ساخت فایل اجرایی</span>
+                <span class="d" data-t="index-096">کیوت در پایتون، سیگنال و اسلات، Qt Designer و ساخت فایل exe با PyInstaller</span>
+            </span>
+        </a>
+
+        <a class="toc-item" href="chapter-37.html">
+            <span class="num">۳۷</span>
+            <span>
+                <span class="t" data-t="index-097">همروندی: نخ‌ها و asyncio</span>
+                <span class="d" data-t="index-098">ماژول threading، شرایط رقابتی و قفل، صف و استخر نخ، قفل سراسری و برنامه‌نویسی ناهمگام</span>
+            </span>
+        </a>
+
+        <a class="toc-item" href="chapter-38.html">
+            <span class="num">۳۸</span>
+            <span>
+                <span class="t" data-t="index-099">وب با Flask</span>
+                <span class="d" data-t="index-100">مسیرها، قالب Jinja2، فرم‌ها، نشست و ورود کاربر، وب‌سرویس JSON و Flask-SQLAlchemy</span>
+            </span>
+        </a>
+
+        <a class="toc-item" href="chapter-39.html">
+            <span class="num">۳۹</span>
+            <span>
+                <span class="t" data-t="index-101">پروژه پایانی، Git و GitHub</span>
+                <span class="d" data-t="index-102">ساخت یک برنامه مدیریت کتابخانه با معماری لایه‌ای، به‌علاوه کنترل نسخه با گیت</span>
+            </span>
+        </a>
+
+        <a class="toc-item eval" href="chapter-40.html">
+            <span class="num">۴۰</span>
+            <span>
+                <span class="t" data-t="index-103">ارزشیابی پایانی</span>
+                <span class="d" data-t="index-104">جلسه آزمون. مرور کل ترم دوم، دفاع از پروژه پایانی و نقشه راه ادامه مسیر</span>
+            </span>
+        </a>
+
+    </div>
+
+    <div class="note">
+        <span class="box-title" data-t="index-105">درباره پوشه‌های تمرین</span>
+        <p data-t="index-106">در انتهای هر فصل، به پوشه‌ای از فایل‌های دوره ارجاع داده شده است، مانند <code>S06-for-loops</code>. اگر آن فایل‌ها را در اختیار دارید، بعد از خواندن هر بخش، نمونه مربوط به آن را باز کنید، اجرایش کنید و کدش را تغییر دهید.</p>
+    </div>
+
+    <div class="pager">
+        <span class="disabled"></span>
+        <a href="chapter-00.html">شروع کتاب: فصل صفر</a>
+    </div>
+
+</main>
+
+</body>
+</html>

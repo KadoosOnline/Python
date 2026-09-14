@@ -1,0 +1,448 @@
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="فصل هفده: ساختن ماژول خودمان، شکل‌های import، بسته و فایل __init__.py، ایمپورت نسبی و ماژول تنظیمات">
+    <title>فصل ۱۷: ماژول‌ها و بسته‌ها</title>
+    <link rel="icon" href="logokm.png" type="image/png">
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<header class="book-bar">
+    <a class="name" href="index.html">برنامه‌نویسی پایتون</a>
+    <a href="index.html">فهرست مطالب</a>
+</header>
+
+<main class="paper">
+
+    <div class="chapter-head">
+        <span class="chapter-num">فصل ۱۷</span>
+        <h1 data-t="ch17-001">ماژول‌ها و بسته‌ها</h1>
+        <p class="lead" data-t="ch17-002">
+            در فصل قبل از ماژول‌های آماده پایتون استفاده کردیم. حالا ماژول
+            خودمان را می‌سازیم و یاد می‌گیریم چطور یک برنامه بزرگ را روی چند
+            فایل پخش کنیم.
+        </p>
+    </div>
+
+    <div class="mini-toc">
+        <span class="box-title" data-t="ch17-003">در این فصل می‌خوانید</span>
+        <ol>
+            <li data-t="ch17-004"><a href="#s1">ماژول فقط یک فایل است</a></li>
+            <li data-t="ch17-005"><a href="#s2">وارد کردن با نام مستعار</a></li>
+            <li data-t="ch17-006"><a href="#s3">وارد کردن مستقیم یک نام</a></li>
+            <li data-t="ch17-007"><a href="#s4">وارد کردن چند نام</a></li>
+            <li data-t="ch17-008"><a href="#s5">پوشه __pycache__</a></li>
+            <li data-t="ch17-009"><a href="#s6">بسته چیست</a></li>
+            <li data-t="ch17-010"><a href="#s7">چند ماژول در یک بسته</a></li>
+            <li data-t="ch17-011"><a href="#s8">بازصدور در __init__.py</a></li>
+            <li data-t="ch17-012"><a href="#s9">کلاس داخل بسته</a></li>
+            <li data-t="ch17-013"><a href="#s10">چرا نگهبان اجرا لازم است</a></li>
+            <li data-t="ch17-014"><a href="#s11">ماژول تنظیمات</a></li>
+        </ol>
+    </div>
+
+    <h2 id="s1" data-t="ch17-015">۱. ماژول فقط یک فایل است</h2>
+
+    <p data-t="ch17-016">
+        خبر خوب: <strong>ماژول چیز خاصی نیست</strong>. هر فایل
+        <code>py.</code> که بنویسید، یک ماژول است و می‌شود از فایل دیگری
+        واردش کرد.
+    </p>
+
+    <pre class="code"><code>'''A tiny module: just a .py file containing functions we want to reuse.'''
+
+
+def add(num1: float, num2: float) -&gt; float:
+    'Return the sum of two numbers.'
+    return num1 + num2</code></pre>
+    <p class="code-caption" data-t="ch17-017">فایل math_module.py</p>
+
+    <pre class="code"><code># 'import math_module' loads the file math_module.py that sits next to this one.
+# The functions are then reached through the module name.
+import math_module
+
+if __name__ == '__main__':
+    result = math_module.add(num1=5, num2=6)
+    print(result)</code></pre>
+    <p class="code-caption" data-t="ch17-018">فایل app.py: نمونه 01_import_module</p>
+
+    <h3 data-t="ch17-019">شرح مثال</h3>
+
+    <ul>
+        <li data-t="ch17-020">نام ماژول همان نام فایل است، <strong>بدون</strong> پسوند <code>py.</code>.</li>
+        <li data-t="ch17-021">پایتون فایل را در پوشه‌ای که برنامه از آن اجرا شده جست‌وجو می‌کند، بعد در مسیرهای نصب پایتون.</li>
+        <li data-t="ch17-022">بعد از <code>import</code>، هر چیزی که در آن فایل تعریف شده از راه نام ماژول در دسترس است.</li>
+        <li data-t="ch17-023">برای اجرای این نمونه‌ها باید ترمینال را <strong>داخل همان پوشه</strong> باز کنید و <code>python app.py</code> بزنید.</li>
+    </ul>
+
+    <h2 id="s2" data-t="ch17-024">۲. وارد کردن با نام مستعار</h2>
+
+    <pre class="code"><code># A module can be renamed while importing it. This is useful when the real
+# name is long (you will see 'import pandas as pd' in real projects).
+import math_module as m
+
+if __name__ == '__main__':
+    result = m.add(num1=5, num2=6)
+    print(result)</code></pre>
+    <p class="code-caption" data-t="ch17-025">نام مستعار: نمونه 02_import_as</p>
+
+    <p data-t="ch17-026">در پروژه‌های واقعی نام‌های مستعار قراردادی وجود دارد که همه رعایت می‌کنند: <code>import numpy as np</code>، <code>import pandas as pd</code>، <code>import tkinter as tk</code>. این موارد را در فصل‌های بعد می‌بینید.</p>
+
+    <h2 id="s3" data-t="ch17-027">۳. وارد کردن مستقیم یک نام</h2>
+
+    <pre class="code"><code># 'from ... import ...' brings the name directly into our file,
+# so we call it without the module prefix.
+from math_module import add
+
+if __name__ == '__main__':
+    result = add(num1=5, num2=6)
+    print(result)</code></pre>
+    <p class="code-caption" data-t="ch17-028">وارد کردن مستقیم: نمونه 03_from_import</p>
+
+    <p data-t="ch17-029">
+        این شکل کد را کوتاه‌تر می‌کند ولی یک هزینه دارد: وقتی در وسط فایل
+        <code>add(...)</code> را می‌بینید، معلوم نیست تابع خودتان است یا از
+        جایی آمده است. برای فایل‌های کوچک اشکالی ندارد.
+    </p>
+
+    <h2 id="s4" data-t="ch17-030">۴. وارد کردن چند نام</h2>
+
+    <pre class="code"><code># Several names can be imported in one line.
+from math_module import add, mul
+
+# 'from math_module import *' would import everything, but then the reader of
+# the file no longer knows where 'add' comes from. Avoid it.
+
+if __name__ == '__main__':
+    print(add(num1=5, num2=6))
+    print(mul(num1=5, num2=6))</code></pre>
+    <p class="code-caption" data-t="ch17-031">چند نام: نمونه 04_import_several</p>
+
+    <h2 id="s5" data-t="ch17-032">۵. پوشه __pycache__</h2>
+
+    <p data-t="ch17-033">
+        اولین باری که ماژولی را وارد کنید، پوشه‌ای به نام
+        <code>__pycache__</code> کنار فایل‌هایتان ظاهر می‌شود. نگران نباشید:
+    </p>
+
+    <ul>
+        <li data-t="ch17-034">پایتون نسخه <strong>ترجمه‌شده</strong> ماژول را آنجا نگه می‌دارد تا دفعه بعد سریع‌تر بارگذاری شود.</li>
+        <li data-t="ch17-035">خودکار ساخته می‌شود و هر وقت بخواهید می‌شود پاکش کرد.</li>
+        <li data-t="ch17-036">بخشی از کد شما نیست و <strong>نباید</strong> در گیت ذخیره شود. در فصل سی و نهم می‌بینید که در فایل <code>.gitignore</code> اولین چیزی که می‌نویسند همین است.</li>
+    </ul>
+
+    <h2 id="s6" data-t="ch17-037">۶. بسته چیست</h2>
+
+    <p data-t="ch17-038">
+        وقتی ماژول‌ها زیاد شوند، باید دسته‌بندی‌شان کرد.
+        <strong>بسته</strong> یک <strong>پوشه</strong> است که داخلش فایلی به نام
+        <code>__init__.py</code> دارد.
+    </p>
+
+    <pre class="out">05_package/
+    app.py
+    math_package/
+        __init__.py
+        my_math.py</pre>
+
+    <pre class="code"><code># A package is a FOLDER that contains an __init__.py file.
+# The path to a module inside it uses dots: package.module
+from math_package.my_math import add, mul
+
+if __name__ == '__main__':
+    print(add(num1=5, num2=6))
+    print(mul(num1=5, num2=6))</code></pre>
+    <p class="code-caption" data-t="ch17-039">استفاده از بسته: نمونه 05_package</p>
+
+    <h3 data-t="ch17-040">شرح مثال</h3>
+
+    <ul>
+        <li data-t="ch17-041">فایل <code>__init__.py</code> می‌تواند کاملاً <strong>خالی</strong> باشد. صرف وجودش، پوشه را به بسته تبدیل می‌کند.</li>
+        <li data-t="ch17-042">مسیر ماژول داخل بسته با نقطه نوشته می‌شود: <code>math_package.my_math</code>.</li>
+        <li data-t="ch17-043">بسته می‌تواند بسته‌های دیگری هم داخلش داشته باشد و هر قدر بخواهید تودرتو شود.</li>
+    </ul>
+
+    <h2 id="s7" data-t="ch17-044">۷. چند ماژول در یک بسته</h2>
+
+    <pre class="code"><code># Two modules of the same package, each imported with its own path.
+from math_package.my_math import add, mul
+from math_package.your_math import sub, div
+
+if __name__ == '__main__':
+    print(add(num1=5, num2=6))
+    print(sub(num1=5, num2=6))
+    print(div(num1=5, num2=6))</code></pre>
+    <p class="code-caption" data-t="ch17-045">دو ماژول: نمونه 06_package_two_modules</p>
+
+    <pre class="code"><code>'''A second module in the same package.'''
+
+
+def sub(num1: float, num2: float) -&gt; float:
+    'Return the difference of two numbers.'
+    return num1 - num2
+
+
+def div(num1: float, num2: float) -&gt; float:
+    'Return the quotient of two numbers.'
+    if num2 == 0:
+        raise ZeroDivisionError('num2 must not be zero')
+    return num1 / num2</code></pre>
+    <p class="code-caption" data-t="ch17-046">فایل your_math.py</p>
+
+    <p data-t="ch17-047">
+        به تابع <code>div</code> دقت کنید: به جای اینکه پیام خطا چاپ کند، خطا
+        <strong>می‌اندازد</strong>. این کار درست یک تابع کتابخانه‌ای است. تابع
+        نباید تصمیم بگیرد که پیام خطا را چطور به کاربر نشان دهد؛ آن وظیفه
+        برنامه اصلی است. دستور <code>raise</code> موضوع فصل نوزدهم است.
+    </p>
+
+    <h2 id="s8" data-t="ch17-048">۸. بازصدور در __init__.py</h2>
+
+    <p data-t="ch17-049">
+        مشکل بخش قبل این است که کاربر بسته باید بداند هر تابع در کدام ماژول
+        است. با نوشتن چند خط در <code>__init__.py</code> این را حل می‌کنیم.
+    </p>
+
+    <pre class="code"><code># __init__.py runs when the package is imported. Re-exporting the names here
+# gives the user of the package a single, simple entry point:
+#     from math_package import add, sub
+#
+# The dot in '.my_math' means "the module my_math of THIS package"
+# (a relative import).
+from .my_math import add, mul
+from .your_math import sub, div</code></pre>
+    <p class="code-caption" data-t="ch17-050">فایل __init__.py: نمونه 07_package_init</p>
+
+    <pre class="code"><code># Thanks to the re-exports in __init__.py, we no longer have to know
+# in which module of the package each function lives.
+from math_package import add, mul, sub, div
+
+if __name__ == '__main__':
+    print(add(num1=5, num2=6))
+    print(div(num1=5, num2=6))</code></pre>
+    <p class="code-caption" data-t="ch17-051">استفاده ساده‌شده: نمونه 07_package_init</p>
+
+    <h3 data-t="ch17-052">شرح مثال</h3>
+
+    <ul>
+        <li data-t="ch17-053">محتوای <code>__init__.py</code> هر بار که بسته وارد شود اجرا جست‌وجو می‌کند.</li>
+        <li data-t="ch17-054">نقطه پیش از نام ماژول یعنی <strong>ایمپورت نسبی</strong>: «ماژول my_math از همین بسته». بدون نقطه، پایتون دنبال ماژولی سراسری به آن نام جست‌وجو می‌کند.</li>
+        <li data-t="ch17-055">حالا کاربر بسته فقط می‌نویسد <code>from math_package import add</code> و ضرورتی ندارد ساختار داخلی بسته را بداند.</li>
+        <li data-t="ch17-056">این همان کاری است که کتابخانه‌های بزرگ می‌کنند: شما می‌نویسید <code>from datetime import date</code> بی‌آنکه بدانید <code>date</code> در کدام فایل تعریف شده است.</li>
+    </ul>
+
+    <h2 id="s9" data-t="ch17-057">۹. کلاس داخل بسته</h2>
+
+    <pre class="code"><code>'''The Animal class (classes are studied in detail in session 21).'''
+
+
+class Animal:
+    def __init__(self, name: str, weight: int, is_pet: bool = False) -&gt; None:
+        self.name = name
+        self.weight = weight
+        self.is_pet = is_pet
+
+    def __str__(self) -&gt; str:
+        return self.name</code></pre>
+    <p class="code-caption" data-t="ch17-058">فایل animals/animal.py: نمونه 08_class_in_a_package</p>
+
+    <pre class="code"><code># A package usually exports classes, not only functions.
+from animals import Animal
+
+if __name__ == '__main__':
+    the_cat = Animal('Tom', 7, is_pet=True)
+    print(the_cat)
+
+    the_wolf = Animal('Fang', 20)
+    print(the_wolf)</code></pre>
+    <p class="code-caption" data-t="ch17-059">استفاده از کلاس: نمونه 08_class_in_a_package</p>
+
+    <p data-t="ch17-060">
+        کلاس موضوع فصل بیست و یکم است، ولی نکته این بخش ربطی به کلاس ندارد:
+        قرارداد رایج این است که <strong>هر کلاس در فایل خودش</strong> باشد و
+        <code>__init__.py</code> آن را بازصادر کند. در پروژه پایانی فصل سی و نهم
+        دقیقاً همین ساختار را می‌بینید.
+    </p>
+
+    <h2 id="s10" data-t="ch17-061">۱۰. چرا نگهبان اجرا لازم است</h2>
+
+    <p data-t="ch17-062">
+        حالا می‌فهمیم آن خط <code>if __name__ == '__main__':</code> که از فصل
+        دوازدهم می‌نویسیم واقعاً به چه درد می‌خورد.
+    </p>
+
+    <pre class="code"><code>'''This module can be RUN on its own and also be IMPORTED.'''
+
+
+class Animal:
+    def __init__(self, name: str, weight: int, is_pet: bool = False) -&gt; None:
+        self.name = name
+        self.weight = weight
+        self.is_pet = is_pet
+
+    def __str__(self) -&gt; str:
+        return self.name
+
+
+# Everything below runs only when this file is started directly
+# (python animals/animal.py). Without this guard, the two animals would also
+# be created and printed every time app.py imports the module.
+if __name__ == '__main__':
+    the_cat = Animal('Tom from the module', 7)
+    print(the_cat)
+
+    the_wolf = Animal('Fang from the module', 20)
+    print(the_wolf)</code></pre>
+    <p class="code-caption" data-t="ch17-063">نگهبان اجرا در ماژول: نمونه 09_module_main_guard</p>
+
+    <div class="try">
+        <span class="box-title" data-t="ch17-064">خودتان امتحان کنید</span>
+        <p data-t="ch17-065">
+            اول <code>python animals/animal.py</code> را اجرا کنید: کد آزمایشی
+            ماژول اجرا می‌شود. بعد <code>python app.py</code> را اجرا کنید:
+            فقط حیوان‌های خود <code>app.py</code> چاپ می‌شوند. حالا خط نگهبان
+            را بردارید و دوباره <code>app.py</code> را اجرا کنید. می‌بینید که
+            حیوان‌های ماژول هم چاپ می‌شوند، در حالی که کسی آنها را نخواسته بود.
+        </p>
+    </div>
+
+    <p data-t="ch17-066">
+        این یعنی هر ماژولی می‌تواند کد آزمایشی خودش را داشته باشد بدون اینکه
+        مزاحم کسی شود. عادت خوبی است که هر ماژولی که می‌نویسید، در انتهایش یک
+        بلوک نگهبان با چند نمونه استفاده داشته باشد.
+    </p>
+
+    <h2 id="s11" data-t="ch17-067">۱۱. ماژول تنظیمات</h2>
+
+    <p data-t="ch17-068">
+        یک کاربرد بسیار عملی ماژول: همه مقدارهای ثابت برنامه را در یک فایل جدا
+        بگذارید.
+    </p>
+
+    <pre class="code"><code>'''All the settings of the program in one place.
+
+Constants are written in CAPITALS. Keeping them in their own module means that
+changing a message or a limit never requires touching the logic of the program.
+'''
+
+APP_NAME: str = 'Kadoos Shop'
+CURRENCY: str = 'Toman'
+
+VAT_RATE: float = 0.09
+MAX_ITEMS: int = 10
+
+WELCOME_MESSAGE: str = 'Welcome to {app}!'
+GOODBYE_MESSAGE: str = 'Thank you, see you soon.'
+
+PRODUCTS: dict[str, int] = {
+    'Notebook': 15_000,
+    'Pencil': 5_000,
+    'Eraser': 3_000,
+}</code></pre>
+    <p class="code-caption" data-t="ch17-069">فایل constants.py: نمونه 10_constants_module</p>
+
+    <pre class="code"><code>'''A small shop that reads every setting from constants.py.'''
+
+import constants
+
+
+def show_products() -&gt; None:
+    'Print the price list.'
+    for name, price in constants.PRODUCTS.items():
+        print(f'{name:&lt;10}{price:&gt;10,} {constants.CURRENCY}')
+
+
+def price_with_vat(price: float) -&gt; float:
+    'Return the price including VAT.'
+    return price * (1 + constants.VAT_RATE)
+
+
+def main() -&gt; None:
+    print(constants.WELCOME_MESSAGE.format(app=constants.APP_NAME))
+    show_products()
+
+    product = input('Which product do you want? ')
+
+    if product in constants.PRODUCTS:
+        total = price_with_vat(constants.PRODUCTS[product])
+        print(f'With VAT: {total:,.0f} {constants.CURRENCY}')
+    else:
+        print('We do not sell that.')
+
+    print(constants.GOODBYE_MESSAGE)
+
+
+if __name__ == '__main__':
+    main()</code></pre>
+    <p class="code-caption" data-t="ch17-070">استفاده از تنظیمات: نمونه 10_constants_module</p>
+
+    <h3 data-t="ch17-071">شرح مثال</h3>
+
+    <ul>
+        <li data-t="ch17-072">برای تغییر نرخ مالیات یا متن خوش‌آمدگویی، فقط یک فایل عوض می‌شود و به منطق برنامه دست نمی‌زنید.</li>
+        <li data-t="ch17-073">اینجا <code>import constants</code> به کار رفته نه <code>from constants import *</code>. با این کار در متن برنامه پیداست که هر مقدار از کجا آمده است.</li>
+        <li data-t="ch17-074">متد <code>format</code> شکل قدیمی‌تر قالب‌بندی است. اینجا لازم است، چون متن پیام در فایل دیگری است و آنجا هنوز نمی‌دانیم نام برنامه چیست.</li>
+    </ul>
+
+    <div class="warn">
+        <span class="box-title" data-t="ch17-075">یک هشدار امنیتی</span>
+        <p data-t="ch17-076">رمز عبور، توکن ربات و کلید API را <strong>هرگز</strong> در <code>constants.py</code> نگذارید، چون آن فایل معمولاً در گیت ذخیره می‌شود و روی اینترنت می‌رود. این موارد باید از <strong>متغیر محیطی</strong> خوانده شوند. در فصل سی و هفتم که ربات پیام‌رسان می‌نویسیم، دقیقاً روی همین موضوع مکث می‌کنیم، چون در نسخه اصلی این دوره یک توکن واقعی داخل کد رها شده بود.</p>
+    </div>
+
+    <div class="folder-ref">
+        <span class="box-title" data-t="ch17-077">فایل‌های تمرینی این فصل</span>
+        <p data-t="ch17-078">
+            پوشه <code>S17-modules-and-packages</code> شامل ده پوشه نمونه، از
+            <code>01_import_module</code> تا <code>10_constants_module</code>.
+            هر کدام را باید <strong>از داخل خودش</strong> اجرا کنید.
+        </p>
+    </div>
+
+    <h2 data-t="ch17-079">خلاصه فصل</h2>
+
+    <div class="table-scroll">
+        <table>
+            <thead>
+                <tr><th data-t="ch17-080">مورد</th><th data-t="ch17-081">توضیح</th></tr>
+            </thead>
+            <tbody>
+                <tr><td data-t="ch17-082">ماژول</td><td data-t="ch17-083">هر فایل <code>py.</code></td></tr>
+                <tr><td data-t="ch17-084">بسته</td><td data-t="ch17-085">پوشه‌ای که <code>__init__.py</code> دارد</td></tr>
+                <tr><td><code>import m</code></td><td data-t="ch17-086">وارد کردن کامل، استفاده با <code>m.name</code></td></tr>
+                <tr><td><code>import m as x</code></td><td data-t="ch17-087">نام مستعار</td></tr>
+                <tr><td><code>from m import a, b</code></td><td data-t="ch17-088">وارد کردن مستقیم چند نام</td></tr>
+                <tr><td><code>from p.m import a</code></td><td data-t="ch17-089">ماژول داخل بسته، با نقطه</td></tr>
+                <tr><td><code>from .m import a</code></td><td data-t="ch17-090">ایمپورت نسبی، داخل خود بسته</td></tr>
+                <tr><td><code>__init__.py</code></td><td data-t="ch17-091">هنگام وارد کردن بسته اجرا می‌شود. جای بازصدور</td></tr>
+                <tr><td><code>__pycache__</code></td><td data-t="ch17-092">نسخه ترجمه‌شده. قابل پاک کردن، نباید در گیت باشد</td></tr>
+                <tr><td data-t="ch17-093">نگهبان اجرا</td><td data-t="ch17-094">کد آزمایشی ماژول هنگام وارد شدن اجرا نشود</td></tr>
+                <tr><td><code>constants.py</code></td><td data-t="ch17-095">همه تنظیمات ثابت در یک جا. بدون رمز و توکن</td></tr>
+            </tbody>
+        </table>
+    </div>
+
+    <div class="exercise">
+        <h3 data-t="ch17-096">تمرین‌های فصل هفده</h3>
+        <ol>
+            <li data-t="ch17-097">ماژول <code>geometry.py</code> با توابع <code>circle_area</code> و <code>rectangle_area</code> و <code>triangle_area</code> بسازید و از یک <code>app.py</code> استفاده‌اش کنید.</li>
+            <li data-t="ch17-098">همان ماژول را به هر سه شکل وارد کنید و مقایسه کنید.</li>
+            <li data-t="ch17-099"><code>geometry.py</code> را به بسته <code>geometry/</code> با دو ماژول <code>flat.py</code> و <code>solid.py</code> تبدیل کنید.</li>
+            <li data-t="ch17-100">در <code>__init__.py</code> آن بسته، همه چیز را بازصادر کنید.</li>
+            <li data-t="ch17-101">به هر ماژولتان یک بلوک آزمایشی با نگهبان اجرا اضافه کنید و ببینید هنگام وارد شدن اجرا نمی‌شود.</li>
+            <li data-t="ch17-102">برای یکی از برنامه‌های قبلی‌تان یک <code>constants.py</code> بسازید و همه متن‌ها و عددهای ثابت را به آن منتقل کنید.</li>
+            <li data-t="ch17-103">مقدار <code>__name__</code> را هم در ماژول و هم در برنامه‌ای که آن را وارد می‌کند چاپ کنید و تفاوت را توضیح دهید.</li>
+        </ol>
+    </div>
+
+    <div class="pager">
+        <a href="chapter-16.html">فصل قبل: کتابخانه استاندارد</a>
+        <a href="chapter-18.html">فصل بعد: فایل‌ها و سیستم‌عامل</a>
+    </div>
+
+</main>
+
+</body>
+</html>

@@ -1,0 +1,58 @@
+# =====================================================================
+# Requested exclusions
+# =====================================================================
+
+# The untouched original material, kept locally only (333 MB).
+_source/
+
+# Working notes for the course rebuild.
+claude.md
+
+# Every markdown file inside a subfolder.
+# The leading */ plus **/ means "one directory or deeper", so a markdown
+# file at the root of the repository would still be tracked.
+*/**/*.md
+
+# The book's proofreading toolkit and its exports.
+book/proofread/
+
+# The book's own working files.
+book/BOOK-PROGRESS.md
+book/mark-done.sh
+
+# =====================================================================
+# Standard exclusions (not requested, added as a safety net)
+# =====================================================================
+
+# Python
+__pycache__/
+*.py[cod]
+*.egg-info/
+.pytest_cache/
+
+# Virtual environments: rebuilt from requirements.txt in one command.
+.venv/
+venv/
+env/
+
+# Data produced by running the examples, not source code.
+*.db
+*.sqlite3
+*.bak
+
+# Secrets. A committed token stays in the history for ever.
+.env
+*.key
+
+# PyInstaller output
+build/
+dist/
+
+# Editors and operating systems
+.vscode/
+.idea/
+.DS_Store
+Thumbs.db
+
+# Syncthing / Dropbox conflict copies
+*.sync-conflict-*

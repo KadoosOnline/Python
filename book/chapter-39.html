@@ -1,0 +1,852 @@
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="فصل سی و نه: پروژه پایانی، برنامه مدیریت کتابخانه با معماری لایه‌ای روی PySide6 و SQLAlchemy، به‌علاوه کنترل نسخه با Git و GitHub">
+    <title>فصل ۳۹: پروژه پایانی، Git و GitHub</title>
+    <link rel="icon" href="logokm.png" type="image/png">
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<header class="book-bar">
+    <a class="name" href="index.html">برنامه‌نویسی پایتون</a>
+    <a href="index.html">فهرست مطالب</a>
+</header>
+
+<main class="paper">
+
+    <div class="chapter-head">
+        <span class="chapter-num">فصل ۳۹</span>
+        <h1 data-t="ch39-001">پروژه پایانی، Git و GitHub</h1>
+        <p class="lead" data-t="ch39-002">
+            همه دوره را در یک برنامه جمع می‌کنیم: یک نرم‌افزار دسکتاپ با
+            پایگاه داده واقعی، معماری تمیز و ساختار پوشه‌بندی درست. و بعد یاد
+            می‌گیریم آن را زیر کنترل نسخه ببریم و منتشرش کنیم.
+        </p>
+    </div>
+
+    <div class="mini-toc">
+        <span class="box-title" data-t="ch39-003">در این فصل می‌خوانید</span>
+        <ol>
+            <li data-t="ch39-004"><a href="#s1">معماری پروژه</a></li>
+            <li data-t="ch39-005"><a href="#s2">مسیرها</a></li>
+            <li data-t="ch39-006"><a href="#s3">مدل‌ها</a></li>
+            <li data-t="ch39-007"><a href="#s4">پایگاه داده و تراکنش</a></li>
+            <li data-t="ch39-008"><a href="#s5">لایه سرویس</a></li>
+            <li data-t="ch39-009"><a href="#s6">امانت دادن</a></li>
+            <li data-t="ch39-010"><a href="#s7">آمار</a></li>
+            <li data-t="ch39-011"><a href="#s8">لایه گرافیکی</a></li>
+            <li data-t="ch39-012"><a href="#s9">پنجره اصلی</a></li>
+            <li data-t="ch39-013"><a href="#s10">اجرا و بسته‌بندی</a></li>
+            <li data-t="ch39-014"><a href="#s11">Git: چرا و چطور</a></li>
+            <li data-t="ch39-015"><a href="#s12">gitignore پیش از اولین کامیت</a></li>
+            <li data-t="ch39-016"><a href="#s13">شاخه و تعارض</a></li>
+            <li data-t="ch39-017"><a href="#s14">GitHub و README</a></li>
+        </ol>
+    </div>
+
+    <h2 id="s1" data-t="ch39-018">۱. معماری پروژه</h2>
+
+    <pre class="out">library/
+├── main.py                 starts the program, and nothing else
+├── core/                   *** imports no PySide6 at all ***
+│   ├── paths.py            where the files are (works frozen too)
+│   ├── models.py           Book, Member, Borrow
+│   ├── database.py         the engine, the session, session_scope()
+│   └── services.py         the RULES of the library
+├── gui/                    *** contains no SQL at all ***
+│   ├── ui_loader.py        loading a .ui file, once
+│   ├── dialogs.py          the three modal forms
+│   └── main_window.py      the four tabs
+└── ui/                     what Qt Designer produced
+    ├── book_dialog.ui
+    ├── member_dialog.ui
+    └── lend_dialog.ui</pre>
+
+    <div class="tip">
+        <span class="box-title" data-t="ch39-019">تنها ایده‌ای که باید از این فصل ببرید</span>
+        <p data-t="ch39-020">
+            <strong>پوشه <code>core/</code> هیچ چیز درباره پنجره نمی‌داند، و
+            پوشه <code>gui/</code> هیچ چیز درباره SQL.</strong>
+            قانون «یک عضو نمی‌تواند بیش از پنج کتاب داشته باشد» یک بار نوشته
+            شده است، در <code>core/services.py</code>. دکمه صدایش می‌زند.
+            صفحه Flask فردا هم همان تابع را صدا می‌زند، و این دو هرگز نمی‌توانند
+            با هم اختلاف پیدا کنند.
+        </p>
+    </div>
+
+    <p data-t="ch39-021">
+        به همین دلیل است که سرویس‌ها به جای نشان دادن پنجره پیام،
+        <code>LibraryError</code> پرتاب می‌کنند: <code>core/</code> مسئله را
+        <strong>بیان</strong> می‌کند و <code>gui/</code> تصمیم می‌گیرد چطور
+        نشانش دهد.
+    </p>
+
+    <div class="table-scroll">
+        <table>
+            <thead>
+                <tr><th data-t="ch39-022">زبانه</th><th data-t="ch39-023">کارها</th></tr>
+            </thead>
+            <tbody>
+                <tr><td data-t="ch39-024">کتاب‌ها</td><td data-t="ch39-025">جست‌وجوی زنده، افزودن، ویرایش، حذف (تا وقتی کتاب بیرون است رد می‌شود)</td></tr>
+                <tr><td data-t="ch39-026">اعضا</td><td data-t="ch39-027">جست‌وجو، افزودن، ویرایش، حذف (تا وقتی کتاب در دست دارند رد می‌شود)</td></tr>
+                <tr><td data-t="ch39-028">امانت‌ها</td><td data-t="ch39-029">امانت دادن، پس گرفتن، تمدید؛ امانت دیرکرددار قرمز</td></tr>
+                <tr><td data-t="ch39-030">آمار</td><td data-t="ch39-031">جمع‌ها و پنج عنوان پرامانت‌تر</td></tr>
+            </tbody>
+        </table>
+    </div>
+
+    <h2 id="s2" data-t="ch39-032">۲. مسیرها</h2>
+
+    <pre class="code"><code>'''Where the files of the application live.
+
+Every path in the program goes through this module, so there is exactly one
+place to change when the layout moves -- and exactly one place that knows
+about PyInstaller (session 36).
+
+    resource_path()  what we READ and ship with the program (the .ui files)
+    data_dir()       what we WRITE, and that must survive a restart
+'''
+
+def project_root() -&gt; Path:
+    '''The folder that holds `main.py` (or the .exe once frozen).'''
+    if is_frozen():
+        return Path(sys.executable).resolve().parent
+    # paths.py -&gt; core -&gt; library
+    return Path(__file__).resolve().parent.parent
+
+
+def resource_path(relative: str) -&gt; Path:
+    '''A file that was SHIPPED with the program (read-only).'''
+    if is_frozen() and hasattr(sys, '_MEIPASS'):
+        # --add-data puts the files here (session 36).
+        return Path(sys._MEIPASS) / relative
+    return project_root() / relative
+
+
+def data_dir() -&gt; Path:
+    '''Where the program WRITES. Created if it does not exist yet.'''
+    folder = project_root() / 'data'
+    folder.mkdir(parents=True, exist_ok=True)
+    return folder
+
+
+def database_path() -&gt; Path:
+    return data_dir() / 'library.db'</code></pre>
+    <p class="code-caption" data-t="ch39-033">مسیرها: library/core/paths.py</p>
+
+    <p data-t="ch39-034">
+        این همان درس فصل سی و ششم است، ولی این بار <strong>از روز اول</strong>
+        در معماری پروژه نشسته: یک ماژول که تنها جای آگاه از PyInstaller است.
+        نتیجه‌اش این است که تبدیل برنامه به فایل اجرایی، هیچ جای دیگری از کد
+        را دست نمی‌زند.
+    </p>
+
+    <h2 id="s3" data-t="ch39-035">۳. مدل‌ها</h2>
+
+    <pre class="code"><code>'''The tables of the library, as SQLAlchemy 2.0 models.
+
+    Member  1 --- n  Borrow  n --- 1  Book
+
+A `Borrow` row is one loan. `return_date IS NULL` means the book is still out,
+which is why we do not need a duplicated "available" flag on `Book`: the
+answer is always one query away, and one fact stored in one place cannot
+disagree with itself.
+
+(Session 35 did keep such a flag, and its bug was exactly that: two places to
+update, one transaction to get wrong.)
+'''
+
+class Book(Base):
+    __tablename__ = 'books'
+
+    id: Mapped[int] = mapped_column(primary_key=True)
+    title: Mapped[str] = mapped_column(String(160), nullable=False)
+    author: Mapped[str] = mapped_column(String(120), default='')
+    year: Mapped[int | None] = mapped_column(Integer, nullable=True)
+    created_at: Mapped[datetime] = mapped_column(DateTime,
+                                                 server_default=func.now())
+
+    # cascade: deleting a book deletes its loan history with it.
+    borrows: Mapped[list['Borrow']] = relationship(
+        back_populates='book', cascade='all, delete-orphan')
+
+    @property
+    def is_out(self) -&gt; bool:
+        '''True while one of the loans has no return date.'''
+        return any(borrow.return_date is None for borrow in self.borrows)
+
+    def __str__(self) -&gt; str:
+        # __str__ must return a STRING. The original returned `self.member`,
+        # an object, which raised TypeError the first time it was printed.
+        return f'{self.title} ({self.author})' if self.author else self.title</code></pre>
+    <p class="code-caption" data-t="ch39-036">مدل کتاب: library/core/models.py</p>
+
+    <pre class="code"><code>class Borrow(Base):
+    __tablename__ = 'borrows'
+
+    id: Mapped[int] = mapped_column(primary_key=True)
+    # ondelete=CASCADE is the rule inside the DATABASE; the `cascade=` above
+    # is the rule inside SQLAlchemy. You want both, and SQLite only obeys the
+    # first one when `PRAGMA foreign_keys = ON` is set (see database.py).
+    book_id: Mapped[int] = mapped_column(
+        ForeignKey('books.id', ondelete='CASCADE'), nullable=False)
+    member_id: Mapped[int] = mapped_column(
+        ForeignKey('members.id', ondelete='CASCADE'), nullable=False)
+
+    # datetime.now, not datetime.utcnow: utcnow is deprecated since 3.12.
+    borrow_date: Mapped[datetime] = mapped_column(DateTime,
+                                                  default=datetime.now)
+    due_date: Mapped[datetime] = mapped_column(DateTime, nullable=False)
+    return_date: Mapped[datetime | None] = mapped_column(DateTime,
+                                                         nullable=True)
+
+    @property
+    def is_late(self) -&gt; bool:
+        '''Out, and past the due date.'''
+        return self.is_open and datetime.now() &gt; self.due_date</code></pre>
+    <p class="code-caption" data-t="ch39-037">مدل امانت</p>
+
+    <h3 data-t="ch39-038">شرح مثال</h3>
+
+    <ul>
+        <li data-t="ch39-039">مهم‌ترین تصمیم طراحی: <strong>ستون <code>available</code> وجود ندارد</strong>. اینکه کتاب بیرون است یا نه، همیشه یک پرس‌وجو دورتر است. یک واقعیت که در یک جا ذخیره شده، نمی‌تواند با خودش اختلاف پیدا کند.</li>
+        <li data-t="ch39-040">در فصل سی و پنجم چنین پرچمی داشتیم و باگش دقیقاً همین بود: دو جا برای به‌روزرسانی، و یک تراکنش برای اشتباه کردن.</li>
+        <li data-t="ch39-041">حذف آبشاری در <strong>دو</strong> جا نوشته شده: <code>ondelete='CASCADE'</code> قانون داخل پایگاه داده است و <code>cascade='all, delete-orphan'</code> قانون داخل SQLAlchemy. هر دو را می‌خواهید.</li>
+        <li data-t="ch39-042"><code>@property</code>هایی مثل <code>is_out</code> و <code>is_late</code> و <code>full_name</code> منطق را کنار داده می‌گذارند. این همان چیزی است که فصل بیست و دوم آموخت.</li>
+        <li data-t="ch39-043"><code>__str__</code> باید <strong>رشته</strong> برگرداند. نسخه اصلی این پروژه شیء برمی‌گرداند و اولین بار که چاپ می‌شد <code>TypeError</code> می‌داد.</li>
+    </ul>
+
+    <h2 id="s4" data-t="ch39-044">۴. پایگاه داده و تراکنش</h2>
+
+    <pre class="code"><code>ENGINE = create_engine(f'sqlite:///{database_path()}', echo=False,
+                       future=True)
+
+# expire_on_commit=False is important here. By default, `commit()` marks every
+# loaded attribute as "must be read again", and reading one after the session
+# is closed raises DetachedInstanceError. The GUI keeps the objects it showed
+# (to know which row is selected), so we need their values to stay usable
+# after the transaction ends.
+SessionLocal = sessionmaker(bind=ENGINE, autoflush=False, autocommit=False,
+                            expire_on_commit=False, future=True)
+
+
+@event.listens_for(ENGINE, 'connect')
+def _enable_foreign_keys(dbapi_connection, connection_record) -&gt; None:
+    '''SQLite needs this on every connection, or ON DELETE does nothing.'''
+    cursor = dbapi_connection.cursor()
+    cursor.execute('PRAGMA foreign_keys=ON')
+    cursor.close()
+
+
+@contextmanager
+def session_scope() -&gt; Iterator[Session]:
+    '''One transaction: commit on success, roll back on any exception.'''
+    session = SessionLocal()
+    try:
+        yield session
+        session.commit()
+    except Exception:
+        session.rollback()
+        raise               # the caller still has to know
+    finally:
+        session.close()</code></pre>
+    <p class="code-caption" data-t="ch39-045">موتور و تراکنش: library/core/database.py</p>
+
+    <h3 data-t="ch39-046">شرح مثال</h3>
+
+    <ul>
+        <li data-t="ch39-047"><code>session_scope()</code> یک <strong>مدیر زمینه</strong> است، ساخته‌شده با <code>@contextmanager</code> فصل بیست و پنجم. با آن، هر عمل برنامه در یک بلوک <code>with</code> جا می‌شود: موفق شد commit، شکست خورد rollback، در هر حال close.</li>
+        <li data-t="ch39-048">بدون آن، یک استثنا در میانه کار، تراکنشی نیمه‌نوشته و نشستی که کسی نبسته باقی می‌گذارد.</li>
+        <li data-t="ch39-049"><code>raise</code> در <code>except</code> فراموش نشود: تمیزکاری کردیم، ولی صداکننده هنوز باید بداند چه شده.</li>
+        <li data-t="ch39-050"><code>expire_on_commit=False</code> نکته ظریفی است که هر کس با SQLAlchemy و رابط گرافیکی کار کند یک بار گیرش می‌افتد: به طور پیش‌فرض بعد از <code>commit</code> خواندن صفت‌های شیء بیرون از نشست، <code>DetachedInstanceError</code> می‌دهد.</li>
+    </ul>
+
+    <h2 id="s5" data-t="ch39-051">۵. لایه سرویس</h2>
+
+    <pre class="code"><code>'''The rules of the library.
+
+Every operation the program can perform is a function here. The windows call
+these functions and show what they return; they never write a query and they
+never decide a rule.
+
+Why that matters:
+
+* the rule "a member may not have more than five books" is written ONCE, so
+  the button and the future web page cannot disagree;
+* this file can be read, reviewed and tested without starting a window;
+* an operation that must not be interrupted (lending: two rows to change) is a
+  single function with a single transaction.
+'''
+
+LOAN_DAYS = 14              # how long a book may be kept
+MAX_OPEN_LOANS = 5          # how many books one member may hold at once
+
+
+class LibraryError(Exception):
+    '''A rule of the library was broken. The message is shown to the user.'''
+
+
+def list_books(session: Session, search: str = '') -&gt; list[Book]:
+    '''Every book. `selectinload` fetches the loans in one extra query
+    instead of one per book (the "N+1 queries" problem).'''
+    query = select(Book).options(selectinload(Book.borrows)).order_by(Book.title)
+
+    if search:
+        pattern = f'%{search}%'
+        # The % is inside a PARAMETER: no SQL injection (session 30).
+        query = query.where(or_(Book.title.ilike(pattern),
+                                Book.author.ilike(pattern),
+                                Book.isbn.ilike(pattern)))
+
+    return list(session.scalars(query))
+
+
+def delete_book(session: Session, book: Book) -&gt; None:
+    if book.is_out:
+        raise LibraryError('This book is lent out. Take it back first.')
+    session.delete(book)</code></pre>
+    <p class="code-caption" data-t="ch39-052">لایه سرویس: library/core/services.py</p>
+
+    <h3 data-t="ch39-053">شرح مثال</h3>
+
+    <ul>
+        <li data-t="ch39-054">هر کاری که برنامه می‌تواند انجام دهد، اینجا یک تابع است. پنجره‌ها فقط صدایشان می‌زنند و نتیجه را نشان می‌دهند.</li>
+        <li data-t="ch39-055">این فایل را می‌شود بدون باز کردن هیچ پنجره‌ای خواند، بازبینی کرد و آزمود.</li>
+        <li data-t="ch39-056"><code>selectinload</code> مسئله <span dir="ltr">N+1</span> فصل سی و دوم را حل می‌کند: به جای یک پرس‌وجو برای هر کتاب، یک پرس‌وجوی اضافه برای همه.</li>
+        <li data-t="ch39-057">علامت درصد داخل <strong>پارامتر</strong> است، نه داخل رشته SQL. درس تزریق SQL فصل سی‌ام هنوز پابرجاست.</li>
+        <li data-t="ch39-058">تصمیم «نمی‌شود» اینجا گرفته می‌شود، نه در دکمه. دکمه فقط <code>LibraryError</code> را می‌گیرد و پیامش را نشان می‌دهد.</li>
+    </ul>
+
+    <h2 id="s6" data-t="ch39-059">۶. امانت دادن</h2>
+
+    <p data-t="ch39-060">
+        این مهم‌ترین تابع کل پروژه است، چون همه قوانین یک امانت را یک‌جا و در
+        یک تراکنش بررسی می‌کند.
+    </p>
+
+    <pre class="code"><code>def lend_book(session: Session, book: Book, member: Member,
+              days: int = LOAN_DAYS) -&gt; Borrow:
+    '''Lend one book to one member. Every rule of a loan is checked here.'''
+    # Ask the database, not the object: another window may have lent it
+    # a second ago.
+    already_out = session.scalar(
+        select(Borrow).where(Borrow.book_id == book.id,
+                             Borrow.return_date.is_(None)))
+    if already_out is not None:
+        raise LibraryError(f'"{book.title}" is already lent out.')
+
+    open_count = session.scalar(
+        select(func.count(Borrow.id))
+        .where(Borrow.member_id == member.id, Borrow.return_date.is_(None)))
+    if open_count and open_count &gt;= MAX_OPEN_LOANS:
+        raise LibraryError(f'{member.full_name} already has '
+                           f'{MAX_OPEN_LOANS} books.')
+
+    now = datetime.now()
+    borrow = Borrow(book_id=book.id, member_id=member.id,
+                    borrow_date=now, due_date=now + timedelta(days=days))
+    session.add(borrow)
+    session.flush()
+    return borrow</code></pre>
+    <p class="code-caption" data-t="ch39-061">امانت دادن: library/core/services.py</p>
+
+    <h3 data-t="ch39-062">شرح مثال</h3>
+
+    <ul>
+        <li data-t="ch39-063">چرا از <strong>پایگاه داده</strong> می‌پرسیم که کتاب بیرون است یا نه، در حالی که <code>book.is_out</code> همان‌جا در دسترس است؟ چون شیئی که در دست داریم عکسی از چند لحظه پیش است. پنجره دیگری ممکن است یک ثانیه قبل همان کتاب را امانت داده باشد.</li>
+        <li data-t="ch39-064">هر دو قانون در <strong>یک</strong> تراکنش بررسی و اعمال می‌شوند. این همان درس اتمی بودن فصل سی و یکم است.</li>
+        <li data-t="ch39-065">عددهای قانون در بالای فایل ثابت تعریف شده‌اند: <code>LOAN_DAYS</code> و <code>MAX_OPEN_LOANS</code>. عدد جادویی وسط کد ننویسید.</li>
+        <li data-t="ch39-066"><code>flush()</code> شناسه را می‌سازد بدون اینکه تراکنش را ببندد؛ commit را <code>session_scope</code> در انتها انجام می‌دهد.</li>
+    </ul>
+
+    <h2 id="s7" data-t="ch39-067">۷. آمار</h2>
+
+    <pre class="code"><code>def statistics(session: Session) -&gt; dict:
+    '''One dictionary with everything the statistics tab shows.'''
+    total_books = session.scalar(select(func.count(Book.id))) or 0
+    total_members = session.scalar(select(func.count(Member.id))) or 0
+    out = session.scalar(
+        select(func.count(Borrow.id)).where(Borrow.return_date.is_(None))) or 0
+    late = session.scalar(
+        select(func.count(Borrow.id))
+        .where(Borrow.return_date.is_(None),
+               Borrow.due_date &lt; datetime.now())) or 0
+
+    # The five most borrowed titles: GROUP BY + ORDER BY (session 30).
+    popular = session.execute(
+        select(Book.title, func.count(Borrow.id).label('times'))
+        .join(Borrow, Borrow.book_id == Book.id)
+        .group_by(Book.id)
+        .order_by(func.count(Borrow.id).desc())
+        .limit(5)).all()
+
+    return {'books': total_books,
+            'members': total_members,
+            'on_loan': out,
+            'available': total_books - out,
+            'late': late,
+            'popular': [(title, times) for title, times in popular]}</code></pre>
+    <p class="code-caption" data-t="ch39-068">آمار: library/core/services.py</p>
+
+    <p data-t="ch39-069">
+        یک تابع، یک دیکشنری. زبانه آمار فقط همین دیکشنری را می‌گیرد و
+        می‌نویسدش. اگر فردا بخواهید همین اعداد را در یک صفحه وب یا در یک
+        گزارش PDF نشان دهید، همین تابع کافی است.
+        <code>GROUP BY</code> و <code>ORDER BY</code> و <code>JOIN</code> هم
+        همان چیزهایی هستند که در فصل سی‌ام با SQL خام نوشتید.
+    </p>
+
+    <h2 id="s8" data-t="ch39-070">۸. لایه گرافیکی</h2>
+
+    <pre class="code"><code>'''Loading the Qt Designer files -- written once, used by every dialog.
+
+The first version of this course repeated the same fifteen lines of
+`QUiLoader` code at the top of nine files. It is one function.
+'''
+
+def load_ui(file_name: str) -&gt; QWidget:
+    '''Load one of the files of `ui/` and return the widget it describes.'''
+    path = ui_path(file_name)
+    if not path.exists():
+        raise FileNotFoundError(
+            f'{path} is missing.\n'
+            'When the program is frozen, the ui/ folder must be shipped with '
+            'it:  pyinstaller --add-data "ui;ui" ...')
+
+    widget = QUiLoader().load(str(path))
+    if widget is None:
+        raise RuntimeError(f'Qt could not read {path} (invalid XML?)')
+    return widget
+
+
+def find(parent: QWidget, widget_type: type[WidgetType],
+         name: str) -&gt; WidgetType:
+    '''findChild that complains at once instead of returning None.'''
+    widget = parent.findChild(widget_type, name)
+    if widget is None:
+        raise RuntimeError(f'No {widget_type.__name__} named {name!r} in the '
+                           'ui file -- check the objectName in Qt Designer.')
+    return widget</code></pre>
+    <p class="code-caption" data-t="ch39-071">بارگذار: library/gui/ui_loader.py</p>
+
+    <pre class="code"><code>class BaseDialog(QDialog):
+    '''A QDialog whose content comes from a .ui file.'''
+
+    UI_FILE = ''
+
+    def __init__(self, parent: QWidget | None, title: str) -&gt; None:
+        super().__init__(parent)
+        self.setWindowTitle(title)
+        self.ui = load_ui(self.UI_FILE)
+        ...
+        self.buttons = find(self.ui, QDialogButtonBox, 'buttonBox')
+        # `accepted` is emitted by Save/OK, `rejected` by Cancel.
+        self.buttons.accepted.connect(self.on_accept)
+        self.buttons.rejected.connect(self.reject)
+
+        self.data: dict = {}
+
+    def on_accept(self) -&gt; None:
+        '''Validate; call `self.accept()` only when everything is right.'''
+        errors = self.collect()
+        if errors:
+            QMessageBox.warning(self, 'Please check the form',
+                                '\n'.join(f'- {message}' for message in errors))
+            return
+        self.accept()
+
+    def collect(self) -&gt; list[str]:
+        '''Fill `self.data` and return the list of problems.'''
+        raise NotImplementedError</code></pre>
+    <p class="code-caption" data-t="ch39-072">کلاس پایه دیالوگ‌ها: library/gui/dialogs.py</p>
+
+    <h3 data-t="ch39-073">شرح مثال</h3>
+
+    <ul>
+        <li data-t="ch39-074">قرارداد همه دیالوگ‌ها یکی است: <code>dialog.exec()</code> اگر کاربر ذخیره را زده باشد درست می‌دهد، و آن وقت <code>dialog.data</code> یک دیکشنری از مقدارهای <strong>پیش‌تر اعتبارسنجی‌شده</strong> است.</li>
+        <li data-t="ch39-075">دیالوگ‌ها <strong>شکل</strong> داده را بررسی می‌کنند: سال عدد است؟ عنوان خالی نیست؟ آنها قوانین کتابخانه را <strong>نمی‌دانند</strong>؛ آن قوانین در <code>core/services.py</code> زندگی می‌کنند. جدا نگه داشتن این دو، همان چیزی است که جلوی نوشته شدن یک قانون در دو جا را می‌گیرد.</li>
+        <li data-t="ch39-076"><code>collect()</code> یک متد انتزاعی است که هر دیالوگ خودش پرش می‌کند. الگوی قالب، از فصل بیست و سوم.</li>
+    </ul>
+
+    <h2 id="s9" data-t="ch39-077">۹. پنجره اصلی</h2>
+
+    <pre class="code"><code>'''The main window: four tabs, three tables, and not one line of SQL.
+
+The two habits that keep this file honest:
+
+1. Every screen is rebuilt by a `refresh_*` method, and an action calls
+   `refresh_all()`. Trying to patch one row of a table by hand is how a
+   display starts disagreeing with the database.
+2. The table is a DISPLAY. The real row is remembered in
+   `self.book_rows[table_row]`, never read back out of the widget. (That was
+   the bug of session 35: a Treeview handed back the word "yes" for a number.)
+'''
+
+    def refresh_books(self) -&gt; None:
+        search = self.book_search.text().strip()
+        self.books_table.setSortingEnabled(False)   # sorting while filling
+        self.books_table.setRowCount(0)             # scrambles the rows
+        self.book_rows.clear()
+
+        with session_scope() as session:
+            for row, book in enumerate(services.list_books(session, search)):
+                self.books_table.insertRow(row)
+                fill_row(self.books_table, row,
+                         [book.id, book.title, book.author or '',
+                          book.publisher or '', book.year or '',
+                          'out' if book.is_out else 'on the shelf'])
+                self.book_rows[row] = book
+
+        self.books_table.setSortingEnabled(True)</code></pre>
+    <p class="code-caption" data-t="ch39-078">بازسازی جدول: library/gui/main_window.py</p>
+
+    <pre class="code"><code>    def delete_book(self) -&gt; None:
+        book = self.selected_book()
+        if book is None:
+            return
+        if QMessageBox.question(
+                self, 'Confirm',
+                f'Delete "{book.title}"?\nIts loan history goes with it.'
+        ) != QMessageBox.StandardButton.Yes:
+            return
+        try:
+            with session_scope() as session:
+                fresh = session.get(Book, book.id)
+                if fresh is not None:
+                    services.delete_book(session, fresh)
+        except LibraryError as error:
+            QMessageBox.warning(self, 'Cannot delete', str(error))
+            return
+        self.refresh_all()
+        self.statusBar().showMessage('The book was deleted.')</code></pre>
+    <p class="code-caption" data-t="ch39-079">یک عمل کامل، از دکمه تا پایگاه داده</p>
+
+    <h3 data-t="ch39-080">شرح مثال</h3>
+
+    <ul>
+        <li data-t="ch39-081">الگوی هر عمل یکسان است: انتخاب را بگیر، تأیید بپرس، در یک <code>session_scope</code> شیء را <strong>تازه</strong> از پایگاه داده بخوان، سرویس را صدا بزن، <code>LibraryError</code> را بگیر و نشان بده، و در پایان <code>refresh_all()</code>.</li>
+        <li data-t="ch39-082">شیئی که در جدول نگه داشته‌ایم از نشستی آمده که حالا بسته شده است. پیش از تغییر دادنش، داخل تراکنش جاری دوباره بخوانیدش.</li>
+        <li data-t="ch39-083">مرتب‌سازی جدول را هنگام پر کردن <strong>خاموش</strong> کنید، وگرنه سطرها وسط کار جابه‌جا می‌شوند و نگاشت <code>book_rows</code> غلط از آب درمی‌آید.</li>
+        <li data-t="ch39-084">تصمیم «اجازه نداری» در سرویس گرفته می‌شود؛ پنجره فقط پیامش را نمایش می‌دهد. این خط، دقیقاً همان مرز معماری است.</li>
+    </ul>
+
+    <h2 id="s10" data-t="ch39-085">۱۰. اجرا و بسته‌بندی</h2>
+
+    <pre class="code"><code>def main() -&gt; int:
+    app = QApplication(sys.argv)
+
+    try:
+        init_database()
+        with session_scope() as session:
+            add_sample_data(session)
+    except Exception as error:
+        # A --windowed build has no console, so a start-up failure must be
+        # shown in a box or nobody will ever see it (session 36).
+        QMessageBox.critical(None, 'The database could not be opened',
+                             f'{type(error).__name__}: {error}')
+        return 1
+
+    window = MainWindow()
+    window.show()
+    return app.exec()
+
+
+if __name__ == '__main__':
+    sys.exit(main())</code></pre>
+    <p class="code-caption" data-t="ch39-086">نقطه شروع: library/main.py</p>
+
+    <pre class="out">python -m venv .venv
+.venv\Scripts\activate              # Windows
+pip install -r requirements.txt
+
+cd library
+python main.py</pre>
+
+    <pre class="out">cd library
+pyinstaller --onefile --windowed --add-data "ui;ui" --name kadoos-library main.py</pre>
+
+    <p data-t="ch39-087">گزینه <code>--add-data "ui;ui"</code> حیاتی است: بدون آن، <code>QUiLoader</code> داخل فایل اجرایی هیچ فایل <code>.ui</code>ای پیدا نمی‌کند. ماژول <code>core/paths.py</code> از قبل در <code>sys._MEIPASS</code> جست‌وجو می‌کند و پایگاه داده را کنار خود فایل اجرایی می‌نویسد.</p>
+
+    <div class="table-scroll">
+        <table>
+            <thead>
+                <tr><th data-t="ch39-088">فصل</th><th data-t="ch39-089">کجای پروژه دیده می‌شود</th></tr>
+            </thead>
+            <tbody>
+                <tr><td data-t="ch39-090">۱۱ تا ۱۳ توابع</td><td data-t="ch39-091">هر سرویس یک تابع کوچک و نام‌دار است</td></tr>
+                <tr><td data-t="ch39-092">۱۴ و ۱۵ ساختار داده</td><td data-t="ch39-093"><code>statistics()</code> یک دیکشنری برمی‌گرداند</td></tr>
+                <tr><td data-t="ch39-094">۱۷ ماژول و بسته</td><td data-t="ch39-095"><code>core/</code> و <code>gui/</code> و <code>__init__.py</code></td></tr>
+                <tr><td data-t="ch39-096">۱۹ استثناها</td><td data-t="ch39-097"><code>LibraryError</code> و جایی که گرفته می‌شود</td></tr>
+                <tr><td data-t="ch39-098">۲۱ تا ۲۴ شیءگرایی</td><td data-t="ch39-099">مدل‌ها، کلاس پایه دیالوگ، <code>@property</code>، <code>__str__</code></td></tr>
+                <tr><td data-t="ch39-100">۲۵ و ۲۶ کد پایتونی</td><td data-t="ch39-101">جامعیت‌ها، <code>@contextmanager</code>، <code>@property</code></td></tr>
+                <tr><td data-t="ch39-102">۳۰ تا ۳۲ پایگاه داده و ORM</td><td data-t="ch39-103">مدل‌ها، پرس‌وجوها، تراکنش‌ها</td></tr>
+                <tr><td data-t="ch39-104">۳۳ الگوهای طراحی</td><td data-t="ch39-105">لایه سرویس، و <code>session_scope</code></td></tr>
+                <tr><td data-t="ch39-106">۳۶ Qt و بسته‌بندی</td><td data-t="ch39-107">دیالوگ‌ها، <code>paths.py</code>، فرمان PyInstaller</td></tr>
+            </tbody>
+        </table>
+    </div>
+
+    <h2 id="s11" data-t="ch39-108">۱۱. Git: چرا و چطور</h2>
+
+    <p data-t="ch39-109">
+        نیمه دوم این جلسه، ابزاری است که هر پروژه‌ای از خط اولش به آن نیاز
+        دارد. چرا؟ چون <code>app_final.py</code> و
+        <code>app_final2.py</code> و <code>app_final_REAL.py</code> و
+        <code dir="ltr">app.sync-conflict-20260717-161647-AGS7SKO.py</code>
+        راهی برای نگه داشتن تاریخچه نیستند؛ و هر چهار فایل واقعاً در پوشه‌ای
+        که این پروژه از آن بازنویسی شد وجود داشتند.
+    </p>
+
+    <p data-t="ch39-110">Git به چهار سؤال جواب می‌دهد که یک پوشه ساده نمی‌تواند:</p>
+
+    <ul>
+        <li data-t="ch39-111">این فایل سه‌شنبه گذشته چه شکلی بود؟</li>
+        <li data-t="ch39-112">چه کسی این خط را عوض کرد، و چرا؟</li>
+        <li data-t="ch39-113">می‌توانم چیز خطرناکی را امتحان کنم بدون اینکه آنچه کار می‌کند از دست برود؟</li>
+        <li data-t="ch39-114">دو نفر می‌توانند همزمان روی یک پروژه کار کنند؟</li>
+    </ul>
+
+    <pre class="out">git --version                 # is it there?
+
+git config --global user.name  "Your Name"
+git config --global user.email "you@example.com"
+git config --global init.defaultBranch main</pre>
+
+    <p data-t="ch39-115">
+        نام و ایمیل در <strong>هر</strong> کامیتی که می‌سازید نوشته می‌شوند،
+        پس این کار را پیش از اولین کامیت انجام دهید.
+    </p>
+
+    <pre class="out">   working folder  --git add--&gt;  staging area  --git commit--&gt;  history
+    (your edits)                  (what will                    (permanent)
+                                   go in next)</pre>
+
+    <pre class="out">git status                    # where is everything? (use it constantly)
+git add file.py               # stage one file
+git add .                     # stage everything (look at status first!)
+git commit -m "Add the lending rules"
+git log --oneline --graph     # the history
+git diff                      # what I changed and have not staged
+git diff --staged             # what is about to be committed</pre>
+
+    <h3 data-t="ch39-116">پیام کامیت</h3>
+
+    <ul>
+        <li data-t="ch39-117">یک کامیت، یک ایده. «جست‌وجو را درست کردم <strong>و</strong> زبانه آمار را اضافه کردم» دو کامیت است.</li>
+        <li data-t="ch39-118">بنویسید چه کار می‌کند، به زمان حال: <code dir="ltr">Add the late-loan colour</code>، نه <code dir="ltr">added stuff</code> و نه <code dir="ltr">update</code>.</li>
+        <li data-t="ch39-119">وقتی دلیل روشن نیست، <strong>چرایی</strong> را در متن کامیت توضیح دهید. کامیت، پیامی است به خودتان در آینده.</li>
+    </ul>
+
+    <h2 id="s12" data-t="ch39-120">۱۲. gitignore پیش از اولین کامیت</h2>
+
+    <div class="warn">
+        <span class="box-title" data-t="ch39-121">ترتیب مهم است</span>
+        <p data-t="ch39-122">
+            فایل <code>.gitignore</code> را <strong>پیش از</strong> اولین
+            کامیت بنویسید. فایلی که یک بار کامیت شده باشد، با اضافه کردن نامش
+            به <code>.gitignore</code> حذف <strong>نمی‌شود</strong>.
+        </p>
+    </div>
+
+    <div class="table-scroll">
+        <table>
+            <thead>
+                <tr><th data-t="ch39-123">هرگز کامیت نکنید</th><th data-t="ch39-124">چرا</th></tr>
+            </thead>
+            <tbody>
+                <tr><td><code>.venv/</code></td><td data-t="ch39-125">صدها مگابایت که <code>pip install -r requirements.txt</code> دوباره می‌سازد</td></tr>
+                <tr><td><code>*.db</code></td><td data-t="ch39-126">داده است نه کد؛ هر اجرا به یک تفاوت عظیم و ناخوانا تبدیل می‌شود</td></tr>
+                <tr><td><code>__pycache__/</code></td><td data-t="ch39-127">از روی فایل‌های <code>.py</code> تولید می‌شود</td></tr>
+                <tr><td data-t="ch39-128"><code>build/</code> و <code>dist/</code></td><td data-t="ch39-129">ساخته PyInstaller</td></tr>
+                <tr><td data-t="ch39-130"><code>.env</code> و توکن‌ها و کلیدها</td><td data-t="ch39-131">رمزی که کامیت شود، تا ابد در تاریخچه می‌ماند</td></tr>
+                <tr><td><code>*.sync-conflict-*</code></td><td data-t="ch39-132">کپی‌های تعارض Syncthing و Dropbox</td></tr>
+            </tbody>
+        </table>
+    </div>
+
+    <pre class="out">git rm -r --cached .venv
+git commit -m "Remove the virtual environment from the repository"</pre>
+
+    <h2 id="s13" data-t="ch39-133">۱۳. شاخه و تعارض</h2>
+
+    <p data-t="ch39-134">
+        <strong>شاخه</strong> یک خط کار جداگانه است. قاعده ساده:
+        <code>main</code> همیشه کار می‌کند، و هر چیز دیگری جای دیگری اتفاق
+        می‌افتد.
+    </p>
+
+    <pre class="out">git switch -c feature/statistics    # create it and go there
+...work, add, commit...
+git switch main
+git merge feature/statistics
+git branch -d feature/statistics</pre>
+
+    <p data-t="ch39-135">
+        <strong>تعارض</strong> وقتی رخ می‌دهد که دو شاخه همان خط‌ها را عوض
+        کرده باشند. Git آنها را در فایل علامت می‌زند:
+    </p>
+
+    <pre class="out">&lt;&lt;&lt;&lt;&lt;&lt;&lt; HEAD
+the version of main
+=======
+the version of the other branch
+&gt;&gt;&gt;&gt;&gt;&gt;&gt; feature/statistics</pre>
+
+    <p data-t="ch39-136">
+        فایل را تا جایی که می‌خواهید ویرایش کنید، سه نشانه را پاک کنید، بعد
+        <code>git add</code> و <code>git commit</code>. هیچ جادویی در کار
+        نیست؛ فقط باید با دقت بخوانید.
+    </p>
+
+    <pre class="out">git restore file.py                 # throw away my changes to that file
+git restore --staged file.py        # unstage it, keep the changes
+git commit --amend                  # fix the LAST commit (message or content)
+git revert &lt;hash&gt;                   # a NEW commit that undoes an old one
+git reset --hard &lt;hash&gt;             # go back and DESTROY what came after</pre>
+
+    <div class="warn">
+        <span class="box-title" data-t="ch39-137">revert در برابر reset</span>
+        <p data-t="ch39-138">
+            <code>git revert</code> امن و عمومی است: یک کامیت تازه می‌سازد که
+            کار کامیت قدیمی را خنثی می‌کند. <code>git reset --hard</code> کار
+            را دور می‌ریزد و <strong>هرگز</strong> نباید روی چیزی که قبلاً
+            push و به اشتراک گذاشته‌اید به کار برود.
+        </p>
+    </div>
+
+    <h2 id="s14" data-t="ch39-139">۱۴. GitHub و README</h2>
+
+    <p data-t="ch39-140">
+        GitHub یک <strong>کپی از مخزن شما روی یک سرور</strong> است. Git بدون
+        آن هم عالی کار می‌کند؛ GitHub پشتیبان و اشتراک‌گذاری و جایی برای
+        خوانده شدن کدتان اضافه می‌کند.
+    </p>
+
+    <pre class="out"># after creating an empty repository on github.com
+git remote add origin https://github.com/USER/kadoos-library.git
+git push -u origin main             # the first push
+git push                            # afterwards
+git pull                            # bring back what others pushed
+git clone https://github.com/USER/kadoos-library.git    # get it elsewhere</pre>
+
+    <p data-t="ch39-141">
+        احراز هویت با رمز عبور دیگر وجود ندارد: از یک
+        <strong>توکن دسترسی شخصی</strong> یا یک کلید SSH استفاده کنید.
+    </p>
+
+    <h3 data-t="ch39-142">README بخشی از پروژه است</h3>
+
+    <p data-t="ch39-143">
+        فایل <code>README.md</code> اولین چیزی است که هر کسی می‌بیند. باید به
+        این ترتیب جواب بدهد:
+    </p>
+
+    <ol>
+        <li data-t="ch39-144">این برنامه چیست؟</li>
+        <li data-t="ch39-145">چطور نصبش کنم؟ (<code>pip install -r requirements.txt</code>)</li>
+        <li data-t="ch39-146">چطور اجرایش کنم؟ (<code>python main.py</code>)</li>
+        <li data-t="ch39-147">یک تصویر از برنامه، اگر پنجره دارد.</li>
+        <li data-t="ch39-148">مجوز.</li>
+    </ol>
+
+    <h3 data-t="ch39-149">کار با دیگران</h3>
+
+    <ol>
+        <li><code>git switch -c my-feature</code></li>
+        <li data-t="ch39-150">کامیت کنید، بعد <code>git push -u origin my-feature</code></li>
+        <li data-t="ch39-151">روی GitHub یک <strong>pull request</strong> باز کنید</li>
+        <li data-t="ch39-152">کسی آن را می‌خواند و نظر می‌دهد: <strong>بازبینی کد</strong></li>
+        <li data-t="ch39-153">ادغام کنید و شاخه را پاک کنید</li>
+    </ol>
+
+    <p data-t="ch39-154">
+        در پروژه‌ای که فقط مال شما نیست، هرگز مستقیم روی <code>main</code>
+        پوش نکنید.
+    </p>
+
+    <pre class="out">git status
+git add &lt;file&gt;
+git commit -m "message"
+git log --oneline
+git diff
+git switch -c &lt;branch&gt;
+git switch &lt;branch&gt;
+git merge &lt;branch&gt;
+git push
+git pull</pre>
+
+    <p class="code-caption" data-t="ch39-155">ده فرمانی که تقریباً همه کار را پوشش می‌دهند</p>
+
+    <div class="folder-ref">
+        <span class="box-title" data-t="ch39-156">فایل‌های این فصل</span>
+        <p data-t="ch39-157">
+            پوشه <code>S39-capstone-project</code> شامل پروژه در
+            <code>library/</code>، فایل <code>.gitignore</code> و راهنمای
+            کامل <code>git_and_github.md</code> است. پیش از اجرا، محیط مجازی
+            بسازید و <code>pip install -r requirements.txt</code> بزنید. اولین
+            اجرا، فایل <code>library/data/library.db</code> را می‌سازد و چند
+            کتاب و عضو نمونه در آن می‌گذارد؛ برای شروع از صفر پاکش کنید.
+        </p>
+    </div>
+
+    <h2 data-t="ch39-158">خلاصه فصل</h2>
+
+    <div class="table-scroll">
+        <table>
+            <thead>
+                <tr><th data-t="ch39-159">موضوع</th><th data-t="ch39-160">نکته کلیدی</th></tr>
+            </thead>
+            <tbody>
+                <tr><td data-t="ch39-161">معماری</td><td data-t="ch39-162"><code>core/</code> بدون پنجره، <code>gui/</code> بدون SQL</td></tr>
+                <tr><td><code>paths.py</code></td><td data-t="ch39-163">تنها جای آگاه از PyInstaller</td></tr>
+                <tr><td data-t="ch39-164">مدل‌ها</td><td data-t="ch39-165">یک واقعیت، یک جا. ستون تکراری نسازید</td></tr>
+                <tr><td><code>session_scope()</code></td><td data-t="ch39-166">یک تراکنش: commit، rollback، close</td></tr>
+                <tr><td data-t="ch39-167">لایه سرویس</td><td data-t="ch39-168">هر قانون یک بار نوشته می‌شود</td></tr>
+                <tr><td><code>LibraryError</code></td><td data-t="ch39-169">core مسئله را می‌گوید، gui نمایشش می‌دهد</td></tr>
+                <tr><td data-t="ch39-170">جدول‌ها</td><td data-t="ch39-171">نمایش‌اند، نه انبار داده</td></tr>
+                <tr><td><code>refresh_all()</code></td><td data-t="ch39-172">بازسازی کامل، به جای وصله زدن یک سطر</td></tr>
+                <tr><td data-t="ch39-173"><code>git init</code> و <code>.gitignore</code></td><td data-t="ch39-174">پیش از اولین کامیت</td></tr>
+                <tr><td><code>git status</code></td><td data-t="ch39-175">پرکاربردترین فرمان. مدام بزنیدش</td></tr>
+                <tr><td data-t="ch39-176">کامیت</td><td data-t="ch39-177">یک ایده، پیام روشن، زمان حال</td></tr>
+                <tr><td><code>git switch -c</code></td><td data-t="ch39-178">هر کار تازه در شاخه خودش</td></tr>
+                <tr><td data-t="ch39-179"><code>revert</code> در برابر <code>reset --hard</code></td><td data-t="ch39-180">اولی امن، دومی نابودکننده</td></tr>
+                <tr><td>pull request</td><td data-t="ch39-181">راه استاندارد کار گروهی</td></tr>
+                <tr><td><code>README.md</code></td><td data-t="ch39-182">چیست، نصب، اجرا، تصویر، مجوز</td></tr>
+            </tbody>
+        </table>
+    </div>
+
+    <div class="exercise">
+        <h3 data-t="ch39-183">تمرین‌های فصل سی و نه</h3>
+        <ol>
+            <li data-t="ch39-184">یک کلیک را تا انتها دنبال کنید: دکمه «پس گرفتن» را بزنید و به ترتیب همه توابعی را که اجرا می‌شوند بنویسید، تا لحظه‌ای که سطر از جدول ناپدید می‌شود.</li>
+            <li data-t="ch39-185">فایل <code>core/services.py</code> هیچ چیزی از <code>gui/</code> وارد نمی‌کند. چرا مهم است، و اگر کسی چنین وارد کردنی اضافه کند چه چیزی خراب می‌شود؟</li>
+            <li data-t="ch39-186">چرا <code>lend_book()</code> از پایگاه داده می‌پرسد که کتاب بیرون است، در حالی که <code>book.is_out</code> همان‌جا هست؟</li>
+            <li data-t="ch39-187">کلاس <code>Book</code> ستون <code>available</code> ندارد. عبارت «روی قفسه» از کجا می‌آید و این طراحی جلوی چه مشکلی را می‌گیرد؟</li>
+            <li data-t="ch39-188">زبانه «تاریخچه امانت» بسازید که امانت‌های بسته‌شده را با تعداد روزهای نگهداری نشان دهد.</li>
+            <li data-t="ch39-189">جریمه اضافه کنید: روزی پنج هزار تومان دیرکرد، در زبانه امانت‌ها و در آمار. این قانون کجا باید نوشته شود؟</li>
+            <li data-t="ch39-190">گزینه «خروجی CSV از کتاب‌ها» را به منوی فایل اضافه کنید.</li>
+            <li data-t="ch39-191">مدت امانت را به یک تنظیم در فایل JSON تبدیل کنید، با یک دیالوگ تنظیمات برای تغییرش.</li>
+            <li data-t="ch39-192">به زبانه امانت‌ها جعبه جست‌وجو اضافه کنید که بر اساس کتاب یا عضو فیلتر کند.</li>
+            <li data-t="ch39-193">متن آمار را با یک نمودار واقعی matplotlib جایگزین کنید.</li>
+            <li data-t="ch39-194">پنجره ورود بسازید: یک مدل <code>User</code> با رمز درهم‌شده، و دکمه‌های حذف را از کاربری که مدیر نیست پنهان کنید.</li>
+            <li data-t="ch39-195">بازسازی همه زبانه‌ها بعد از هر عمل، کل پایگاه داده را دوباره می‌خواند. با پنج هزار کتاب اندازه‌اش بگیرید و بعد کندترین بخش را درست کنید. اول اندازه بگیرید، هرگز پیش از آن.</li>
+            <li data-t="ch39-196">همین برنامه را به شکل یک سایت Flask بنویسید و <code>core/</code> را بدون تغییر دوباره استفاده کنید. چقدرش را مجبور شدید عوض کنید؟</li>
+            <li data-t="ch39-197">پروژه را با <code>git init</code> شروع کنید، اولین کامیت را بزنید، شاخه‌ای بسازید، تعارضی عمدی درست کنید و حلش کنید.</li>
+            <li data-t="ch39-198">فایلی با یک رمز عبور کامیت و پوش کرده‌اید. پاک کردن آن خط و کامیت دوباره کافی نیست. چرا، و واقعاً باید چه کار کنید؟</li>
+            <li data-t="ch39-199">نسخه خودتان از پروژه را با یک <code>README.md</code> و یک تصویر و یک مجوز روی GitHub منتشر کنید.</li>
+        </ol>
+    </div>
+
+    <div class="pager">
+        <a href="chapter-38.html">فصل قبل: وب با Flask</a>
+        <a href="chapter-40.html">فصل بعد: ارزشیابی پایانی</a>
+    </div>
+
+</main>
+
+</body>
+</html>

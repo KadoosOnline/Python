@@ -1,0 +1,595 @@
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="فصل بیست و هفت: خواندن و نوشتن فایل CSV با ماژول csv و کار با JSON در پایتون">
+    <title>فصل ۲۷: CSV و JSON</title>
+    <link rel="icon" href="logokm.png" type="image/png">
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<header class="book-bar">
+    <a class="name" href="index.html">برنامه‌نویسی پایتون</a>
+    <a href="index.html">فهرست مطالب</a>
+</header>
+
+<main class="paper">
+
+    <div class="chapter-head">
+        <span class="chapter-num">فصل ۲۷</span>
+        <h1 data-t="ch27-001">CSV و JSON</h1>
+        <p class="lead" data-t="ch27-002">
+            در فصل هجدهم فایل متنی ساده نوشتیم. ولی دنیای واقعی دو قالب
+            استاندارد دارد: CSV برای جدول‌ها و صفحه‌گسترده‌ها، و JSON برای
+            وب و ارتباط بین برنامه‌ها.
+        </p>
+    </div>
+
+    <div class="mini-toc">
+        <span class="box-title" data-t="ch27-003">در این فصل می‌خوانید</span>
+        <ol>
+            <li data-t="ch27-004"><a href="#s1">فایل CSV چیست</a></li>
+            <li data-t="ch27-005"><a href="#s2">خواندن CSV به شکل لیست</a></li>
+            <li data-t="ch27-006"><a href="#s3">خواندن CSV به شکل دیکشنری</a></li>
+            <li data-t="ch27-007"><a href="#s4">پردازش داده‌های CSV</a></li>
+            <li data-t="ch27-008"><a href="#s5">نوشتن CSV</a></li>
+            <li data-t="ch27-009"><a href="#s6">افزودن و تغییر جداکننده</a></li>
+            <li data-t="ch27-010"><a href="#s7">JSON چیست</a></li>
+            <li data-t="ch27-011"><a href="#s8">خواندن JSON</a></li>
+            <li data-t="ch27-012"><a href="#s9">نوشتن JSON</a></li>
+            <li data-t="ch27-013"><a href="#s10">JSON به شکل رشته</a></li>
+            <li data-t="ch27-014"><a href="#s11">چیزهایی که JSON نمی‌تواند ذخیره کند</a></li>
+            <li data-t="ch27-015"><a href="#s12">پروژه: تبدیل CSV به گزارش JSON</a></li>
+        </ol>
+    </div>
+
+    <h2 id="s1" data-t="ch27-016">۱. فایل CSV چیست</h2>
+
+    <p data-t="ch27-017"><strong>CSV</strong> یعنی «مقدارهای جداشده با ویرگول». در عمل فقط یک فایل متنی ساده است: هر خط یک سطر جدول، و مقدارها با ویرگول از هم جدا شده‌اند. خط اول معمولاً <strong>سرستون</strong> است.</p>
+
+    <pre class="out">StudentID,Name,Age,Grade,Math_Score,Science_Score,English_Score
+1,Alice,14,9,85,90,88
+2,Bob,15,10,78,82,80
+3,Charlie,14,9,92,88,95</pre>
+
+    <p data-t="ch27-018">
+        اکسل و گوگل‌شیت هر دو این قالب را می‌فهمند. پس CSV پل بین برنامه شما و
+        دنیای صفحه‌گسترده است.
+    </p>
+
+    <div class="tip">
+        <span class="box-title" data-t="ch27-019">چرا با split نخوانیمش</span>
+        <p data-t="ch27-020">
+            وسوسه می‌شوید که فایل را خط به خط بخوانید و با
+            <code>split(',')</code> بشکنید. برای فایل‌های ساده کار می‌کند، ولی
+            اگر مقداری خودش ویرگول داشته باشد (مثل «رشت، گیلان»)، همه چیز به هم
+            می‌ریزد. ماژول <code>csv</code> این حالت‌ها را با گیومه‌گذاری درست
+            مدیریت می‌کند. همیشه از آن استفاده کنید.
+        </p>
+    </div>
+
+    <h2 id="s2" data-t="ch27-021">۲. خواندن CSV به شکل لیست</h2>
+
+    <pre class="code"><code>import csv
+
+
+def read_as_lists() -&gt; None:
+    '''csv.reader gives every row as a LIST of strings.'''
+    with open('students.csv', newline='', encoding='utf-8') as f:
+        reader = csv.reader(f)
+
+        header = next(reader)          # the first line is the header
+        print('Header:', header)
+
+        rows = []
+        for row in reader:             # the reader continues after the header
+            rows.append(row)
+
+        print(f'Total students: {len(rows)}')
+        for row in rows[:3]:
+            print(row)</code></pre>
+    <p class="code-caption" data-t="ch27-022">خواندن به شکل لیست: نمونه 01_read_csv</p>
+
+    <div class="warn">
+        <span class="box-title" data-t="ch27-023">پارامتر newline='' اجباری است</span>
+        <p data-t="ch27-024">
+            هنگام باز کردن فایل CSV، حتماً <code>newline=''</code> بنویسید.
+            بدون آن، هم ماژول <code>csv</code> و هم سیستم‌عامل کاراکتر پایان
+            خط اضافه می‌کنند و در ویندوز بین هر دو سطر یک خط خالی می‌افتد.
+            این یکی از عجیب‌ترین باگ‌هایی است که تازه‌کارها با آن روبه‌رو
+            می‌شوند.
+        </p>
+    </div>
+
+    <p data-t="ch27-025">
+        تابع <code>next(reader)</code> اولین سطر یعنی سرستون را می‌خواند و
+        مکان‌نما را جلو می‌برد، پس حلقه بعدی از سطر داده شروع می‌شود.
+    </p>
+
+    <h2 id="s3" data-t="ch27-026">۳. خواندن CSV به شکل دیکشنری</h2>
+
+    <pre class="code"><code>def read_as_dicts() -&gt; None:
+    '''csv.DictReader gives every row as a DICTIONARY: much more readable.'''
+    with open('students.csv', newline='', encoding='utf-8') as f:
+        reader = csv.DictReader(f)     # the header becomes the keys
+
+        students = []
+        for row in reader:
+            # Everything read from a CSV file is TEXT: convert what is numeric.
+            row['StudentID'] = int(row['StudentID'])
+            row['Age'] = int(row['Age'])
+            row['Grade'] = int(row['Grade'])
+            row['Math_Score'] = int(row['Math_Score'])
+            row['Science_Score'] = int(row['Science_Score'])
+            row['English_Score'] = int(row['English_Score'])
+            students.append(row)
+
+        for s in students[:3]:
+            # Use DOUBLE quotes outside when the keys use single quotes.
+            print(f"  {s['Name']} (Grade {s['Grade']}): "
+                  f"Math={s['Math_Score']}, Science={s['Science_Score']}")</code></pre>
+    <p class="code-caption" data-t="ch27-027">خواندن به شکل دیکشنری: نمونه 01_read_csv</p>
+
+    <div class="table-scroll">
+        <table>
+            <thead>
+                <tr><th></th><th><code>csv.reader</code></th><th><code>csv.DictReader</code></th></tr>
+            </thead>
+            <tbody>
+                <tr><td data-t="ch27-028">هر سطر</td><td data-t="ch27-029">لیستی از رشته‌ها</td><td data-t="ch27-030">دیکشنری با کلید نام ستون</td></tr>
+                <tr><td data-t="ch27-031">دسترسی</td><td><code>row[1]</code></td><td><code>row['Name']</code></td></tr>
+                <tr><td data-t="ch27-032">سرستون</td><td data-t="ch27-033">باید دستی رد شود</td><td data-t="ch27-034">خودکار به کلید تبدیل می‌شود</td></tr>
+                <tr><td data-t="ch27-035">اگر ستون‌ها جابه‌جا شوند</td><td data-t="ch27-036">کد خراب می‌شود</td><td data-t="ch27-037">کد سالم می‌ماند</td></tr>
+            </tbody>
+        </table>
+    </div>
+
+    <div class="warn">
+        <span class="box-title" data-t="ch27-038">همه چیز در CSV متن است</span>
+        <p data-t="ch27-039">حتی اگر ستون شبیه عدد باشد، آنچه می‌خوانید رشته است. <code>'85' + 10</code> خطا ایجاد می‌کند و <code>'85' &gt; '9'</code> نادرست است، چون مقایسه متنی انجام می‌شود. همیشه ستون‌های عددی را صریحاً تبدیل کنید. این هم ساختار داده فصل پانزدهم را می‌سازد: لیستی از دیکشنری‌ها.</p>
+    </div>
+
+    <h2 id="s4" data-t="ch27-040">۴. پردازش داده‌های CSV</h2>
+
+    <pre class="code"><code>def best_student() -&gt; None:
+    '''Find the student with the best total, keeping the file open only once.'''
+    with open('students.csv', newline='', encoding='utf-8') as f:
+        rows = list(csv.DictReader(f))
+
+    def total(row: dict) -&gt; int:
+        return (int(row['Math_Score'])
+                + int(row['Science_Score'])
+                + int(row['English_Score']))
+
+    best = max(rows, key=total)
+    print(f"  {best['Name']} with {total(best)} points")
+
+
+def filter_by_grade(grade: int) -&gt; None:
+    '''Show the names of the students of one grade.'''
+    with open('students.csv', newline='', encoding='utf-8') as f:
+        reader = csv.DictReader(f)
+        for row in reader:
+            if int(row['Grade']) == grade:
+                print(f"  {row['Name']}")</code></pre>
+    <p class="code-caption" data-t="ch27-041">پردازش: نمونه 01_read_csv</p>
+
+    <p data-t="ch27-042">
+        نکته مهم: <code>list(csv.DictReader(f))</code> کل فایل را در حافظه
+        می‌ریزد. برای فایل کوچک عالی است، ولی برای فایل چندگیگابایتی باید خط به
+        خط پردازش کنید، همان‌طور که در <code>filter_by_grade</code> شده است.
+        مولدهای فصل قبل دقیقاً برای همین ساخته شده‌اند.
+    </p>
+
+    <h2 id="s5" data-t="ch27-043">۵. نوشتن CSV</h2>
+
+    <pre class="code"><code>FIELDNAMES = [
+    'StudentID', 'Name', 'Age', 'Grade',
+    'Math_Score', 'Science_Score', 'English_Score',
+]
+
+
+def write_list_data() -&gt; None:
+    '''csv.writer writes rows given as LISTS.'''
+    rows = [
+        [11, 'Liam', 14, 9, 77, 81, 79],
+        [12, 'Mia', 15, 10, 88, 92, 90],
+    ]
+
+    with open('students_from_lists.csv', 'w', newline='', encoding='utf-8') as f:
+        writer = csv.writer(f)
+        writer.writerow(FIELDNAMES)    # one row
+        writer.writerows(rows)         # many rows at once
+
+
+def write_dict_data() -&gt; None:
+    '''csv.DictWriter writes rows given as DICTIONARIES.'''
+    students = [
+        {'StudentID': 14, 'Name': 'Olivia', 'Age': 14, 'Grade': 9,
+         'Math_Score': 95, 'Science_Score': 97, 'English_Score': 93},
+    ]
+
+    with open('students_from_dicts.csv', 'w', newline='', encoding='utf-8') as f:
+        writer = csv.DictWriter(f, fieldnames=FIELDNAMES)
+        writer.writeheader()           # the header comes from fieldnames
+        writer.writerows(students)</code></pre>
+    <p class="code-caption" data-t="ch27-044">نوشتن: نمونه 02_write_csv</p>
+
+    <h3 data-t="ch27-045">شرح مثال</h3>
+
+    <ul>
+        <li data-t="ch27-046"><code>writerow</code> یک سطر و <code>writerows</code> چند سطر می‌نویسد.</li>
+        <li data-t="ch27-047"><code>DictWriter</code> باید <code>fieldnames</code> بگیرد تا بداند ترتیب ستون‌ها چیست.</li>
+        <li data-t="ch27-048"><code>writeheader()</code> سطر سرستون را از روی همان <code>fieldnames</code> می‌نویسد. فراموش کردنش یعنی فایلی بدون سرستون.</li>
+        <li data-t="ch27-049">به خاطر داشته باشید که حالت <code>'w'</code> فایل قبلی را پاک می‌کند.</li>
+    </ul>
+
+    <h2 id="s6" data-t="ch27-050">۶. افزودن و تغییر جداکننده</h2>
+
+    <pre class="code"><code>def append_to_file() -&gt; None:
+    '''Mode "a" adds a row without touching what is already there.'''
+    new_student = [17, 'Ruby', 14, 9, 89, 91, 86]
+
+    with open('students_from_lists.csv', 'a', newline='', encoding='utf-8') as f:
+        writer = csv.writer(f)
+        writer.writerow(new_student)
+
+
+def write_with_semicolon() -&gt; None:
+    '''Some spreadsheets expect ';' instead of ','.'''
+    with open('students_semicolon.csv', 'w', newline='', encoding='utf-8') as f:
+        writer = csv.writer(f, delimiter=';')
+        writer.writerow(['Name', 'City'])
+        writer.writerow(['Ali', 'Rasht'])
+        writer.writerow(['Sara, the second', 'Lahijan'])   # the comma is quoted</code></pre>
+    <p class="code-caption" data-t="ch27-051">افزودن و جداکننده: نمونه 02_write_csv</p>
+
+    <p data-t="ch27-052">
+        در بسیاری از کشورها، از جمله وقتی ویندوز فارسی است، اکسل انتظار
+        <strong>نقطه‌ویرگول</strong> دارد نه ویرگول. پارامتر
+        <code>delimiter</code> این را حل می‌کند. و به سطر آخر دقت کنید: مقداری
+        که خودش ویرگول دارد، خودکار داخل گیومه گذاشته می‌شود.
+    </p>
+
+    <h2 id="s7" data-t="ch27-053">۷. JSON چیست</h2>
+
+    <p data-t="ch27-054">
+        <strong>JSON</strong> قالب استاندارد تبادل داده در وب است. تقریباً هر
+        وب‌سرویسی در دنیا با JSON جواب می‌دهد. خوبی‌اش برای ما این است که
+        ساختارش تقریباً عین دیکشنری و لیست پایتون است.
+    </p>
+
+    <div class="table-scroll">
+        <table>
+            <thead>
+                <tr><th data-t="ch27-055">در JSON</th><th data-t="ch27-056">در پایتون</th></tr>
+            </thead>
+            <tbody>
+                <tr><td>object</td><td><code>dict</code></td></tr>
+                <tr><td>array</td><td><code>list</code></td></tr>
+                <tr><td>string</td><td><code>str</code></td></tr>
+                <tr><td>number</td><td data-t="ch27-057"><code>int</code> یا <code>float</code></td></tr>
+                <tr><td><code>true</code> / <code>false</code></td><td><code>True</code> / <code>False</code></td></tr>
+                <tr><td><code>null</code></td><td><code>None</code></td></tr>
+            </tbody>
+        </table>
+    </div>
+
+    <p data-t="ch27-058">تفاوت‌های مهم با پایتون:</p>
+
+    <ul>
+        <li data-t="ch27-059">در JSON کلیدها <strong>حتماً</strong> باید رشته و داخل جفت‌گیومه باشند. تک‌گیومه مجاز نیست.</li>
+        <li data-t="ch27-060"><code>true</code> و <code>false</code> و <code>null</code> با حرف کوچک نوشته می‌شوند.</li>
+        <li data-t="ch27-061">ویرگول اضافه بعد از آخرین عضو مجاز نیست، برخلاف پایتون.</li>
+        <li data-t="ch27-062">JSON توضیح ندارد.</li>
+    </ul>
+
+    <div class="table-scroll">
+        <table>
+            <thead>
+                <tr><th data-t="ch27-063">تابع</th><th data-t="ch27-064">از</th><th data-t="ch27-065">به</th></tr>
+            </thead>
+            <tbody>
+                <tr><td><code>json.load(f)</code></td><td data-t="ch27-066">فایل</td><td data-t="ch27-067">شیء پایتون</td></tr>
+                <tr><td><code>json.dump(obj, f)</code></td><td data-t="ch27-068">شیء پایتون</td><td data-t="ch27-069">فایل</td></tr>
+                <tr><td><code>json.loads(s)</code></td><td data-t="ch27-070">رشته</td><td data-t="ch27-071">شیء پایتون</td></tr>
+                <tr><td><code>json.dumps(obj)</code></td><td data-t="ch27-072">شیء پایتون</td><td data-t="ch27-073">رشته</td></tr>
+            </tbody>
+        </table>
+    </div>
+
+    <p data-t="ch27-074">
+        حرف <code>s</code> در انتها یعنی string. این را حفظ کنید تا هیچ‌وقت
+        اشتباهشان نگیرید.
+    </p>
+
+    <h2 id="s8" data-t="ch27-075">۸. خواندن JSON</h2>
+
+    <pre class="code"><code>import json
+
+
+def load_products(filename: str) -&gt; list[dict]:
+    '''Load the product list from a JSON file.'''
+    with open(filename, 'r', encoding='utf-8') as f:
+        data = json.load(f)          # load() reads from a FILE
+    return data
+
+
+def filter_by_tag(products: list[dict], tag: str) -&gt; list[dict]:
+    '''Return the products carrying a given tag.'''
+    result = []
+    for p in products:
+        if tag in p['tags']:         # 'tags' is a nested list
+            result.append(p)
+    return result
+
+
+def group_by_manufacturer(products: list[dict]) -&gt; dict[str, list[str]]:
+    '''Return {manufacturer: [product names]}.'''
+    groups: dict[str, list[str]] = {}
+    for p in products:
+        groups.setdefault(p['manufacturer'], []).append(p['name'])
+    return groups</code></pre>
+    <p class="code-caption" data-t="ch27-076">خواندن JSON: نمونه 03_read_json</p>
+
+    <p data-t="ch27-077">
+        بعد از <code>json.load</code>، آنچه دارید یک ساختار داده معمولی پایتون
+        است: لیستی از دیکشنری‌ها که بعضی مقدارهایشان خودشان لیست‌اند. تمام
+        مهارت‌های فصل پانزدهم اینجا به کار می‌آیند. متد
+        <code>setdefault</code> هم از فصل چهاردهم آمده و گروه‌بندی را یک خطی
+        می‌کند.
+    </p>
+
+    <h2 id="s9" data-t="ch27-078">۹. نوشتن JSON</h2>
+
+    <pre class="code"><code>def save_news_to_json(news: list[dict], filename: str) -&gt; None:
+    '''Write the articles into a JSON file.
+
+    indent=2          -&gt; a readable, indented file
+    ensure_ascii=False-&gt; keep the Persian letters instead of \\u06cc escapes
+    '''
+    with open(filename, 'w', encoding='utf-8') as f:
+        json.dump(news, f, indent=2, ensure_ascii=False)
+
+    print(f'{len(news)} news articles saved to {filename}')</code></pre>
+    <p class="code-caption" data-t="ch27-079">نوشتن JSON: نمونه 04_write_json</p>
+
+    <div class="warn">
+        <span class="box-title" data-t="ch27-080">دو پارامتری که برای فارسی حیاتی‌اند</span>
+        <p data-t="ch27-081">
+            بدون <code>ensure_ascii=False</code>، پایتون هر حرف فارسی را به
+            کدی مثل <code>ی</code> تبدیل می‌کند. فایل از نظر فنی درست
+            است ولی هیچ انسانی نمی‌تواند بخواندش. و بدون
+            <code>indent=2</code>، کل فایل یک خط بی‌پایان می‌شود. هر دو را
+            همیشه بنویسید. این هم یکی از باگ‌هایی بود که در فایل‌های اصلی این
+            دوره اصلاح شد.
+        </p>
+    </div>
+
+    <p data-t="ch27-082">
+        JSON با ساختارهای <strong>تودرتو</strong> طبیعی کار می‌کند: لیستی از
+        مقاله‌ها که هر کدام لیست برچسب و لیست دیکشنری نظرها دارند. با فایل
+        متنی ساده، ذخیره چنین چیزی کابوس است.
+    </p>
+
+    <h2 id="s10" data-t="ch27-083">۱۰. JSON به شکل رشته</h2>
+
+    <pre class="code"><code>import json
+
+student = {
+    'name': 'Ali',
+    'age': 20,
+    'scores': [18, 20, 15],
+    'active': True,
+    'address': None,
+    'city': 'رشت',
+}
+
+# dumps() -&gt; a Python object becomes a JSON string
+text = json.dumps(student)
+print(text)
+print(type(text))
+
+# The options make it readable.
+print(json.dumps(student, indent=2, ensure_ascii=False, sort_keys=True))
+
+# loads() -&gt; a JSON string becomes a Python object
+back = json.loads(text)
+print(back['name'], back['scores'][0])
+
+print(json.loads('{"a": true, "b": null, "c": [1, 2.5]}'))
+
+# A broken text raises JSONDecodeError (a subclass of ValueError).
+try:
+    json.loads('{not json}')
+except json.JSONDecodeError as e:
+    print('Invalid JSON:', e)</code></pre>
+    <p class="code-caption" data-t="ch27-084">رشته JSON: نمونه 05_json_strings</p>
+
+    <p data-t="ch27-085">
+        نسخه رشته‌ای دقیقاً همان چیزی است که در فصل بعد، هنگام کار با
+        وب‌سرویس‌ها، لازمتان می‌شود: سرور یک رشته JSON می‌فرستد و شما با
+        <code>loads</code> بازش می‌کنید. همیشه <code>JSONDecodeError</code> را
+        بگیرید، چون داده‌ای که از اینترنت می‌آید ممکن است خراب باشد.
+    </p>
+
+    <h2 id="s11" data-t="ch27-086">۱۱. چیزهایی که JSON نمی‌تواند ذخیره کند</h2>
+
+    <pre class="code"><code>from datetime import date
+
+# JSON cannot store a date, a set or an object.
+data = {'day': date.today(), 'tags': {'a', 'b'}}
+try:
+    json.dumps(data)
+except TypeError as e:
+    print('Cannot serialise:', e)
+
+# Solution 1: convert by hand.
+print(json.dumps({'day': str(date.today()), 'tags': list({'a', 'b'})}))
+
+# Solution 2: give dumps() a 'default' function for the unknown types.
+def convert(value):
+    if isinstance(value, date):
+        return value.isoformat()
+    if isinstance(value, set):
+        return sorted(value)
+    raise TypeError(f'{type(value)} is not serialisable')
+
+print(json.dumps(data, default=convert))</code></pre>
+    <p class="code-caption" data-t="ch27-087">محدودیت‌ها: نمونه 05_json_strings</p>
+
+    <p data-t="ch27-088">JSON فقط شش نوع دارد: رشته، عدد، بولی، تهی، آرایه و شیء. تاریخ، مجموعه، تاپل و اشیاء کلاس‌های شما جزوشان نیستند. دو راه حل وجود دارد: دستی تبدیل کنید، یا تابعی به <code>default</code> بدهید که پایتون هر وقت به نوع ناشناخته‌ای رسید صدایش بزند. اگر به خاطر داشته باشید، در فصل بیست و دوم تابع <code>asdict</code> برای dataclass همین کار را ساده می‌کرد.</p>
+
+    <h2 id="s12" data-t="ch27-089">۱۲. پروژه: تبدیل CSV به گزارش JSON</h2>
+
+    <pre class="code"><code>'''A small complete tool: read a CSV file, analyse it, save the result as JSON.'''
+
+import csv
+import json
+import os
+
+CSV_FILE = 'students.csv'
+JSON_FILE = 'report.json'
+
+NUMERIC_FIELDS = ['StudentID', 'Age', 'Grade',
+                  'Math_Score', 'Science_Score', 'English_Score']
+
+
+def read_students(path: str) -&gt; list[dict]:
+    '''Read the CSV file and convert the numeric columns.'''
+    if not os.path.exists(path):
+        raise FileNotFoundError(f'{path} was not found')
+
+    students: list[dict] = []
+
+    with open(path, newline='', encoding='utf-8') as f:
+        for row in csv.DictReader(f):
+            for field in NUMERIC_FIELDS:
+                try:
+                    row[field] = int(row[field])
+                except (KeyError, ValueError):
+                    raise ValueError(f'the column {field} is missing or invalid')
+            students.append(row)
+
+    return students
+
+
+def add_computed_fields(students: list[dict]) -&gt; None:
+    '''Add the total and the average to every student.'''
+    for student in students:
+        scores = [student['Math_Score'],
+                  student['Science_Score'],
+                  student['English_Score']]
+        student['Total'] = sum(scores)
+        student['Average'] = round(sum(scores) / len(scores), 2)
+        student['Passed'] = student['Average'] &gt;= 70</code></pre>
+    <p class="code-caption" data-t="ch27-090">خواندن و محاسبه: نمونه 06_project_csv_to_json</p>
+
+    <pre class="code"><code>def build_report(students: list[dict]) -&gt; dict:
+    '''Build the summary that will be saved as JSON.'''
+    by_grade: dict[str, list[str]] = {}
+    for student in students:
+        by_grade.setdefault(str(student['Grade']), []).append(student['Name'])
+
+    return {
+        'source': CSV_FILE,
+        'count': len(students),
+        'class_average': round(
+            sum(s['Average'] for s in students) / len(students), 2),
+        'best': max(students, key=lambda s: s['Total'])['Name'],
+        'worst': min(students, key=lambda s: s['Total'])['Name'],
+        'passed': [s['Name'] for s in students if s['Passed']],
+        'failed': [s['Name'] for s in students if not s['Passed']],
+        'by_grade': by_grade,
+        'students': students,
+    }
+
+
+def main() -&gt; None:
+    try:
+        students = read_students(CSV_FILE)
+    except (FileNotFoundError, ValueError) as e:
+        print('Error:', e)
+        return
+
+    if not students:
+        print('The file contains no student.')
+        return
+
+    add_computed_fields(students)
+    report = build_report(students)
+
+    with open(JSON_FILE, 'w', encoding='utf-8') as f:
+        json.dump(report, f, indent=2, ensure_ascii=False)</code></pre>
+    <p class="code-caption" data-t="ch27-091">ساخت گزارش: نمونه 06_project_csv_to_json</p>
+
+    <h3 data-t="ch27-092">شرح پروژه</h3>
+
+    <ul>
+        <li data-t="ch27-093">سه مرحله روشن: <strong>خواندن</strong>، <strong>محاسبه</strong>، <strong>گزارش</strong>. هر کدام تابع خودش را دارد.</li>
+        <li data-t="ch27-094">تابع خواندن، خطای معنادار می‌اندازد و <code>main</code> آن را می‌گیرد؛ همان تقسیم مسئولیت فصل نوزدهم.</li>
+        <li data-t="ch27-095">در <code>build_report</code> تقریباً همه ابزارهای فصل بیست و پنجم و بیست و ششم دیده می‌شوند: درک لیستی، عبارت مولد داخل <code>sum</code>، و <code>max</code> با <code>key</code>.</li>
+        <li data-t="ch27-096">خروجی JSON هم خلاصه دارد و هم داده کامل. این الگوی رایج گزارش‌سازی است: کسی که فقط خلاصه می‌خواهد بالای فایل را می‌خواند، و کسی که جزئیات می‌خواهد پایین را.</li>
+        <li data-t="ch27-097">کلیدهای دیکشنری <code>by_grade</code> با <code>str()</code> به رشته تبدیل شده‌اند، چون در JSON کلید حتماً باید رشته باشد.</li>
+    </ul>
+
+    <div class="folder-ref">
+        <span class="box-title" data-t="ch27-098">فایل‌های تمرینی این فصل</span>
+        <p data-t="ch27-099">
+            پوشه <code>S27-csv-and-json</code> شامل شش پوشه نمونه، از
+            <code>01_read_csv</code> تا
+            <code>06_project_csv_to_json</code>، به‌علاوه فایل‌های داده
+            <code>students.csv</code> و <code>products.json</code>.
+        </p>
+    </div>
+
+    <h2 data-t="ch27-100">خلاصه فصل</h2>
+
+    <div class="table-scroll">
+        <table>
+            <thead>
+                <tr><th data-t="ch27-101">ابزار</th><th data-t="ch27-102">وظیفه آن</th></tr>
+            </thead>
+            <tbody>
+                <tr><td><code>newline=''</code></td><td data-t="ch27-103">هنگام باز کردن CSV، اجباری</td></tr>
+                <tr><td><code>csv.reader</code></td><td data-t="ch27-104">هر سطر یک لیست</td></tr>
+                <tr><td><code>csv.DictReader</code></td><td data-t="ch27-105">هر سطر یک دیکشنری. معمولاً بهتر</td></tr>
+                <tr><td data-t="ch27-106"><code>csv.writer</code> و <code>writerows</code></td><td data-t="ch27-107">نوشتن سطرها از روی لیست</td></tr>
+                <tr><td data-t="ch27-108"><code>csv.DictWriter</code> و <code>writeheader</code></td><td data-t="ch27-109">نوشتن از روی دیکشنری</td></tr>
+                <tr><td><code>delimiter=';'</code></td><td data-t="ch27-110">تغییر جداکننده</td></tr>
+                <tr><td data-t="ch27-111">داده CSV</td><td data-t="ch27-112">همیشه متن است. عددها را تبدیل کنید</td></tr>
+                <tr><td data-t="ch27-113"><code>json.load</code> و <code>dump</code></td><td data-t="ch27-114">کار با فایل</td></tr>
+                <tr><td data-t="ch27-115"><code>json.loads</code> و <code>dumps</code></td><td data-t="ch27-116">کار با رشته</td></tr>
+                <tr><td><code>indent=2</code></td><td data-t="ch27-117">فایل خوانا</td></tr>
+                <tr><td><code>ensure_ascii=False</code></td><td data-t="ch27-118">حفظ حروف فارسی</td></tr>
+                <tr><td><code>default=func</code></td><td data-t="ch27-119">ذخیره نوع‌هایی که JSON نمی‌شناسد</td></tr>
+                <tr><td><code>JSONDecodeError</code></td><td data-t="ch27-120">خطای متن JSON خراب</td></tr>
+            </tbody>
+        </table>
+    </div>
+
+    <div class="exercise">
+        <h3 data-t="ch27-121">تمرین‌های فصل بیست و هفت</h3>
+        <ol>
+            <li data-t="ch27-122"><code>students.csv</code> را بخوانید و فقط دانشجویانی که میانگینشان بالای ۸۰ است را چاپ کنید.</li>
+            <li data-t="ch27-123">فایل CSV تازه‌ای بنویسید که نام و میانگین هر دانشجو را داشته باشد.</li>
+            <li data-t="ch27-124">ستون <code>Result</code> با مقدار <code>pass</code> یا <code>fail</code> به فایل CSV اضافه کنید.</li>
+            <li data-t="ch27-125"><code>products.json</code> را بخوانید و کالاهای یک سازنده خاص را چاپ کنید.</li>
+            <li data-t="ch27-126">کالاهای یک دسته‌بندی را در فایل JSON تازه‌ای ذخیره کنید.</li>
+            <li data-t="ch27-127"><code>products.json</code> را به CSV تبدیل کنید، با برچسب‌هایی که با نقطه‌ویرگول به هم چسبیده‌اند.</li>
+            <li data-t="ch27-128">برنامه‌ای بنویسید که فایل JSON مخاطبان را بخواند و به کاربر اجازه دهد مخاطب اضافه کند.</li>
+            <li data-t="ch27-129">توضیح دهید چرا مجموعه را نمی‌شود در JSON ذخیره کرد و دو راه حل نشان دهید.</li>
+        </ol>
+    </div>
+
+    <div class="pager">
+        <a href="chapter-26.html">فصل قبل: کد پایتونی، بخش دوم</a>
+        <a href="chapter-28.html">فصل بعد: بسته‌ها، REST API و XML</a>
+    </div>
+
+</main>
+
+</body>
+</html>

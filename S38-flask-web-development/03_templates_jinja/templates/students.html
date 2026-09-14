@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Students</title>
+</head>
+<body>
+    <h1>Our students</h1>
+
+    <table border="1" cellpadding="6">
+        <tr><th>#</th><th>Name</th><th>City</th><th>Score</th><th></th></tr>
+
+        {# `loop.index` counts from 1; `students` is the list we passed in #}
+        {% for student in students %}
+            <tr>
+                <td>{{ loop.index }}</td>
+                <td>{{ student.name | title }}</td>
+                <td>{{ student.city }}</td>
+                <td>{{ student.score }}</td>
+                <td>
+                    {% if student.score >= passing_mark %}
+                        passed
+                    {% else %}
+                        failed
+                    {% endif %}
+                </td>
+            </tr>
+        {% else %}
+            {# runs when the list is EMPTY -- no `if` needed around the loop #}
+            <tr><td colspan="5">Nobody has registered yet.</td></tr>
+        {% endfor %}
+    </table>
+
+    <p>
+        Average:
+        {{ (students | sum(attribute='score') / students | length) | round(2)
+           if students else '-' }}
+    </p>
+
+    <p><a href="/">back home</a></p>
+</body>
+</html>

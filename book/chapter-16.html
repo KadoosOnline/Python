@@ -1,0 +1,539 @@
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="فصل شانزده: دستور import و ماژول‌های random و math و datetime و time و sys از کتابخانه استاندارد پایتون">
+    <title>فصل ۱۶: کتابخانه استاندارد</title>
+    <link rel="icon" href="logokm.png" type="image/png">
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<header class="book-bar">
+    <a class="name" href="index.html">برنامه‌نویسی پایتون</a>
+    <a href="index.html">فهرست مطالب</a>
+</header>
+
+<main class="paper">
+
+    <div class="chapter-head">
+        <span class="chapter-num">فصل ۱۶</span>
+        <h1 data-t="ch16-001">کتابخانه استاندارد</h1>
+        <p class="lead" data-t="ch16-002">
+            پایتون با «باتری‌های همراه» می‌آید. صدها ماژول آماده همراه نصب
+            پایتون هستند و شما فقط باید بدانید که وجود دارند. این فصل معرفی
+            پرکاربردترین‌هایشان است.
+        </p>
+    </div>
+
+    <div class="mini-toc">
+        <span class="box-title" data-t="ch16-003">در این فصل می‌خوانید</span>
+        <ol>
+            <li data-t="ch16-004"><a href="#s1">سه شکل import</a></li>
+            <li data-t="ch16-005"><a href="#s2">عدد تصادفی صحیح</a></li>
+            <li data-t="ch16-006"><a href="#s3">عدد تصادفی اعشاری</a></li>
+            <li data-t="ch16-007"><a href="#s4">انتخاب تصادفی از یک مجموعه</a></li>
+            <li data-t="ch16-008"><a href="#s5">دانه تصادفی</a></li>
+            <li data-t="ch16-009"><a href="#s6">بازی تاس</a></li>
+            <li data-t="ch16-010"><a href="#s7">ماژول math</a></li>
+            <li data-t="ch16-011"><a href="#s8">گرد کردن</a></li>
+            <li data-t="ch16-012"><a href="#s9">تاریخ و زمان</a></li>
+            <li data-t="ch16-013"><a href="#s10">اختلاف دو تاریخ</a></li>
+            <li data-t="ch16-014"><a href="#s11">ماژول time</a></li>
+            <li data-t="ch16-015"><a href="#s12">آرگومان‌های خط فرمان</a></li>
+        </ol>
+    </div>
+
+    <h2 id="s1" data-t="ch16-016">۱. سه شکل import</h2>
+
+    <p data-t="ch16-017">
+        <strong>ماژول</strong> یک فایل پایتون است پر از توابع آماده. برای
+        استفاده از آن باید اول واردش کنید.
+    </p>
+
+    <pre class="code"><code># Way 1: import the whole module, then use 'module.name'
+import random
+print(random.randint(1, 6))
+
+# Way 2: import it under a shorter name
+import random as rnd
+print(rnd.randint(1, 6))
+
+# Way 3: import only what we need, then use the name directly
+from random import randint, choice
+print(randint(1, 6))
+print(choice(['red', 'green', 'blue']))
+
+# 'from module import *' imports everything. Avoid it: you no longer know
+# where a name comes from, and it can silently overwrite your own names.</code></pre>
+    <p class="code-caption" data-t="ch16-018">سه شکل وارد کردن: نمونه 01_import_styles.py</p>
+
+    <div class="table-scroll">
+        <table>
+            <thead>
+                <tr><th data-t="ch16-019">شکل</th><th data-t="ch16-020">استفاده</th><th data-t="ch16-021">کی</th></tr>
+            </thead>
+            <tbody>
+                <tr><td><code>import random</code></td><td><code>random.randint(...)</code></td><td data-t="ch16-022">حالت پیش‌فرض و امن‌ترین</td></tr>
+                <tr><td><code>import random as rnd</code></td><td><code>rnd.randint(...)</code></td><td data-t="ch16-023">وقتی نام ماژول طولانی است</td></tr>
+                <tr><td><code>from random import randint</code></td><td><code>randint(...)</code></td><td data-t="ch16-024">وقتی فقط چند تابع لازم دارید</td></tr>
+                <tr><td><code>from random import *</code></td><td data-t="ch16-025">همه چیز</td><td data-t="ch16-026">هرگز</td></tr>
+            </tbody>
+        </table>
+    </div>
+
+    <div class="warn">
+        <span class="box-title" data-t="ch16-027">چرا ستاره ممنوع است</span>
+        <p data-t="ch16-028">
+            <code>from module import *</code> همه نام‌های ماژول را داخل فایل
+            شما می‌ریزد. اگر ماژول تابعی به نام <code>choice</code> داشته باشد و
+            شما هم متغیری به همان نام داشته باشید، یکی دیگری را از بین می‌برد و
+            هیچ خطایی هم نمی‌بینید. به‌علاوه، وقتی کد را می‌خوانید نمی‌دانید
+            <code>randint</code> از کجا آمده است.
+        </p>
+    </div>
+
+    <div class="tip">
+        <span class="box-title" data-t="ch16-029">دام نام فایل</span>
+        <p data-t="ch16-030">هرگز فایل خودتان را <code>random.py</code> یا <code>math.py</code> نگذارید. پایتون اول در پوشه جاری جست‌وجو می‌کند، فایل شما را پیدا می‌کند و به جای ماژول واقعی واردش می‌کند. نتیجه، خطاهای بسیار گیج‌کننده است.</p>
+    </div>
+
+    <h2 id="s2" data-t="ch16-031">۲. عدد تصادفی صحیح</h2>
+
+    <pre class="code"><code>import random
+
+# randint(a, b) -&gt; a whole number between a and b, BOTH included.
+x = random.randint(1, 6)
+y = random.randint(1, 6)
+print(f'{x}, {y}')
+
+# randrange() works like range(): the last value is NOT included.
+print(random.randrange(1, 10))        # 1..9
+print(random.randrange(0, 100, 5))    # 0, 5, 10, ... 95</code></pre>
+    <p class="code-caption" data-t="ch16-032">عدد تصادفی صحیح: نمونه 02_random_integers.py</p>
+
+    <p data-t="ch16-033">
+        تفاوت مهم: در <code>randint</code> هر دو سر بازه <strong>شامل</strong>
+        هستند، ولی <code>randrange</code> مثل <code>range</code> عمل می‌کند و
+        عدد آخر را شامل نمی‌شود. برای تاس، <code>randint(1, 6)</code> درست است.
+    </p>
+
+    <h2 id="s3" data-t="ch16-034">۳. عدد تصادفی اعشاری</h2>
+
+    <pre class="code"><code>import random
+
+# random() -&gt; a decimal number between 0.0 and 1.0 (1.0 excluded)
+print(random.random())
+
+# uniform(a, b) -&gt; a decimal number between a and b
+print(random.uniform(5, 10))
+
+# A percentage with two decimals:
+print(round(random.random() * 100, 2))</code></pre>
+    <p class="code-caption" data-t="ch16-035">عدد تصادفی اعشاری: نمونه 03_random_floats.py</p>
+
+    <h2 id="s4" data-t="ch16-036">۴. انتخاب تصادفی از یک مجموعه</h2>
+
+    <pre class="code"><code>import random
+
+colors = ['red', 'green', 'blue']
+
+# choice() -&gt; ONE item
+print(random.choice(colors))
+
+# sample() -&gt; k DIFFERENT items (no repetition)
+print(random.sample(colors, 2))
+
+# choices() -&gt; k items WITH repetition allowed
+print(random.choices(colors, k=5))
+
+# choices() can also be given weights.
+print(random.choices(colors, weights=[10, 1, 1], k=5))
+
+# shuffle() mixes a list IN PLACE and returns None.
+numbers = [1, 2, 3, 4, 5]
+random.shuffle(numbers)
+print(numbers)</code></pre>
+    <p class="code-caption" data-t="ch16-037">انتخاب تصادفی: نمونه 04_random_choice.py</p>
+
+    <div class="table-scroll">
+        <table>
+            <thead>
+                <tr><th data-t="ch16-038">تابع</th><th data-t="ch16-039">وظیفه آن</th></tr>
+            </thead>
+            <tbody>
+                <tr><td><code>choice(lst)</code></td><td data-t="ch16-040">یک عضو تصادفی</td></tr>
+                <tr><td><code>sample(lst, k)</code></td><td data-t="ch16-041">k عضو <strong>متفاوت</strong>، بدون تکرار. مثل قرعه‌کشی</td></tr>
+                <tr><td><code>choices(lst, k=n)</code></td><td data-t="ch16-042">n عضو <strong>با</strong> امکان تکرار</td></tr>
+                <tr><td><code>choices(..., weights=[...])</code></td><td data-t="ch16-043">با احتمال‌های متفاوت</td></tr>
+                <tr><td><code>shuffle(lst)</code></td><td data-t="ch16-044">بُر زدن خود لیست. چیزی برنمی‌گرداند</td></tr>
+            </tbody>
+        </table>
+    </div>
+
+    <p data-t="ch16-045">
+        باز هم آن دام آشنا: <code>shuffle</code> مثل <code>sort</code> خود لیست
+        را عوض می‌کند و <code>None</code> برمی‌گرداند. ننویسید
+        <code>numbers = random.shuffle(numbers)</code>.
+    </p>
+
+    <h2 id="s5" data-t="ch16-046">۵. دانه تصادفی</h2>
+
+    <pre class="code"><code>import random
+
+# The "random" numbers of a computer are computed from a starting value
+# called the seed. With the same seed we always get the same sequence -
+# which is exactly what we want while testing a program.
+random.seed(42)
+print([random.randint(1, 100) for _ in range(5)])
+
+random.seed(42)
+print([random.randint(1, 100) for _ in range(5)])   # the same five numbers
+
+# Without a seed, Python uses the current time, so the numbers change.
+random.seed()
+print([random.randint(1, 100) for _ in range(5)])</code></pre>
+    <p class="code-caption" data-t="ch16-047">دانه: نمونه 05_random_seed.py</p>
+
+    <p data-t="ch16-048">اعداد تصادفی کامپیوتر در عمل <strong>شبه‌تصادفی</strong> هستند: از یک عدد شروع می‌شوند و با فرمولی محاسبه می‌شوند. اگر همان عدد شروع را بدهید، همان دنباله را می‌گیرید. این برای آزمایش برنامه بسیار مفید است، چون می‌توانید باگ را دوباره تولید کنید.</p>
+
+    <div class="note">
+        <span class="box-title" data-t="ch16-049">برای رمز و امنیت</span>
+        <p data-t="ch16-050">
+            ماژول <code>random</code> برای بازی و شبیه‌سازی عالی است ولی برای
+            تولید رمز عبور یا توکن امنیتی مناسب نیست، چون قابل پیش‌بینی است.
+            برای آن کارها ماژول <code>secrets</code> ساخته شده است.
+        </p>
+    </div>
+
+    <h2 id="s6" data-t="ch16-051">۶. بازی تاس</h2>
+
+    <pre class="code"><code>'''A small dice game: the player and the computer roll two dice.'''
+
+import random
+
+
+def roll_two_dice() -&gt; int:
+    'Roll two dice and return their total.'
+    return random.randint(1, 6) + random.randint(1, 6)
+
+
+def main() -&gt; None:
+    player_score = 0
+    computer_score = 0
+
+    for round_number in range(1, 4):
+        input(f'Round {round_number} - press Enter to roll...')
+
+        player = roll_two_dice()
+        computer = roll_two_dice()
+
+        print(f'You: {player}   Computer: {computer}')
+
+        if player &gt; computer:
+            player_score += 1
+            print('You win this round!')
+        elif computer &gt; player:
+            computer_score += 1
+            print('The computer wins this round!')
+        else:
+            print('Draw.')
+
+    print(f'\nFinal score - you: {player_score}, computer: {computer_score}')
+
+
+if __name__ == '__main__':
+    main()</code></pre>
+    <p class="code-caption" data-t="ch16-052">بازی تاس: نمونه 06_dice_game.py</p>
+
+    <p data-t="ch16-053">
+        نکته ظریف: <code>input()</code> اینجا بدون ذخیره کردن نتیجه به کار رفته
+        است. فقط می‌خواهیم برنامه منتظر بماند تا کاربر اینتر بزند. این ترفند
+        ساده‌ای است برای مکث دادن به برنامه‌های متنی.
+    </p>
+
+    <h2 id="s7" data-t="ch16-054">۷. ماژول math</h2>
+
+    <pre class="code"><code>import math
+
+print(math.pi)              # 3.141592653589793
+print(math.e)
+
+print(math.sqrt(16))        # 4.0  -&gt; square root
+print(math.pow(2, 10))      # 1024.0 (a float; the operator ** gives an int)
+print(2 ** 10)              # 1024
+
+print(math.factorial(5))    # 120
+print(math.gcd(12, 18))     # 6  -&gt; greatest common divisor
+
+print(math.floor(3.7))      # 3  -&gt; down
+print(math.ceil(3.2))       # 4  -&gt; up
+print(math.fabs(-5))        # 5.0
+
+# Area of a circle.
+radius = float(input('Radius of the circle: '))
+print('Area:', math.pi * radius ** 2)</code></pre>
+    <p class="code-caption" data-t="ch16-055">ماژول math: نمونه 07_math_module.py</p>
+
+    <p data-t="ch16-056">
+        در فصل‌های قبل فاکتوریل و بزرگ‌ترین مقسوم‌علیه مشترک را با دست نوشتیم.
+        حالا می‌بینید که هر دو آماده‌اند. باز هم همان درس: اول بفهمید چطور کار
+        می‌کند، بعد از نسخه آماده استفاده کنید.
+    </p>
+
+    <h2 id="s8" data-t="ch16-057">۸. گرد کردن</h2>
+
+    <pre class="code"><code>import math
+
+value = 3.567
+
+print(round(value))         # 4     -&gt; nearest whole number
+print(round(value, 2))      # 3.57  -&gt; two decimals
+print(math.floor(value))    # 3     -&gt; always down
+print(math.ceil(value))     # 4     -&gt; always up
+print(int(value))           # 3     -&gt; simply cuts the decimals
+
+# Careful with negative numbers: int() and floor() are NOT the same.
+print(int(-3.7), math.floor(-3.7))    # -3  and  -4
+
+# Python uses "banker's rounding": .5 goes to the nearest EVEN number.
+print(round(2.5), round(3.5))         # 2  and  4</code></pre>
+    <p class="code-caption" data-t="ch16-058">گرد کردن: نمونه 08_rounding.py</p>
+
+    <div class="table-scroll">
+        <table>
+            <thead>
+                <tr><th data-t="ch16-059">روش</th><th data-t="ch16-060">روی ۳٫۷</th><th data-t="ch16-061">روی منفی ۳٫۷</th><th data-t="ch16-062">معنی</th></tr>
+            </thead>
+            <tbody>
+                <tr><td><code>round()</code></td><td data-t="ch16-063">۴</td><td data-t="ch16-064">منفی ۴</td><td data-t="ch16-065">نزدیک‌ترین</td></tr>
+                <tr><td><code>math.floor()</code></td><td data-t="ch16-066">۳</td><td data-t="ch16-067">منفی ۴</td><td data-t="ch16-068">همیشه به سمت پایین</td></tr>
+                <tr><td><code>math.ceil()</code></td><td data-t="ch16-069">۴</td><td data-t="ch16-070">منفی ۳</td><td data-t="ch16-071">همیشه به سمت بالا</td></tr>
+                <tr><td><code>int()</code></td><td data-t="ch16-072">۳</td><td data-t="ch16-073">منفی ۳</td><td data-t="ch16-074">بریدن اعشار، به سمت صفر</td></tr>
+            </tbody>
+        </table>
+    </div>
+
+    <div class="warn">
+        <span class="box-title" data-t="ch16-075">گرد کردن بانکی</span>
+        <p data-t="ch16-076">
+            <code>round(2.5)</code> برابر ۲ است، نه ۳. این باگ نیست: پایتون
+            نصف‌ها را به نزدیک‌ترین عدد <strong>زوج</strong> گرد می‌کند. دلیلش
+            این است که اگر همیشه رو به بالا گرد کنید، در محاسبات مالی بزرگ یک
+            خطای انباشته ایجاد می‌شود. اگر رفتار مدرسه‌ای می‌خواهید، باید
+            خودتان بنویسید یا از ماژول <code>decimal</code> استفاده کنید.
+        </p>
+    </div>
+
+    <h2 id="s9" data-t="ch16-077">۹. تاریخ و زمان</h2>
+
+    <pre class="code"><code>from datetime import datetime, date
+
+# The current date and time.
+now = datetime.now()
+print(now)
+print(now.year, now.month, now.day)
+print(now.hour, now.minute, now.second)
+
+# Only the date.
+today = date.today()
+print(today)
+
+# Building a specific date.
+birthday = date(2005, 3, 21)
+print(birthday)
+
+# strftime() turns a date into text the way we want it.
+print(now.strftime('%Y/%m/%d'))
+print(now.strftime('%d %B %Y'))
+print(now.strftime('%H:%M:%S'))
+
+# strptime() does the opposite: it reads a date out of a text.
+parsed = datetime.strptime('2026-09-08', '%Y-%m-%d')
+print(parsed)</code></pre>
+    <p class="code-caption" data-t="ch16-078">تاریخ و زمان: نمونه 09_datetime_basics.py</p>
+
+    <div class="table-scroll">
+        <table>
+            <thead>
+                <tr><th data-t="ch16-079">کد قالب</th><th data-t="ch16-080">یعنی</th></tr>
+            </thead>
+            <tbody>
+                <tr><td><code>%Y</code></td><td data-t="ch16-081">سال چهاررقمی</td></tr>
+                <tr><td><code>%m</code></td><td data-t="ch16-082">ماه دورقمی</td></tr>
+                <tr><td><code>%d</code></td><td data-t="ch16-083">روز دورقمی</td></tr>
+                <tr><td><code>%B</code></td><td data-t="ch16-084">نام ماه</td></tr>
+                <tr><td><code>%H:%M:%S</code></td><td data-t="ch16-085">ساعت و دقیقه و ثانیه</td></tr>
+            </tbody>
+        </table>
+    </div>
+
+    <p data-t="ch16-086">
+        دو تابع را با هم اشتباه نگیرید: <code>strftime</code> تاریخ را به
+        <strong>متن</strong> تبدیل می‌کند و <code>strptime</code> متن را به
+        تاریخ. حرف <code>f</code> یعنی format و حرف <code>p</code> یعنی parse.
+    </p>
+
+    <h2 id="s10" data-t="ch16-087">۱۰. اختلاف دو تاریخ</h2>
+
+    <pre class="code"><code>from datetime import date, timedelta
+
+today = date.today()
+birthday = date(2005, 3, 21)
+
+# Subtracting two dates gives a timedelta.
+age = today - birthday
+print('Days lived:', age.days)
+print('Approximate age:', age.days // 365)
+
+# Adding a duration to a date.
+print('In 100 days:', today + timedelta(days=100))
+print('One week ago:', today - timedelta(weeks=1))
+
+# A small program: how many days until the end of the year?
+end_of_year = date(today.year, 12, 31)
+print('Days left this year:', (end_of_year - today).days)</code></pre>
+    <p class="code-caption" data-t="ch16-088">اختلاف تاریخ: نمونه 10_datetime_difference.py</p>
+
+    <p data-t="ch16-089">
+        تفریق دو تاریخ یک <code>timedelta</code> می‌دهد که یعنی «مدت زمان».
+        صفت <code>.days</code> تعداد روزهایش را می‌دهد. برای جمع زدن هم همین
+        نوع را می‌سازید و به تاریخ اضافه می‌کنید.
+    </p>
+
+    <h2 id="s11" data-t="ch16-090">۱۱. ماژول time</h2>
+
+    <pre class="code"><code>import time
+
+print('Start')
+time.sleep(1)          # pause the program for one second
+print('One second later')
+
+# Measuring how long a piece of code takes.
+start = time.time()
+
+total = 0
+for i in range(3_000_000):
+    total += i
+
+end = time.time()
+print(f'The loop took {end - start:.3f} seconds.')
+
+# perf_counter() is more precise for measuring short durations.
+start = time.perf_counter()
+sum(range(3_000_000))
+print(f'sum() took {time.perf_counter() - start:.3f} seconds.')</code></pre>
+    <p class="code-caption" data-t="ch16-091">ماژول time: نمونه 11_time_module.py</p>
+
+    <pre class="out">Start
+One second later
+The loop took 0.187 seconds.
+sum() took 0.043 seconds.</pre>
+
+    <h3 data-t="ch16-092">شرح مثال</h3>
+
+    <ul>
+        <li data-t="ch16-093"><code>sleep(n)</code> برنامه را n ثانیه متوقف می‌کند. برای انیمیشن‌های متنی و برای مکث بین درخواست‌های شبکه به کار می‌آید.</li>
+        <li data-t="ch16-094">اندازه‌گیری زمان الگوی ساده‌ای دارد: زمان را پیش و پس از کد بگیرید و تفریق کنید.</li>
+        <li data-t="ch16-095">نتیجه جالب است: <code>sum(range(...))</code> چند برابر سریع‌تر از حلقه دستی است، چون داخل خود پایتون و به زبان C پیاده‌سازی شده است.</li>
+        <li data-t="ch16-096">نوشتن <code>3_000_000</code> با زیرخط کاملاً مجاز است و فقط برای خوانایی است. پایتون زیرخط‌ها را نادیده می‌گیرد.</li>
+    </ul>
+
+    <h2 id="s12" data-t="ch16-097">۱۲. آرگومان‌های خط فرمان</h2>
+
+    <pre class="code"><code>'''Reading the arguments typed on the command line.
+
+Run it like this:
+    python 12_sys_argv.py 12 30
+'''
+
+import sys
+
+
+def main() -&gt; None:
+    # sys.argv[0] is the name of the file itself.
+    print('All the arguments:', sys.argv)
+
+    if len(sys.argv) &lt; 3:
+        print('Usage: python 12_sys_argv.py &lt;number1&gt; &lt;number2&gt;')
+        sys.exit(1)          # stop the program with an error code
+
+    num1 = float(sys.argv[1])
+    num2 = float(sys.argv[2])
+
+    print('Sum:', num1 + num2)
+
+
+if __name__ == '__main__':
+    main()</code></pre>
+    <p class="code-caption" data-t="ch16-098">خط فرمان: نمونه 12_sys_argv.py</p>
+
+    <pre class="out">$ python 12_sys_argv.py 12 30
+All the arguments: ['12_sys_argv.py', '12', '30']
+Sum: 42.0</pre>
+
+    <h3 data-t="ch16-099">شرح مثال</h3>
+
+    <ul>
+        <li data-t="ch16-100"><code>sys.argv</code> لیستی از رشته‌هاست: عضو صفرم نام خود فایل است و بقیه، آرگومان‌های کاربر.</li>
+        <li data-t="ch16-101">همه اعضا <strong>رشته</strong> هستند، پس مثل <code>input</code> باید تبدیلشان کنید.</li>
+        <li data-t="ch16-102">بررسی طول لیست ضروری است، وگرنه اگر کاربر آرگومان ندهد <code>IndexError</code> می‌گیرید.</li>
+        <li data-t="ch16-103"><code>sys.exit(1)</code> برنامه را با کد خطا تمام می‌کند. عدد صفر یعنی موفقیت و هر عدد دیگری یعنی خطا؛ این قرارداد سیستم‌عامل است.</li>
+        <li data-t="ch16-104">برای برنامه‌های جدی، ماژول <code>argparse</code> بسیار بهتر است و خودش راهنما و اعتبارسنجی می‌سازد.</li>
+    </ul>
+
+    <div class="folder-ref">
+        <span class="box-title" data-t="ch16-105">فایل‌های تمرینی این فصل</span>
+        <p data-t="ch16-106">
+            پوشه <code>S16-standard-library</code> شامل نمونه‌های
+            <code>01_import_styles.py</code> تا <code>12_sys_argv.py</code>.
+        </p>
+    </div>
+
+    <h2 data-t="ch16-107">خلاصه فصل</h2>
+
+    <div class="table-scroll">
+        <table>
+            <thead>
+                <tr><th data-t="ch16-108">ابزار</th><th data-t="ch16-109">وظیفه آن</th></tr>
+            </thead>
+            <tbody>
+                <tr><td><code>import m</code> / <code>from m import x</code></td><td data-t="ch16-110">وارد کردن ماژول. ستاره را به کار نبرید</td></tr>
+                <tr><td><code>random.randint(a, b)</code></td><td data-t="ch16-111">عدد صحیح تصادفی، هر دو سر شامل</td></tr>
+                <tr><td><code>random.choice</code> <code>sample</code> <code>shuffle</code></td><td data-t="ch16-112">انتخاب و بُر زدن</td></tr>
+                <tr><td><code>random.seed(n)</code></td><td data-t="ch16-113">تکرارپذیر کردن نتیجه‌های تصادفی</td></tr>
+                <tr><td><code>math.sqrt</code> <code>pi</code> <code>factorial</code> <code>gcd</code></td><td data-t="ch16-114">توابع ریاضی آماده</td></tr>
+                <tr><td><code>round floor ceil int</code></td><td data-t="ch16-115">چهار نوع گرد کردن با رفتار متفاوت</td></tr>
+                <tr><td><code>datetime.now()</code> <code>date.today()</code></td><td data-t="ch16-116">زمان و تاریخ جاری</td></tr>
+                <tr><td><code>strftime</code> <code>strptime</code></td><td data-t="ch16-117">تاریخ به متن و متن به تاریخ</td></tr>
+                <tr><td><code>timedelta</code></td><td data-t="ch16-118">مدت زمان، برای جمع و تفریق تاریخ</td></tr>
+                <tr><td><code>time.sleep</code> <code>perf_counter</code></td><td data-t="ch16-119">مکث و اندازه‌گیری زمان</td></tr>
+                <tr><td><code>sys.argv</code></td><td data-t="ch16-120">آرگومان‌های خط فرمان، همیشه رشته</td></tr>
+            </tbody>
+        </table>
+    </div>
+
+    <div class="exercise">
+        <h3 data-t="ch16-121">تمرین‌های فصل شانزده</h3>
+        <ol>
+            <li data-t="ch16-122">بازی حدس عدد را بنویسید که کامپیوتر عددی بین ۱ تا ۱۰۰ انتخاب کند و بگوید بزرگ‌تر یا کوچک‌تر.</li>
+            <li data-t="ch16-123">برنامه‌ای بنویسید که هزار بار تاس بیندازد و بشمارد هر وجه چند بار آمده است.</li>
+            <li data-t="ch16-124">یک رمز عبور تصادفی ده کاراکتری از حروف و ارقام و نمادها بسازید.</li>
+            <li data-t="ch16-125">برنامه‌ای بنویسید که شش عدد متفاوت بین ۱ تا ۴۹ انتخاب کند، مثل قرعه‌کشی.</li>
+            <li data-t="ch16-126">شعاع دایره را بگیرید و با <code>math</code> مساحت و محیطش را چاپ کنید.</li>
+            <li data-t="ch16-127">تاریخ تولد را بگیرید و سن دقیق را به سال و ماه و روز چاپ کنید.</li>
+            <li data-t="ch16-128">تاریخ امروز را در سه قالب مختلف چاپ کنید.</li>
+            <li data-t="ch16-129">زمان جمع اعداد یک تا ده میلیون را یک بار با حلقه و یک بار با <code>sum(range(...))</code> اندازه بگیرید و مقایسه کنید.</li>
+        </ol>
+    </div>
+
+    <div class="pager">
+        <a href="chapter-15.html">فصل قبل: ساختارهای داده تودرتو</a>
+        <a href="chapter-17.html">فصل بعد: ماژول‌ها و بسته‌ها</a>
+    </div>
+
+</main>
+
+</body>
+</html>

@@ -1,0 +1,2 @@
+dilami_calendar==0.4.3
+Khayyam==3.0.17

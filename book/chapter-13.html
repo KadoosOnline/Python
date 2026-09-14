@@ -1,0 +1,547 @@
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="فصل سیزده: آرگومان‌های ستاره‌دار args و kwargs، راهنمای نوع، مستندنویسی، دام پیش‌فرض تغییرپذیر و بازگشت">
+    <title>فصل ۱۳: توابع پیشرفته</title>
+    <link rel="icon" href="logokm.png" type="image/png">
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<header class="book-bar">
+    <a class="name" href="index.html">برنامه‌نویسی پایتون</a>
+    <a href="index.html">فهرست مطالب</a>
+</header>
+
+<main class="paper">
+
+    <div class="chapter-head">
+        <span class="chapter-num">فصل ۱۳</span>
+        <h1 data-t="ch13-001">توابع پیشرفته</h1>
+        <p class="lead" data-t="ch13-002">
+            فصل پایانی توابع. توابعی که هر تعداد آرگومان می‌پذیرند، توابعی که
+            نوعشان مستند است، و توابعی که خودشان را صدا می‌زنند.
+        </p>
+    </div>
+
+    <div class="mini-toc">
+        <span class="box-title" data-t="ch13-003">در این فصل می‌خوانید</span>
+        <ol>
+            <li data-t="ch13-004"><a href="#s1">آرگومان‌های ستاره‌دار</a></li>
+            <li data-t="ch13-005"><a href="#s2">آرگومان‌های دوستاره</a></li>
+            <li data-t="ch13-006"><a href="#s3">همه با هم و ترتیبشان</a></li>
+            <li data-t="ch13-007"><a href="#s4">تحویل دادن آرگومان‌ها به تابع دیگر</a></li>
+            <li data-t="ch13-008"><a href="#s5">راهنمای نوع روی متغیر</a></li>
+            <li data-t="ch13-009"><a href="#s6">راهنمای نوع روی تابع</a></li>
+            <li data-t="ch13-010"><a href="#s7">راهنمای نوع مجموعه‌ها</a></li>
+            <li data-t="ch13-011"><a href="#s8">راهنمای نوع، بررسی نیست</a></li>
+            <li data-t="ch13-012"><a href="#s9">دام پیش‌فرض تغییرپذیر</a></li>
+            <li data-t="ch13-013"><a href="#s10">مستندنویسی</a></li>
+            <li data-t="ch13-014"><a href="#s11">بازگشت</a></li>
+        </ol>
+    </div>
+
+    <h2 id="s1" data-t="ch13-015">۱. آرگومان‌های ستاره‌دار</h2>
+
+    <p data-t="ch13-016">
+        گاهی نمی‌دانید چند آرگومان به تابعتان داده می‌شود. تابع
+        <code>print</code> خودش همین‌طور است: می‌شود یک مقدار یا ده مقدار به آن
+        داد. یک ستاره پیش از نام پارامتر، این توانایی را به تابع شما هم می‌دهد.
+    </p>
+
+    <pre class="code"><code># A '*' in front of a parameter collects ALL the extra positional arguments
+# into a tuple. The name 'args' is only a convention.
+def sum_numbers(*args):
+    print('args is:', args, type(args))
+    total = 0
+    for number in args:
+        total += number
+    return total
+
+print(sum_numbers(1, 2, 3))
+print(sum_numbers(10, 20, 30, 40))
+print(sum_numbers())              # an empty tuple -&gt; 0
+
+# A '*' at the CALL site does the opposite: it spreads a list into arguments.
+numbers = [5, 10, 15]
+print(sum_numbers(*numbers))</code></pre>
+    <p class="code-caption" data-t="ch13-017">آرگومان‌های ستاره‌دار: نمونه 01_args.py</p>
+
+    <pre class="out">args is: (1, 2, 3) &lt;class 'tuple'&gt;
+6
+args is: (10, 20, 30, 40) &lt;class 'tuple'&gt;
+100
+args is: () &lt;class 'tuple'&gt;
+0
+args is: (5, 10, 15) &lt;class 'tuple'&gt;
+30</pre>
+
+    <h3 data-t="ch13-018">شرح مثال</h3>
+
+    <ul>
+        <li data-t="ch13-019">ستاره همه آرگومان‌های اضافی را در یک <strong>تاپل</strong> جمع می‌کند. تاپل شبیه لیست است ولی تغییرناپذیر؛ در فصل بعد کاملاً می‌بینیدش.</li>
+        <li data-t="ch13-020">نام <code>args</code> فقط یک قرارداد است. <code>*numbers</code> هم کاملاً درست است، ولی همه دنیا <code>args</code> می‌نویسند.</li>
+        <li data-t="ch13-021">اگر هیچ آرگومانی داده نشود، تاپل خالی می‌شود و حلقه اصلاً اجرا نمی‌شود.</li>
+        <li data-t="ch13-022">ستاره در <strong>محل صدا زدن</strong> کار برعکس می‌کند: یک لیست را باز می‌کند و اعضایش را جدا جدا به تابع می‌دهد.</li>
+    </ul>
+
+    <h2 id="s2" data-t="ch13-023">۲. آرگومان‌های دوستاره</h2>
+
+    <pre class="code"><code># '**' collects all the extra KEYWORD arguments into a dictionary.
+def show_info(**kwargs):
+    print('kwargs is:', kwargs, type(kwargs))
+    for key, value in kwargs.items():
+        print(key, ':', value)
+
+show_info(name='Ali', age=22, city='Rasht')
+print()
+show_info(Riyazi=20, Farsi=19, Dini=12, Varzesh=18)
+
+# '**' at the call site spreads a dictionary into keyword arguments.
+data = {'name': 'Sara', 'age': 19}
+show_info(**data)</code></pre>
+    <p class="code-caption" data-t="ch13-024">آرگومان‌های دوستاره: نمونه 02_kwargs.py</p>
+
+    <p data-t="ch13-025">
+        دو ستاره، آرگومان‌های <strong>نام‌دار</strong> را در یک
+        <strong>دیکشنری</strong> جمع می‌کند. دیکشنری موضوع فصل بعد است؛ فعلاً
+        همین‌قدر بدانید که هر مقدار در آن یک کلید دارد. متد
+        <code>items()</code> کلید و مقدار را با هم می‌دهد.
+    </p>
+
+    <h2 id="s3" data-t="ch13-026">۳. همه با هم و ترتیبشان</h2>
+
+    <pre class="code"><code># The complete order of the parameters:
+#   normal, with a default, *args, **kwargs
+def demo(a, b=10, *args, **kwargs):
+    print('a:', a)
+    print('b:', b)
+    print('args:', args)
+    print('kwargs:', kwargs)
+
+demo(1, 20, 30, 40, name='Ali', city='Rasht')
+print()
+demo(1)</code></pre>
+    <p class="code-caption" data-t="ch13-027">ترتیب کامل: نمونه 03_args_and_kwargs.py</p>
+
+    <pre class="out">a: 1
+b: 20
+args: (30, 40)
+kwargs: {'name': 'Ali', 'city': 'Rasht'}
+
+a: 1
+b: 10
+args: ()
+kwargs: {}</pre>
+
+    <div class="table-scroll">
+        <table>
+            <thead>
+                <tr><th data-t="ch13-028">ترتیب</th><th data-t="ch13-029">نوع پارامتر</th><th data-t="ch13-030">مثال</th></tr>
+            </thead>
+            <tbody>
+                <tr><td data-t="ch13-031">۱</td><td data-t="ch13-032">معمولی</td><td><code>a</code></td></tr>
+                <tr><td data-t="ch13-033">۲</td><td data-t="ch13-034">دارای پیش‌فرض</td><td><code>b=10</code></td></tr>
+                <tr><td data-t="ch13-035">۳</td><td data-t="ch13-036">بقیه بی‌نام‌ها</td><td><code>*args</code></td></tr>
+                <tr><td data-t="ch13-037">۴</td><td data-t="ch13-038">بقیه نام‌دارها</td><td><code>**kwargs</code></td></tr>
+            </tbody>
+        </table>
+    </div>
+
+    <h2 id="s4" data-t="ch13-039">۴. تحویل دادن آرگومان‌ها به تابع دیگر</h2>
+
+    <p data-t="ch13-040">
+        رایج‌ترین کاربرد واقعی این دو ابزار این است: تابعی بسازید که هر چه گرفت،
+        دست‌نخورده به تابع دیگری بدهد.
+    </p>
+
+    <pre class="code"><code># A very common use of *args / **kwargs: accept anything and hand it over
+# unchanged to another function. Here we build our own print().
+def show(*args, **kwargs):
+    print(*args, **kwargs)
+
+def main():
+    show('Hello World!', end=' *** ')
+    show('Hello Kadoos!', end=' *** ')
+    show()
+    show('a', 'b', 'c', sep='-')
+
+if __name__ == '__main__':
+    main()</code></pre>
+    <p class="code-caption" data-t="ch13-041">تحویل دادن: نمونه 04_forwarding.py</p>
+
+    <p data-t="ch13-042">
+        تابع <code>show</code> دقیقاً مثل <code>print</code> رفتار می‌کند، چون
+        هر چه بگیرد پاس می‌دهد. اگر روزی بخواهید همه پیام‌های برنامه را در فایل
+        هم بنویسید، فقط همین یک تابع را عوض می‌کنید. در فصل بیست و ششم می‌بینید
+        که دکوراتورها دقیقاً روی همین تکنیک ساخته شده‌اند.
+    </p>
+
+    <h2 id="s5" data-t="ch13-043">۵. راهنمای نوع روی متغیر</h2>
+
+    <p data-t="ch13-044">
+        پایتون به شما اجازه می‌دهد بنویسید که هر متغیر قرار است چه نوعی داشته
+        باشد. این نوشته هیچ اثری بر اجرای برنامه ندارد و فقط
+        <strong>مستندسازی</strong> است، ولی ویرایشگر با کمکش خطاهایتان را پیش
+        از اجرا نشان می‌دهد.
+    </p>
+
+    <pre class="code"><code># A type hint says WHAT KIND of value a name is supposed to hold.
+# It changes nothing at run time, but the editor can then warn us.
+number: int = 23
+PI: float = 3.14
+name: str = 'Kadoos'
+is_active: bool = True
+
+user_input: str = input('Enter a number: ')
+my_number: float = float(user_input)
+
+print(number, PI, name, is_active, my_number)</code></pre>
+    <p class="code-caption" data-t="ch13-045">راهنمای نوع متغیر: نمونه 05_type_hints_variables.py</p>
+
+    <h2 id="s6" data-t="ch13-046">۶. راهنمای نوع روی تابع</h2>
+
+    <pre class="code"><code># Parameters are annotated with ': type', the result with '-&gt; type'.
+def add(number1: float, number2: float) -&gt; float:
+    return number1 + number2
+
+def greet(name: str) -&gt; str:
+    return f'Hello {name}'
+
+# A function that returns nothing is annotated with '-&gt; None'.
+def main() -&gt; None:
+    print(add(3.2, 2.0))
+    print(greet('Kadoos'))
+
+if __name__ == '__main__':
+    main()</code></pre>
+    <p class="code-caption" data-t="ch13-047">راهنمای نوع تابع: نمونه 06_type_hints_functions.py</p>
+
+    <p data-t="ch13-048">
+        نوع پارامتر با دونقطه و نوع خروجی با فلش نوشته می‌شود. تابعی که چیزی
+        برنمی‌گرداند، <code>-&gt; None</code> می‌گیرد. از این فصل به بعد، همه
+        کدهای این کتاب راهنمای نوع دارند.
+    </p>
+
+    <h2 id="s7" data-t="ch13-049">۷. راهنمای نوع مجموعه‌ها</h2>
+
+    <pre class="code"><code># Hints for collections say what is INSIDE them.
+def get_total(numbers: list[int]) -&gt; int:
+    return sum(numbers)
+
+def show_student(data: dict[str, int]) -&gt; None:
+    print(data)
+
+# '|' means "one type OR the other".
+def add(number1: int | float = 1, number2: int | float = 1) -&gt; int | float:
+    return number1 + number2
+
+# 'X | None' is used for a value that may be missing.
+def find_name(names: list[str], target: str) -&gt; str | None:
+    for name in names:
+        if name == target:
+            return name
+    return None
+
+# A long signature is easier to read spread over several lines.
+def register(
+    number1: float = 1.0,
+    number2: float = 1.0,
+    name: str = 'Kadoos',
+    active: bool = True,
+) -&gt; float:
+    return number1 + number2</code></pre>
+    <p class="code-caption" data-t="ch13-050">راهنمای نوع مجموعه‌ها: نمونه 07_type_hints_collections.py</p>
+
+    <div class="table-scroll">
+        <table>
+            <thead>
+                <tr><th data-t="ch13-051">نوشتار</th><th data-t="ch13-052">یعنی</th></tr>
+            </thead>
+            <tbody>
+                <tr><td><code>list[int]</code></td><td data-t="ch13-053">لیستی از عددهای صحیح</td></tr>
+                <tr><td><code>dict[str, int]</code></td><td data-t="ch13-054">دیکشنری با کلید رشته و مقدار عدد</td></tr>
+                <tr><td><code>int | float</code></td><td data-t="ch13-055">یا صحیح یا اعشاری</td></tr>
+                <tr><td><code>str | None</code></td><td data-t="ch13-056">یا رشته یا هیچ. برای وقتی ممکن است چیزی پیدا نشود</td></tr>
+                <tr><td><code>-&gt; None</code></td><td data-t="ch13-057">تابع چیزی برنمی‌گرداند</td></tr>
+            </tbody>
+        </table>
+    </div>
+
+    <p data-t="ch13-058">
+        نوشتار <code>str | None</code> بسیار مهم است و به خواننده هشدار می‌دهد
+        که خروجی ممکن است <code>None</code> باشد، پس باید بررسی‌اش کند. بسیاری
+        از خطاهای واقعی برنامه‌ها از همین جا می‌آیند که کسی فراموش کرده
+        <code>None</code> را بررسی کند.
+    </p>
+
+    <h2 id="s8" data-t="ch13-059">۸. راهنمای نوع، بررسی نیست</h2>
+
+    <pre class="code"><code># Python does NOT check the type hints while the program runs.
+def add(a: int, b: int) -&gt; int:
+    return a + b
+
+print(add(2, 3))          # 5, as expected
+
+# The hints say "int", but this call still works, because '+' also works
+# on two strings. The editor will warn us; Python will not.
+print(add('Hi', 'Hello'))  # 'HiHello'
+
+# If we really want to refuse wrong types, we must check by hand.
+def strict_add(a: int, b: int) -&gt; int:
+    if not isinstance(a, int) or not isinstance(b, int):
+        raise TypeError('strict_add() only accepts integers')
+    return a + b
+
+print(strict_add(2, 3))
+# strict_add('Hi', 'Hello')  -&gt;  TypeError</code></pre>
+    <p class="code-caption" data-t="ch13-060">راهنما اجباری نیست: نمونه 08_hints_are_not_checks.py</p>
+
+    <div class="warn">
+        <span class="box-title" data-t="ch13-061">سوءتفاهم رایج</span>
+        <p data-t="ch13-062">
+            راهنمای نوع <strong>هیچ چیزی را اجبار نمی‌کند</strong>. پایتون هنگام
+            اجرا کاملاً نادیده‌شان می‌گیرد. آنها برای انسان و برای ویرایشگر
+            نوشته می‌شوند، نه برای مفسر. اگر واقعاً می‌خواهید نوع را کنترل کنید،
+            باید با <code>isinstance</code> دستی بررسی کنید و خطا بیندازید.
+            دستور <code>raise</code> موضوع فصل نوزدهم است.
+        </p>
+    </div>
+
+    <h2 id="s9" data-t="ch13-063">۹. دام پیش‌فرض تغییرپذیر</h2>
+
+    <p data-t="ch13-064">
+        این یکی از معروف‌ترین دام‌های پایتون است و حتی برنامه‌نویس‌های باتجربه
+        هم گاهی گرفتارش می‌شوند.
+    </p>
+
+    <pre class="code"><code># A default value is created ONCE, when the function is defined.
+# With a list as a default, all the calls end up sharing the SAME list.
+def add_student_wrong(name, students=[]):
+    students.append(name)
+    return students
+
+print(add_student_wrong('Ali'))     # ['Ali']
+print(add_student_wrong('Sara'))    # ['Ali', 'Sara']  &lt;- surprise!
+
+# The correct pattern uses None as the default.
+def add_student(name: str, students: list[str] | None = None) -&gt; list[str]:
+    if students is None:
+        students = []
+    students.append(name)
+    return students
+
+print(add_student('Ali'))           # ['Ali']
+print(add_student('Sara'))          # ['Sara']
+
+existing = ['Taghi', 'Naghi']
+print(add_student('Rahman', existing))</code></pre>
+    <p class="code-caption" data-t="ch13-065">دام پیش‌فرض: نمونه 09_mutable_default_trap.py</p>
+
+    <h3 data-t="ch13-066">شرح مثال</h3>
+
+    <ul>
+        <li data-t="ch13-067">مقدار پیش‌فرض <strong>یک بار</strong> ساخته می‌شود، آن هم موقع تعریف تابع، نه در هر صدا زدن.</li>
+        <li data-t="ch13-068">پس آن لیست خالی، بین همه فراخوانی‌ها <strong>مشترک</strong> است و هر بار چیزی به آن اضافه می‌شود.</li>
+        <li data-t="ch13-069">راه حل استاندارد و جهانی: پیش‌فرض را <code>None</code> بگذارید و داخل تابع، اگر <code>None</code> بود لیست تازه بسازید.</li>
+        <li data-t="ch13-070">این قاعده برای هر نوع تغییرپذیری صادق است: لیست، دیکشنری و مجموعه. برای عدد و رشته مشکلی نیست چون تغییرناپذیرند.</li>
+        <li data-t="ch13-071">دقت کنید که برای مقایسه با <code>None</code> از <code>is</code> استفاده می‌کنیم نه <code>==</code>. این قرارداد پایتون است.</li>
+    </ul>
+
+    <h2 id="s10" data-t="ch13-072">۱۰. مستندنویسی</h2>
+
+    <pre class="code"><code>'''Module docstring: a short description of what this file does.'''
+
+
+def area_of_rectangle(length: float, width: float) -&gt; float:
+    '''Return the area of a rectangle.
+
+    Args:
+        length: the length of the rectangle.
+        width: the width of the rectangle.
+
+    Returns:
+        The area, i.e. length * width.
+    '''
+    return length * width
+
+
+def main() -&gt; None:
+    print(area_of_rectangle(3, 4))
+
+    # A docstring is stored in the function and can be read at run time.
+    print(area_of_rectangle.__doc__)
+
+    # help() displays it nicely.
+    help(area_of_rectangle)
+
+
+if __name__ == '__main__':
+    main()</code></pre>
+    <p class="code-caption" data-t="ch13-073">مستندنویسی: نمونه 10_docstrings.py</p>
+
+    <h3 data-t="ch13-074">شرح مثال</h3>
+
+    <ul>
+        <li data-t="ch13-075"><strong>مستند</strong> یا docstring، یک رشته سه‌گیومه‌ای است که بلافاصله بعد از خط <code>def</code> می‌آید.</li>
+        <li data-t="ch13-076">فرقش با توضیح معمولی این است که در خود برنامه ذخیره می‌شود و با <code>help()</code> قابل دیدن است. توضیح با <code>#</code> فقط در فایل می‌ماند.</li>
+        <li data-t="ch13-077">ساختار استاندارد: یک خط خلاصه، خط خالی، بعد شرح پارامترها و خروجی.</li>
+        <li data-t="ch13-078">فایل هم می‌تواند مستند داشته باشد؛ کافی است اولین چیز فایل یک رشته سه‌گیومه‌ای باشد.</li>
+        <li data-t="ch13-079">در ویرایشگر، وقتی موس را روی نام تابع نگه دارید همین متن را می‌بینید. برای تابعی که خودتان شش ماه بعد استفاده می‌کنید، نعمت بزرگی است.</li>
+    </ul>
+
+    <h2 id="s11" data-t="ch13-080">۱۱. بازگشت</h2>
+
+    <p data-t="ch13-081">
+        <strong>بازگشت</strong> یعنی تابعی که خودش را صدا می‌زند. هر تابع
+        بازگشتی حتماً باید یک <strong>حالت پایه</strong> داشته باشد، یعنی
+        شرطی که در آن دیگر خودش را صدا نمی‌زند. بدون آن، برنامه تا بی‌نهایت
+        پیش می‌رود.
+    </p>
+
+    <pre class="code"><code># A recursive function is a function that calls itself.
+# It always needs a BASE CASE, otherwise it never stops.
+
+def factorial(n: int) -&gt; int:
+    'n! computed recursively.'
+    if n &lt;= 1:            # base case
+        return 1
+    return n * factorial(n - 1)
+
+
+def fibonacci(n: int) -&gt; int:
+    'The n-th Fibonacci number (0, 1, 1, 2, 3, 5, ...).'
+    if n &lt; 2:             # two base cases: fib(0) = 0 and fib(1) = 1
+        return n
+    return fibonacci(n - 1) + fibonacci(n - 2)
+
+
+def countdown(n: int) -&gt; None:
+    'Print n, n-1, ... 1 and then "Go!".'
+    if n == 0:
+        print('Go!')
+        return
+    print(n)
+    countdown(n - 1)</code></pre>
+    <p class="code-caption" data-t="ch13-082">بازگشت: نمونه 11_recursion.py</p>
+
+    <p data-t="ch13-083">
+        اجرای <code>factorial(4)</code> را دنبال کنیم:
+    </p>
+
+    <pre class="out">factorial(4) = 4 * factorial(3)
+factorial(3) = 3 * factorial(2)
+factorial(2) = 2 * factorial(1)
+factorial(1) = 1                 &lt;- base case
+                                 -&gt; 2 * 1  = 2
+                                 -&gt; 3 * 2  = 6
+                                 -&gt; 4 * 6  = 24</pre>
+
+    <h3 data-t="ch13-084">شرح مثال</h3>
+
+    <ul>
+        <li data-t="ch13-085">هر تابع بازگشتی دو بخش دارد: حالت پایه که مستقیم جواب می‌دهد، و حالت بازگشتی که مسئله را کوچک‌تر می‌کند و دوباره خودش را صدا می‌زند.</li>
+        <li data-t="ch13-086">مسئله باید در هر مرحله واقعاً <strong>کوچک‌تر</strong> شود، وگرنه به حالت پایه نمی‌رسیم.</li>
+        <li data-t="ch13-087">اگر حالت پایه را فراموش کنید، پایتون بعد از حدود هزار فراخوانی تودرتو خطای <code>RecursionError</code> می‌دهد.</li>
+        <li data-t="ch13-088">بازگشت زیباست ولی رایگان نیست: هر فراخوانی حافظه می‌گیرد. نسخه حلقه‌ای فاکتوریل هم سریع‌تر است و هم کم‌مصرف‌تر.</li>
+        <li data-t="ch13-089">فیبوناچی بازگشتی مثال بدی از کارایی است: <code>fibonacci(35)</code> چند ثانیه طول می‌کشد چون بارها مقدارهای تکراری را دوباره حساب می‌کند. در فصل بیست و ششم با <code>lru_cache</code> همین را در یک چشم به هم زدن حل می‌کنیم.</li>
+    </ul>
+
+    <div class="note">
+        <span class="box-title" data-t="ch13-090">پس بازگشت کجا واقعاً به درد می‌خورد</span>
+        <p data-t="ch13-091">
+            جایی که خود مسئله ساختار بازگشتی دارد: پیمایش پوشه‌ها و
+            زیرپوشه‌ها، پردازش یک درخت، تحلیل عبارت‌های ریاضی تودرتو. برای
+            شمردن ساده و جمع زدن، حلقه بهتر است.
+        </p>
+    </div>
+
+    <p data-t="ch13-092">و در پایان، یک برنامه کامل با همه چیزهای این فصل:</p>
+
+    <pre class="code"><code>'''A fully annotated and documented version of the prime test.'''
+
+
+def is_prime(number: int) -&gt; bool:
+    '''Return True when 'number' is a prime number.'''
+    if number &lt; 2:
+        return False
+
+    # Testing the divisors up to the square root is enough.
+    divisor: int = 2
+    while divisor * divisor &lt;= number:
+        if number % divisor == 0:
+            return False
+        divisor += 1
+
+    return True
+
+
+def main() -&gt; None:
+    user_input: str = input('Enter a number: ')
+    number: int = int(user_input)
+
+    if is_prime(number):
+        print(number, 'is prime.')
+    else:
+        print(number, 'is NOT prime.')
+
+
+if __name__ == '__main__':
+    main()</code></pre>
+    <p class="code-caption" data-t="ch13-093">نمونه کامل: نمونه 12_prime_with_hints.py</p>
+
+    <div class="folder-ref">
+        <span class="box-title" data-t="ch13-094">فایل‌های تمرینی این فصل</span>
+        <p data-t="ch13-095">
+            پوشه <code>S13-functions-advanced</code> شامل نمونه‌های
+            <code>01_args.py</code> تا <code>12_prime_with_hints.py</code>.
+        </p>
+    </div>
+
+    <h2 data-t="ch13-096">خلاصه فصل</h2>
+
+    <div class="table-scroll">
+        <table>
+            <thead>
+                <tr><th data-t="ch13-097">ابزار</th><th data-t="ch13-098">وظیفه آن</th></tr>
+            </thead>
+            <tbody>
+                <tr><td><code>*args</code></td><td data-t="ch13-099">جمع کردن آرگومان‌های بی‌نام اضافی در یک تاپل</td></tr>
+                <tr><td><code>**kwargs</code></td><td data-t="ch13-100">جمع کردن آرگومان‌های نام‌دار اضافی در یک دیکشنری</td></tr>
+                <tr><td><code>f(*lst)</code></td><td data-t="ch13-101">باز کردن یک لیست به آرگومان‌های جدا</td></tr>
+                <tr><td data-t="ch13-102">ترتیب پارامترها</td><td data-t="ch13-103">معمولی، پیش‌فرض‌دار، <code>*args</code>، <code>**kwargs</code></td></tr>
+                <tr><td data-t="ch13-104"><code>x: int</code> و <code>-&gt; str</code></td><td data-t="ch13-105">راهنمای نوع. فقط مستند است، اجبار نیست</td></tr>
+                <tr><td><code>list[int]</code> <code>str | None</code></td><td data-t="ch13-106">راهنمای نوع مجموعه‌ها و نوع اختیاری</td></tr>
+                <tr><td><code>def f(x=[])</code></td><td data-t="ch13-107">خطرناک. پیش‌فرض را <code>None</code> بگذارید</td></tr>
+                <tr><td data-t="ch13-108">مستند</td><td data-t="ch13-109">رشته سه‌گیومه‌ای زیر <code>def</code>، قابل دیدن با <code>help()</code></td></tr>
+                <tr><td data-t="ch13-110">بازگشت</td><td data-t="ch13-111">تابعی که خودش را صدا می‌زند. حتماً حالت پایه لازم دارد</td></tr>
+            </tbody>
+        </table>
+    </div>
+
+    <div class="exercise">
+        <h3 data-t="ch13-112">تمرین‌های فصل سیزده</h3>
+        <ol>
+            <li data-t="ch13-113">تابع <code>maximum(*args)</code> را بنویسید که بزرگ‌ترین مقدار از هر تعداد ورودی را برگرداند.</li>
+            <li data-t="ch13-114">تابع <code>make_profile(**kwargs)</code> را بنویسید که هر کلید و مقداری که گرفت را چاپ کند.</li>
+            <li data-t="ch13-115">به همه توابعی که در فصل یازدهم نوشتید، راهنمای نوع و مستند اضافه کنید.</li>
+            <li data-t="ch13-116">تابع <code>join_texts(*texts, separator=' ')</code> را بنویسید که متن‌ها را به هم بچسباند.</li>
+            <li data-t="ch13-117">با مثال خودتان توضیح دهید چرا <code>def f(items=[])</code> خطرناک است.</li>
+            <li data-t="ch13-118">تابع <code>sum_to(n)</code> را به شکل بازگشتی بنویسید.</li>
+            <li data-t="ch13-119">تابع <code>reverse_text(text)</code> را به شکل بازگشتی بنویسید.</li>
+            <li data-t="ch13-120">تابع <code>power(base, exponent)</code> را به شکل بازگشتی بنویسید.</li>
+            <li data-t="ch13-121">زمان اجرای نسخه بازگشتی و نسخه حلقه‌ای <code>factorial(20)</code> را با هم مقایسه کنید.</li>
+        </ol>
+    </div>
+
+    <div class="pager">
+        <a href="chapter-12.html">فصل قبل: آرگومان‌ها و حوزه متغیر</a>
+        <a href="chapter-14.html">فصل بعد: دیکشنری، تاپل و مجموعه</a>
+    </div>
+
+</main>
+
+</body>
+</html>

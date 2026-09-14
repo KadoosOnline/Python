@@ -1,0 +1,17 @@
+{% extends 'base.html' %}
+
+{% block title %}Log in{% endblock %}
+
+{% block content %}
+    <h1>Log in</h1>
+    <form method="post">
+        <label for="username">User name</label>
+        <input id="username" name="username" value="{{ username }}">
+
+        <label for="password">Password</label>
+        {# type="password" hides the typing; it does NOT encrypt anything. #}
+        <input id="password" name="password" type="password">
+
+        <button type="submit">Log in</button>
+    </form>
+{% endblock %}

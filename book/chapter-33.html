@@ -1,0 +1,756 @@
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="فصل سی و سه: الگوهای طراحی در پایتون، تک‌نمونه، کارخانه، سازنده، مبدل، دکوراتور، استراتژی و ناظر">
+    <title>فصل ۳۳: الگوهای طراحی</title>
+    <link rel="icon" href="logokm.png" type="image/png">
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<header class="book-bar">
+    <a class="name" href="index.html">برنامه‌نویسی پایتون</a>
+    <a href="index.html">فهرست مطالب</a>
+</header>
+
+<main class="paper">
+
+    <div class="chapter-head">
+        <span class="chapter-num">فصل ۳۳</span>
+        <h1 data-t="ch33-001">الگوهای طراحی</h1>
+        <p class="lead" data-t="ch33-002">
+            بعضی مسئله‌ها در هر پروژه‌ای تکرار می‌شوند، و برنامه‌نویس‌ها در
+            طول سال‌ها برای هر کدام یک راه حل جاافتاده پیدا کرده‌اند. به این
+            راه‌حل‌ها <strong>الگوی طراحی</strong> می‌گویند. در این فصل هفت
+            الگوی پرکاربرد را می‌بینیم و مهم‌تر از خود الگوها، یاد می‌گیریم
+            هرکدام چه مسئله‌ای را حل می‌کنند.
+        </p>
+    </div>
+
+    <div class="mini-toc">
+        <span class="box-title" data-t="ch33-003">در این فصل می‌خوانید</span>
+        <ol>
+            <li data-t="ch33-004"><a href="#s1">الگوی طراحی چیست</a></li>
+            <li data-t="ch33-005"><a href="#s2">تک‌نمونه</a></li>
+            <li data-t="ch33-006"><a href="#s3">کارخانه</a></li>
+            <li data-t="ch33-007"><a href="#s4">سازنده</a></li>
+            <li data-t="ch33-008"><a href="#s5">مبدل</a></li>
+            <li data-t="ch33-009"><a href="#s6">دکوراتور</a></li>
+            <li data-t="ch33-010"><a href="#s7">استراتژی</a></li>
+            <li data-t="ch33-011"><a href="#s8">استراتژی در زمان اجرا</a></li>
+            <li data-t="ch33-012"><a href="#s9">ناظر</a></li>
+            <li data-t="ch33-013"><a href="#s10">هشدار: الگوی بی‌جا</a></li>
+        </ol>
+    </div>
+
+    <h2 id="s1" data-t="ch33-014">۱. الگوی طراحی چیست</h2>
+
+    <p data-t="ch33-015">
+        الگوی طراحی نه یک کتابخانه است و نه کدی که کپی کنید. الگو یک
+        <strong>شکل راه حل</strong> است که بارها جواب داده است. شما آن را
+        متناسب با مسئله خودتان پیاده می‌کنید.
+    </p>
+
+    <p data-t="ch33-016">
+        فایده دوم الگوها زبان مشترک است. وقتی به همکارتان بگویید «اینجا از
+        استراتژی استفاده کن»، یک جمله جای ده دقیقه توضیح می‌نشیند. الگوها
+        معمولاً در سه خانواده دسته‌بندی می‌شوند:
+    </p>
+
+    <div class="table-scroll">
+        <table>
+            <thead>
+                <tr><th data-t="ch33-017">الگو</th><th data-t="ch33-018">خانواده</th><th data-t="ch33-019">به چه سؤالی جواب می‌دهد</th></tr>
+            </thead>
+            <tbody>
+                <tr><td data-t="ch33-020">تک‌نمونه</td><td data-t="ch33-021">ساختنی</td><td data-t="ch33-022">از این شیء فقط باید یکی وجود داشته باشد</td></tr>
+                <tr><td data-t="ch33-023">کارخانه</td><td data-t="ch33-024">ساختنی</td><td data-t="ch33-025">در زمان اجرا تصمیم بگیر کدام کلاس ساخته شود</td></tr>
+                <tr><td data-t="ch33-026">سازنده</td><td data-t="ch33-027">ساختنی</td><td data-t="ch33-028">یک شیء پیچیده را قدم‌به‌قدم بساز</td></tr>
+                <tr><td data-t="ch33-029">مبدل</td><td data-t="ch33-030">ساختاری</td><td data-t="ch33-031">یک کلاس قدیمی را با رابط جدید جور کن</td></tr>
+                <tr><td data-t="ch33-032">دکوراتور</td><td data-t="ch33-033">ساختاری</td><td data-t="ch33-034">رفتاری اضافه کن بدون دست زدن به کلاس</td></tr>
+                <tr><td data-t="ch33-035">استراتژی</td><td data-t="ch33-036">رفتاری</td><td data-t="ch33-037">الگوریتم را در زمان اجرا عوض کن</td></tr>
+                <tr><td data-t="ch33-038">ناظر</td><td data-t="ch33-039">رفتاری</td><td data-t="ch33-040">وقتی چیزی عوض شد، به همه خبر بده</td></tr>
+            </tbody>
+        </table>
+    </div>
+
+    <div class="note">
+        <span class="box-title" data-t="ch33-041">پیش‌نیاز این فصل</span>
+        <p data-t="ch33-042">
+            همه چیزهایی که در فصل‌های بیست و یکم تا بیست و ششم خواندید اینجا
+            به کار می‌آیند: وراثت، کلاس انتزاعی <code>ABC</code>، تایپ اردکی،
+            متدهای جادویی و دکوراتورها. اگر جایی گیر کردید، به آن فصل‌ها
+            برگردید.
+        </p>
+    </div>
+
+    <h2 id="s2" data-t="ch33-043">۲. تک‌نمونه</h2>
+
+    <p data-t="ch33-044">
+        بعضی شیءها باید در کل برنامه فقط <strong>یکی</strong> باشند: یک
+        فایل ثبت وقایع، یک شیء تنظیمات، یک استخر اتصال پایگاه داده. اگر دو تا
+        ساخته شوند، دو نسخه از حقیقت خواهید داشت.
+    </p>
+
+    <pre class="code"><code>'''SINGLETON - creational pattern.
+
+Problem:  some objects must exist only once in the whole program:
+          a logger, a configuration, a connection pool.
+Solution: the class itself makes sure that every call returns the SAME object.
+'''
+
+
+class SingletonLogger:
+    # A class attribute holds the single instance.
+    _instance = None
+
+    def __new__(cls):
+        '''__new__ runs BEFORE __init__ and is what really creates the object.
+
+        By overriding it we can return an object that already exists instead of
+        building a new one.
+        '''
+        if cls._instance is None:
+            cls._instance = super().__new__(cls)
+            cls._instance.logs = []      # initialised only the first time
+        return cls._instance
+
+    def log(self, message: str) -&gt; None:
+        self.logs.append(message)
+        print(f'LOG: {message}')
+
+
+if __name__ == '__main__':
+    logger1 = SingletonLogger()
+    logger2 = SingletonLogger()
+
+    logger1.log('First message')
+    logger2.log('Second message')
+
+    print(logger1 is logger2)    # True - it is the very same object
+    print(logger1.logs)          # ['First message', 'Second message']</code></pre>
+    <p class="code-caption" data-t="ch33-045">تک‌نمونه: نمونه 01_singleton.py</p>
+
+    <pre class="out">LOG: First message
+LOG: Second message
+True
+['First message', 'Second message']</pre>
+
+    <h3 data-t="ch33-046">شرح مثال</h3>
+
+    <ul>
+        <li data-t="ch33-047">متد <code>__new__</code> برخلاف <code>__init__</code> شیء را <strong>می‌سازد</strong> و پیش از آن اجرا می‌شود. با بازنویسی‌اش می‌توانیم شیء موجود را برگردانیم.</li>
+        <li data-t="ch33-048">صفت کلاسی <code>_instance</code> تنها نمونه را نگه می‌دارد. خط زیرش فقط بار اول اجرا می‌شود، پس فهرست گزارش‌ها هر بار خالی نمی‌شود.</li>
+        <li data-t="ch33-049">عملگر <code>is</code> می‌گوید دو نام به <strong>یک شیء</strong> اشاره می‌کنند، نه اینکه محتوایشان برابر است. تفاوت <code>is</code> با <code>==</code> را در فصل نهم دیدید.</li>
+    </ul>
+
+    <div class="tip">
+        <span class="box-title" data-t="ch33-050">در پایتون راه ساده‌تری هست</span>
+        <p data-t="ch33-051">
+            هر <strong>ماژول</strong> پایتون خودش یک تک‌نمونه است: هر چند بار
+            هم <code>import</code> شود، فقط یک بار اجرا می‌شود. کافی است در
+            بالای یک ماژول بنویسید <code>logger = Logger()</code> و هر جا لازم
+            شد همان را <code>import</code> کنید. همان تضمین، بدون هیچ جادویی.
+            پیش از رفتن سراغ <code>__new__</code>، این راه را در نظر بگیرید.
+        </p>
+    </div>
+
+    <h2 id="s3" data-t="ch33-052">۳. کارخانه</h2>
+
+    <p data-t="ch33-053">
+        گاهی تا زمان اجرا نمی‌دانید کدام کلاس را باید بسازید: به انتخاب کاربر،
+        به یک تنظیم، یا به محتوای یک فایل بستگی دارد. الگوی
+        <strong>کارخانه</strong> این تصمیم را در یک نقطه جمع می‌کند.
+    </p>
+
+    <pre class="code"><code>from abc import ABC, abstractmethod
+
+
+class Notifier(ABC):
+    'The common interface. Every notifier can send a message.'
+
+    @abstractmethod
+    def send(self, message: str) -&gt; None:
+        ...
+
+
+class EmailNotifier(Notifier):
+    def send(self, message: str) -&gt; None:
+        print(f'Sending email: {message}')
+
+
+class SMSNotifier(Notifier):
+    def send(self, message: str) -&gt; None:
+        print(f'Sending SMS: {message}')
+
+
+class BotNotifier(Notifier):
+    def send(self, message: str) -&gt; None:
+        print(f'Sending bot message: {message}')
+
+
+class NotifierFactory:
+    'The only place in the program that knows the concrete classes.'
+
+    # A dictionary is cleaner than a chain of elif: adding a channel is
+    # one line, and no existing code has to be touched.
+    _channels = {
+        'email': EmailNotifier,
+        'sms': SMSNotifier,
+        'bot': BotNotifier,
+    }
+
+    @staticmethod
+    def create_notifier(channel: str) -&gt; Notifier:
+        'Return the notifier matching the given channel name.'
+        notifier_class = NotifierFactory._channels.get(channel)
+
+        if notifier_class is None:
+            raise ValueError(f'Unknown channel: {channel!r}')
+
+        return notifier_class()
+
+
+if __name__ == '__main__':
+    notifier = NotifierFactory.create_notifier('email')
+    notifier.send('Welcome to Kadoos!')
+
+    # The rest of the program never mentions EmailNotifier or SMSNotifier.
+    for channel in ('sms', 'bot'):
+        NotifierFactory.create_notifier(channel).send('Your class starts soon')
+
+    try:
+        NotifierFactory.create_notifier('pigeon')
+    except ValueError as e:
+        print('Refused:', e)</code></pre>
+    <p class="code-caption" data-t="ch33-054">کارخانه: نمونه 02_factory.py</p>
+
+    <pre class="out">Sending email: Welcome to Kadoos!
+Sending SMS: Your class starts soon
+Sending bot message: Your class starts soon
+Refused: Unknown channel: 'pigeon'</pre>
+
+    <h3 data-t="ch33-055">شرح مثال</h3>
+
+    <ul>
+        <li data-t="ch33-056">کلاس انتزاعی <code>Notifier</code> قرارداد مشترک را تعیین می‌کند: هر کانالی باید <code>send</code> داشته باشد.</li>
+        <li data-t="ch33-057">نکته کلیدی در دیکشنری <code>_channels</code> است. مقدارهای این دیکشنری <strong>خود کلاس‌ها</strong> هستند، نه شیء. در پایتون کلاس هم یک شیء است و می‌شود در متغیر و لیست و دیکشنری نگهش داشت.</li>
+        <li data-t="ch33-058"><code>notifier_class()</code> یعنی همان کلاس را صدا بزن و یک نمونه بساز.</li>
+        <li data-t="ch33-059">دیکشنری جای زنجیره <code>if/elif</code> نشسته است. افزودن کانال تازه یک سطر است و هیچ کد موجودی دست نمی‌خورد. این همان «اصل باز و بسته» است: باز برای گسترش، بسته برای تغییر.</li>
+        <li data-t="ch33-060">کانال ناشناس با <code>ValueError</code> رد می‌شود، نه با یک <code>None</code> بی‌سروصدا.</li>
+    </ul>
+
+    <h2 id="s4" data-t="ch33-061">۴. سازنده</h2>
+
+    <p data-t="ch33-062">
+        وقتی یک شیء ده جزء اختیاری دارد، سازنده‌ای با ده پارامتر غیرقابل خواندن
+        می‌شود. الگوی <strong>سازنده</strong> شیء را قدم‌به‌قدم می‌سازد: هر جزء
+        یک متد.
+    </p>
+
+    <pre class="code"><code>class Pizza:
+    'The object we want to build.'
+
+    def __init__(self) -&gt; None:
+        self.size: str | None = None
+        self.cheese: bool = False
+        self.pepperoni: bool = False
+        self.mushrooms: bool = False
+
+    def __str__(self) -&gt; str:
+        toppings = []
+        if self.cheese:
+            toppings.append('cheese')
+        if self.pepperoni:
+            toppings.append('pepperoni')
+        if self.mushrooms:
+            toppings.append('mushrooms')
+        return f'Pizza(size={self.size}, toppings={toppings})'
+
+
+class PizzaBuilder:
+    'Builds a Pizza one step at a time.'
+
+    def __init__(self) -&gt; None:
+        self.pizza = Pizza()
+
+    def set_size(self, size: str) -&gt; 'PizzaBuilder':
+        self.pizza.size = size
+        return self                # returning self is what allows chaining
+
+    def add_cheese(self) -&gt; 'PizzaBuilder':
+        self.pizza.cheese = True
+        return self
+
+    def add_mushrooms(self) -&gt; 'PizzaBuilder':
+        self.pizza.mushrooms = True
+        return self
+
+    def build(self) -&gt; Pizza:
+        'Return the finished object.'
+        if self.pizza.size is None:
+            raise ValueError('a pizza needs a size')
+        return self.pizza</code></pre>
+    <p class="code-caption" data-t="ch33-063">سازنده: نمونه 03_builder.py</p>
+
+    <pre class="code"><code># Spread over several lines - the most readable form:
+pizza = (
+    PizzaBuilder()
+    .set_size('large')
+    .add_cheese()
+    .add_pepperoni()
+    .add_mushrooms()
+    .build()
+)
+print(pizza)
+
+try:
+    PizzaBuilder().add_cheese().build()
+except ValueError as e:
+    print('Refused:', e)</code></pre>
+    <p class="code-caption" data-t="ch33-064">استفاده زنجیره‌ای</p>
+
+    <pre class="out">Pizza(size=large, toppings=['cheese', 'pepperoni', 'mushrooms'])
+Refused: a pizza needs a size</pre>
+
+    <h3 data-t="ch33-065">شرح مثال</h3>
+
+    <ul>
+        <li data-t="ch33-066">ترفندی که کل الگو را دلپذیر می‌کند یک خط است: <code>return self</code>. چون هر متد خودِ سازنده را برمی‌گرداند، می‌شود متدها را پشت سر هم <strong>زنجیر</strong> کرد.</li>
+        <li data-t="ch33-067">پرانتز دور کل عبارت اجازه می‌دهد زنجیره چندخطی شود و هر قدم در یک سطر بنشیند. این خواناترین شکل نوشتن است.</li>
+        <li data-t="ch33-068">متد <code>build</code> فقط شیء را برنمی‌گرداند، بلکه <strong>اعتبارسنجی</strong> هم می‌کند. پیتزای بدون اندازه ساخته نمی‌شود.</li>
+        <li data-t="ch33-069">مقایسه کنید با <code>Pizza('large', True, False, True)</code>. شش ماه بعد هیچ‌کس نمی‌فهمد آن سه بولی یعنی چه.</li>
+    </ul>
+
+    <h2 id="s5" data-t="ch33-070">۵. مبدل</h2>
+
+    <p data-t="ch33-071">
+        تصویر واقعی این الگو، مبدل دوشاخه برق است: از نظر الکتریکی هیچ چیز را
+        عوض نمی‌کند، فقط دو شکل را با هم جور می‌کند. در برنامه‌نویسی هم وقتی
+        یک کلاس قدیمی کار درست را انجام می‌دهد ولی نام متدهایش با سیستم جدید
+        نمی‌خواند و اجازه تغییرش را ندارید، یک <strong>مبدل</strong>
+        می‌نویسید.
+    </p>
+
+    <pre class="code"><code>class LegacyPrinter:
+    'The old class. We are not allowed to modify it.'
+
+    def old_print(self, text: str) -&gt; None:
+        print(f'Legacy printer: {text}')
+
+
+class PrinterInterface:
+    'What the new system expects from a printer.'
+
+    def print_message(self, text: str) -&gt; None:
+        raise NotImplementedError
+
+
+class ModernPrinter(PrinterInterface):
+    'A class written for the new interface.'
+
+    def print_message(self, text: str) -&gt; None:
+        print(f'Modern printer: {text}')
+
+
+class PrinterAdapter(PrinterInterface):
+    'Makes a LegacyPrinter usable wherever a PrinterInterface is expected.'
+
+    def __init__(self, legacy_printer: LegacyPrinter) -&gt; None:
+        self.legacy_printer = legacy_printer
+
+    def print_message(self, text: str) -&gt; None:
+        # The only job of the adapter: translate the call.
+        self.legacy_printer.old_print(text)
+
+
+def print_report(printer: PrinterInterface) -&gt; None:
+    'This function only knows the new interface.'
+    printer.print_message('Hello from the new system')
+
+
+if __name__ == '__main__':
+    print_report(ModernPrinter())
+
+    legacy = LegacyPrinter()
+    print_report(PrinterAdapter(legacy))    # the old class fits in</code></pre>
+    <p class="code-caption" data-t="ch33-072">مبدل: نمونه 04_adapter.py</p>
+
+    <pre class="out">Modern printer: Hello from the new system
+Legacy printer: Hello from the new system</pre>
+
+    <h3 data-t="ch33-073">شرح مثال</h3>
+
+    <ul>
+        <li data-t="ch33-074">تابع <code>print_report</code> فقط رابط جدید را می‌شناسد و اصلاً خبر ندارد کلاس قدیمی وجود دارد.</li>
+        <li data-t="ch33-075">مبدل کلاس قدیمی را <strong>در خود نگه می‌دارد</strong> (ترکیب) و از آن ارث نمی‌برد. این همان بحث «ترکیب در برابر وراثت» فصل بیست و سوم است.</li>
+        <li data-t="ch33-076">کل بدنه متد مبدل یک خط است: ترجمه نام. مبدل نباید منطق اضافه داشته باشد؛ اگر دارد، دیگر مبدل نیست.</li>
+        <li data-t="ch33-077">این الگو در کار واقعی بسیار پرکاربرد است: وقتی کتابخانه‌ای را عوض می‌کنید، یک مبدل می‌نویسید تا بقیه برنامه دست نخورد.</li>
+    </ul>
+
+    <h2 id="s6" data-t="ch33-078">۶. دکوراتور</h2>
+
+    <p data-t="ch33-079">
+        دکوراتورها را در فصل بیست و ششم به عنوان یک ابزار پایتون دیدید. اینجا
+        همان را به عنوان یک <strong>الگو</strong> می‌بینیم: افزودن رفتار
+        (زمان‌گیری، ثبت وقایع، بررسی دسترسی، حافظه نهان) بدون دست زدن به کد
+        اصلی.
+    </p>
+
+    <pre class="code"><code>import time
+from functools import wraps
+
+
+def timing_decorator(func):
+    'Measure how long the decorated function takes.'
+
+    @wraps(func)          # keeps the name and the docstring of func
+    def wrapper(*args, **kwargs):
+        start = time.time()
+        result = func(*args, **kwargs)      # the original behaviour
+        end = time.time()
+        print(f'{func.__name__} took {end - start:.4f} seconds')
+        return result
+
+    return wrapper
+
+
+def audit(username: str):
+    'A decorator with a parameter: who is allowed to run this?'
+    def decorator(func):
+        @wraps(func)
+        def wrapper(*args, **kwargs):
+            print(f'[audit] {username} called {func.__name__}')
+            return func(*args, **kwargs)
+        return wrapper
+    return decorator
+
+
+@timing_decorator
+def slow_function():
+    'A function that takes some time.'
+    time.sleep(1)
+    print('Function finished')
+
+
+@audit('admin')
+@timing_decorator          # decorators stack: the closest one wraps first
+def compute(n: int) -&gt; int:
+    return sum(range(n))</code></pre>
+    <p class="code-caption" data-t="ch33-080">دکوراتور: نمونه 05_decorator.py</p>
+
+    <pre class="out">Function finished
+slow_function took 1.0012 seconds
+[audit] admin called compute
+compute took 0.0921 seconds
+4499998500000</pre>
+
+    <h3 data-t="ch33-081">شرح مثال</h3>
+
+    <ul>
+        <li data-t="ch33-082"><code>@wraps(func)</code> نام و مستندات تابع اصلی را حفظ می‌کند. بدون آن، <code>compute.__name__</code> می‌شود <code>'wrapper'</code> و اشکال‌زدایی سخت می‌شود.</li>
+        <li data-t="ch33-083">دکوراتور پارامتردار یک لایه بیشتر دارد: تابعی که دکوراتور می‌سازد. سه سطح تودرتو عجیب به نظر می‌رسد ولی همیشه همین شکل است.</li>
+        <li data-t="ch33-084">دکوراتورها روی هم انباشته می‌شوند و <strong>نزدیک‌ترین</strong> به تابع، اول می‌پیچد. اینجا اول زمان‌گیری و بعد ثبت وقایع.</li>
+        <li data-t="ch33-085">تفاوت با الگوی کلاسیک: در کتاب‌های قدیمی دکوراتور <strong>شیء</strong> را می‌پیچد، در پایتون معمولاً <strong>تابع</strong> را با <code>@</code>. ایده یکی است: افزودن رفتار با پیچیدن، نه با ارث‌بری.</li>
+    </ul>
+
+    <h2 id="s7" data-t="ch33-086">۷. استراتژی</h2>
+
+    <p data-t="ch33-087">
+        هر وقت چند الگوریتم قابل تعویض دارید و یک زنجیره <code>if/elif</code>
+        دارید که با هر مورد تازه بلندتر می‌شود، الگوی
+        <strong>استراتژی</strong> جواب شماست: هر الگوریتم یک کلاس، همه با یک
+        رابط مشترک.
+    </p>
+
+    <pre class="code"><code>from abc import ABC, abstractmethod
+
+
+class DiscountStrategy(ABC):
+    'The common interface of every discount.'
+
+    @abstractmethod
+    def apply(self, price: float) -&gt; float:
+        ...
+
+
+class NoDiscount(DiscountStrategy):
+    def apply(self, price: float) -&gt; float:
+        return price
+
+
+class TenPercentDiscount(DiscountStrategy):
+    def apply(self, price: float) -&gt; float:
+        return price * 0.9
+
+
+class FixedDiscount(DiscountStrategy):
+    'Adding a new strategy changes NO existing class.'
+
+    def __init__(self, amount: float) -&gt; None:
+        self.amount = amount
+
+    def apply(self, price: float) -&gt; float:
+        return max(0.0, price - self.amount)
+
+
+class ShoppingCart:
+    'The client. It does not know which discount it is using.'
+
+    def __init__(self, discount_strategy: DiscountStrategy) -&gt; None:
+        self.discount_strategy = discount_strategy
+
+    def checkout(self, price: float) -&gt; float:
+        return self.discount_strategy.apply(price)
+
+
+def main() -&gt; None:
+    print(ShoppingCart(NoDiscount()).checkout(1000))          # 1000
+    print(ShoppingCart(TenPercentDiscount()).checkout(1000))  # 900.0
+    print(ShoppingCart(FixedDiscount(250)).checkout(1000))    # 750.0
+
+    # The strategy can even be changed while the program runs.
+    cart = ShoppingCart(NoDiscount())
+    print(cart.checkout(1000))
+    cart.discount_strategy = TenPercentDiscount()
+    print(cart.checkout(1000))</code></pre>
+    <p class="code-caption" data-t="ch33-088">استراتژی: نمونه 06_strategy.py</p>
+
+    <pre class="out">1000
+900.0
+750.0
+1000
+900.0</pre>
+
+    <h3 data-t="ch33-089">شرح مثال</h3>
+
+    <ul>
+        <li data-t="ch33-090"><code>ShoppingCart</code> هیچ نمی‌داند کدام تخفیف را به کار می‌برد. فقط می‌داند شیئی دارد که متد <code>apply</code> دارد.</li>
+        <li data-t="ch33-091">افزودن <code>FixedDiscount</code> هیچ کلاس موجودی را تغییر نداد. اگر زنجیره <code>elif</code> بود، باید تابع اصلی را دست می‌زدیم و ریسک شکستن بقیه را می‌پذیرفتیم.</li>
+        <li data-t="ch33-092">استراتژی می‌تواند <strong>در میانه اجرا</strong> عوض شود: کافی است صفت را بازنویسی کنید.</li>
+        <li data-t="ch33-093">استراتژی‌ای که خودش پارامتر دارد (مثل مبلغ ثابت) نشان می‌دهد چرا کلاس بهتر از تابع ساده است: کلاس می‌تواند حالت داشته باشد.</li>
+    </ul>
+
+    <h2 id="s8" data-t="ch33-094">۸. استراتژی در زمان اجرا</h2>
+
+    <p data-t="ch33-095">
+        جایی که این الگو واقعاً سود می‌دهد آنجاست که
+        <strong>تصمیم</strong> (کدام استراتژی) از <strong>رفتار</strong> (آن
+        استراتژی چه می‌کند) جدا می‌شود.
+    </p>
+
+    <pre class="code"><code>def choose_strategy(price: float) -&gt; DiscountStrategy:
+    'The business rule lives here, and ONLY here.'
+    if price &gt;= 10_000_000:
+        return TwentyPercentDiscount()
+    if price &gt;= 5_000_000:
+        return TenPercentDiscount()
+    return NoDiscount()
+
+
+def read_price() -&gt; float:
+    'Ask until the answer is a number.'
+    while True:
+        try:
+            return float(input('Enter the price: '))
+        except ValueError:
+            print('That is not a number.')
+
+
+def main() -&gt; None:
+    price = read_price()
+
+    cart = ShoppingCart(choose_strategy(price))
+
+    print(f'Strategy: {type(cart.discount_strategy).__name__}')
+    print(f'To pay:   {cart.checkout(price):,.0f}')</code></pre>
+    <p class="code-caption" data-t="ch33-096">انتخاب در زمان اجرا: نمونه 07_strategy_interactive.py</p>
+
+    <pre class="out">Enter the price: 12000000
+Strategy: TwentyPercentDiscount
+To pay:   9,600,000</pre>
+
+    <h3 data-t="ch33-097">شرح مثال</h3>
+
+    <ul>
+        <li data-t="ch33-098">تنها جایی که قانون کسب‌وکار نوشته شده، تابع <code>choose_strategy</code> است. اگر فردا مدیر بگوید آستانه‌ها عوض شوند، فقط همین تابع تغییر می‌کند.</li>
+        <li data-t="ch33-099"><code>type(obj).__name__</code> نام کلاس یک شیء را می‌دهد؛ برای پیام و گزارش مفید است.</li>
+        <li data-t="ch33-100"><code>read_price</code> همان حلقه اعتبارسنجی ورودی فصل هشتم است. هیچ وقت <code>float(input(...))</code> را بدون محافظ ننویسید.</li>
+        <li data-t="ch33-101">قالب <code>{price:,.0f}</code> عددها را سه‌رقم‌سه‌رقم جدا می‌کند. برای نمایش مبلغ عالی است.</li>
+    </ul>
+
+    <h2 id="s9" data-t="ch33-102">۹. ناظر</h2>
+
+    <p data-t="ch33-103">
+        وقتی چیزی تغییر می‌کند، چند شیء دیگر باید واکنش نشان دهند، و شیئی که
+        تغییر کرده نباید مجبور باشد آنها را بشناسد. الگوی
+        <strong>ناظر</strong> این را با یک فهرست مشترک حل می‌کند.
+    </p>
+
+    <pre class="code"><code>class NewsPublisher:
+    'The subject: it holds the state and notifies the subscribers.'
+
+    def __init__(self) -&gt; None:
+        self.subscribers: list = []
+        self.latest_news: str | None = None
+
+    def subscribe(self, subscriber) -&gt; None:
+        'Add a subscriber (only once).'
+        if subscriber not in self.subscribers:
+            self.subscribers.append(subscriber)
+
+    def unsubscribe(self, subscriber) -&gt; None:
+        'Remove a subscriber, quietly when it is not there.'
+        if subscriber in self.subscribers:
+            self.subscribers.remove(subscriber)
+
+    def notify(self) -&gt; None:
+        'Tell every subscriber about the latest news.'
+        # A copy of the list, so a subscriber may unsubscribe during notify().
+        for subscriber in list(self.subscribers):
+            subscriber.update(self.latest_news)
+
+    def add_news(self, news: str) -&gt; None:
+        'Change the state and notify - the two always go together.'
+        self.latest_news = news
+        self.notify()
+
+
+class NewsReader:
+    'An observer. It only has to offer an update() method (duck typing).'
+
+    def __init__(self, name: str) -&gt; None:
+        self.name = name
+
+    def update(self, news: str) -&gt; None:
+        print(f'{self.name} received news: {news}')
+
+
+class NewsArchive:
+    'Another observer, doing something completely different.'
+
+    def __init__(self) -&gt; None:
+        self.history: list[str] = []
+
+    def update(self, news: str) -&gt; None:
+        self.history.append(news)
+        print(f'[archive] {len(self.history)} news stored')</code></pre>
+    <p class="code-caption" data-t="ch33-104">ناظر: نمونه 08_observer.py</p>
+
+    <pre class="out">Ali received news: Python 3.14 is released
+Sara received news: Python 3.14 is released
+[archive] 1 news stored
+---
+Ali received news: Kadoos opens a new Python class
+[archive] 2 news stored
+---
+archive: ['Python 3.14 is released', 'Kadoos opens a new Python class']</pre>
+
+    <h3 data-t="ch33-105">شرح مثال</h3>
+
+    <ul>
+        <li data-t="ch33-106">ناشر فقط می‌داند مشترکانش متد <code>update</code> دارند. این <strong>تایپ اردکی</strong> فصل بیست و سوم است: هیچ کلاس پایه مشترکی ضرورتی ندارد.</li>
+        <li data-t="ch33-107">دو ناظر کارهای کاملاً متفاوتی می‌کنند: یکی چاپ می‌کند، دیگری بایگانی. ناشر تفاوتشان را نمی‌بیند.</li>
+        <li data-t="ch33-108">در <code>notify</code> روی <strong>یک کپی</strong> از فهرست حلقه می‌زنیم. اگر ناظری در میانه اطلاع‌رسانی خودش را لغو اشتراک کند، بدون این کپی برنامه دچار خطا می‌شود. این یک باگ کلاسیک و سخت‌یاب است.</li>
+        <li data-t="ch33-109"><code>add_news</code> تغییر حالت و اطلاع‌رسانی را با هم انجام می‌دهد. جدا کردنشان یعنی روزی یکی فراموش می‌شود.</li>
+    </ul>
+
+    <div class="tip">
+        <span class="box-title" data-t="ch33-110">این الگو را قبلاً دیده‌اید</span>
+        <p data-t="ch33-111">
+            دکمه‌های رابط گرافیکی در فصل‌های سی و چهارم تا سی و ششم دقیقاً
+            همین‌اند: <code>command=my_function</code> یعنی «وقتی کلیک شدم به
+            این خبر بده». سیگنال و اسلات در Qt هم همین است. الگوی ناظر در هر
+            رابط کاربری و هر سیستم رویدادمحوری زندگی می‌کند.
+        </p>
+    </div>
+
+    <h2 id="s10" data-t="ch33-112">۱۰. هشدار: الگوی بی‌جا</h2>
+
+    <p data-t="ch33-113">
+        این مهم‌ترین بخش فصل است. الگویی که جای لازم به کار نرود، کد را
+        <strong>بدتر</strong> می‌کند. تازه‌کارها بعد از یاد گرفتن الگوها
+        معمولاً همه جا از آنها استفاده می‌کنند و برنامه ساده را به هزارتو
+        تبدیل می‌کنند.
+    </p>
+
+    <p data-t="ch33-114">
+        قاعده درست: با ساده‌ترین چیزی که کار می‌کند شروع کنید؛ وقتی مسئله‌ای
+        که یک الگو حل می‌کند <strong>واقعاً پیدا شد</strong>، آن وقت سراغش
+        بروید.
+    </p>
+
+    <div class="table-scroll">
+        <table>
+            <thead>
+                <tr><th data-t="ch33-115">الگو</th><th data-t="ch33-116">کی سراغش نروید</th></tr>
+            </thead>
+            <tbody>
+                <tr><td data-t="ch33-117">تک‌نمونه</td><td data-t="ch33-118">وقتی یک ماژول ساده کافی است. تک‌نمونه حالت سراسری می‌سازد و آزمودن کد را سخت می‌کند</td></tr>
+                <tr><td data-t="ch33-119">کارخانه</td><td data-t="ch33-120">وقتی فقط یک یا دو کلاس دارید و انتخاب ثابت است</td></tr>
+                <tr><td data-t="ch33-121">سازنده</td><td data-t="ch33-122">وقتی شیء دو یا سه پارامتر دارد. آرگومان کلیدواژه‌ای پایتون کافی است</td></tr>
+                <tr><td data-t="ch33-123">مبدل</td><td data-t="ch33-124">وقتی می‌توانید خود کلاس را اصلاح کنید</td></tr>
+                <tr><td data-t="ch33-125">دکوراتور</td><td data-t="ch33-126">وقتی رفتار اضافه فقط در یک تابع لازم است</td></tr>
+                <tr><td data-t="ch33-127">استراتژی</td><td data-t="ch33-128">وقتی فقط دو حالت دارید و هرگز زیاد نمی‌شوند</td></tr>
+                <tr><td data-t="ch33-129">ناظر</td><td data-t="ch33-130">وقتی فقط یک شنونده دارید. صدا زدن مستقیم خواناتر است</td></tr>
+            </tbody>
+        </table>
+    </div>
+
+    <div class="folder-ref">
+        <span class="box-title" data-t="ch33-131">فایل‌های تمرینی این فصل</span>
+        <p data-t="ch33-132">
+            پوشه <code>S33-design-patterns</code> شامل هشت فایل
+            <code>01_singleton.py</code> تا <code>08_observer.py</code>. هر
+            فایل مستقل است و بدون نصب چیزی اجرا می‌شود. توصیه می‌شود هر فایل
+            را اجرا کنید و بعد سعی کنید یک کلاس تازه به آن اضافه کنید: تجربه
+            کردن اینکه «هیچ کد موجودی دست نخورد» کل درس این فصل است.
+        </p>
+    </div>
+
+    <h2 data-t="ch33-133">خلاصه فصل</h2>
+
+    <div class="table-scroll">
+        <table>
+            <thead>
+                <tr><th data-t="ch33-134">الگو</th><th data-t="ch33-135">هسته پیاده‌سازی</th></tr>
+            </thead>
+            <tbody>
+                <tr><td data-t="ch33-136">تک‌نمونه</td><td data-t="ch33-137">بازنویسی <code>__new__</code> و نگه داشتن <code>_instance</code>، یا فقط یک ماژول</td></tr>
+                <tr><td data-t="ch33-138">کارخانه</td><td data-t="ch33-139">دیکشنری از نام به کلاس، به‌علاوه یک تابع سازنده</td></tr>
+                <tr><td data-t="ch33-140">سازنده</td><td data-t="ch33-141">یک متد برای هر جزء، همه با <code>return self</code>، و یک <code>build()</code></td></tr>
+                <tr><td data-t="ch33-142">مبدل</td><td data-t="ch33-143">کلاسی که شیء قدیمی را نگه می‌دارد و نام متدها را ترجمه می‌کند</td></tr>
+                <tr><td data-t="ch33-144">دکوراتور</td><td data-t="ch33-145">تابعی که تابع می‌گیرد و تابع پیچیده برمی‌گرداند، با <code>@wraps</code></td></tr>
+                <tr><td data-t="ch33-146">استراتژی</td><td data-t="ch33-147">یک <code>ABC</code> و چند پیاده‌سازی، که به مشتری تزریق می‌شوند</td></tr>
+                <tr><td data-t="ch33-148">ناظر</td><td data-t="ch33-149">فهرست مشترکان، متدهای <code>subscribe</code> و <code>notify</code></td></tr>
+                <tr><td data-t="ch33-150">قاعده طلایی</td><td data-t="ch33-151">ساده شروع کنید. الگو را وقتی مسئله‌اش ظاهر شد به کار ببرید</td></tr>
+            </tbody>
+        </table>
+    </div>
+
+    <div class="exercise">
+        <h3 data-t="ch33-152">تمرین‌های فصل سی و سه</h3>
+        <ol>
+            <li data-t="ch33-153">یک تک‌نمونه <code>Settings</code> بنویسید که فایل پیکربندی را فقط یک بار بخواند.</li>
+            <li data-t="ch33-154">یک <code>ShapeFactory</code> بنویسید که از روی نام، شیء <code>Circle</code> یا <code>Square</code> یا <code>Triangle</code> بسازد.</li>
+            <li data-t="ch33-155">کلاس <code>Pasta</code> و <code>PastaBuilder</code> را طبق الگوی سازنده بنویسید.</li>
+            <li data-t="ch33-156">کلاس قدیمی <code>OldDatabase</code> با متد <code>run_query()</code> را در نظر بگیرید و مبدلی بنویسید که به جایش <code>execute()</code> ارائه دهد.</li>
+            <li data-t="ch33-157">دکوراتور <code>@log_to_file</code> را بنویسید که هر فراخوانی را در <code>calls.log</code> بنویسد.</li>
+            <li data-t="ch33-158">سه استراتژی مرتب‌سازی (بر اساس نام، نمره و سن) و یک کلاس <code>Ranking</code> بنویسید که از یکی‌شان استفاده کند.</li>
+            <li data-t="ch33-159">یک ناظر <code>EmailAlert</code> به <code>08_observer.py</code> اضافه کنید و بررسی کنید که کلاس ناشر اصلاً تغییر نکرده باشد.</li>
+            <li data-t="ch33-160">یکی از برنامه‌های قبلی خودتان را که زنجیره بلند <code>if/elif</code> دارد، با الگوی استراتژی بازنویسی کنید.</li>
+            <li data-t="ch33-161">برای هر الگوی این فصل، یک جمله بنویسید که بگوید کی <strong>نباید</strong> به وظیفه آن برد.</li>
+        </ol>
+    </div>
+
+    <div class="pager">
+        <a href="chapter-32.html">فصل قبل: ORM و SQLAlchemy</a>
+        <a href="chapter-34.html">فصل بعد: رابط گرافیکی با tkinter</a>
+    </div>
+
+</main>
+
+</body>
+</html>

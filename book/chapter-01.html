@@ -1,0 +1,492 @@
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="فصل یک: دستور print، توضیحات، متغیرها، چهار نوع داده پایه، تابع type، گرفتن ورودی با input و تبدیل نوع">
+    <title>فصل ۱: اولین قدم‌ها</title>
+    <link rel="icon" href="logokm.png" type="image/png">
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<header class="book-bar">
+    <a class="name" href="index.html">برنامه‌نویسی پایتون</a>
+    <a href="index.html">فهرست مطالب</a>
+</header>
+
+<main class="paper">
+
+    <div class="chapter-head">
+        <span class="chapter-num">فصل ۱</span>
+        <h1 data-t="ch01-001">اولین قدم‌ها</h1>
+        <p class="lead" data-t="ch01-002">
+            هر برنامه‌ای در دنیا سه کار انجام می‌دهد: چیزی می‌گیرد، کاری روی آن
+            انجام می‌دهد و چیزی برمی‌گرداند. در این فصل هر سه را یاد می‌گیرید.
+        </p>
+    </div>
+
+    <div class="mini-toc">
+        <span class="box-title" data-t="ch01-003">در این فصل می‌خوانید</span>
+        <ol>
+            <li data-t="ch01-004"><a href="#s1">دستور print</a></li>
+            <li data-t="ch01-005"><a href="#s2">پارامترهای sep و end</a></li>
+            <li data-t="ch01-006"><a href="#s3">توضیحات</a></li>
+            <li data-t="ch01-007"><a href="#s4">متغیرها</a></li>
+            <li data-t="ch01-008"><a href="#s5">قوانین نام‌گذاری</a></li>
+            <li data-t="ch01-009"><a href="#s6">چهار نوع داده پایه</a></li>
+            <li data-t="ch01-010"><a href="#s7">تابع type</a></li>
+            <li data-t="ch01-011"><a href="#s8">گرفتن ورودی از کاربر</a></li>
+            <li data-t="ch01-012"><a href="#s9">تبدیل نوع</a></li>
+            <li data-t="ch01-013"><a href="#s10">اولین برنامه واقعی</a></li>
+        </ol>
+    </div>
+
+    <h2 id="s1" data-t="ch01-014">۱. دستور print</h2>
+
+    <p data-t="ch01-015">
+        <code>print</code> یک <strong>تابع</strong> است. تابع یعنی دستوری که یک
+        اسم دارد و بعد از اسمش پرانتز می‌گذاریم و چیزی را داخل پرانتز به آن
+        می‌دهیم. کار این یکی ساده است: هر چه به آن بدهید روی صفحه چاپ می‌کند و
+        بعد به خط بعد می‌رود.
+    </p>
+
+    <pre class="code"><code># The classic first program.
+# print() writes its arguments to the screen and then moves to a new line.
+print('Hello World!')</code></pre>
+    <p class="code-caption" data-t="ch01-016">اولین برنامه: نمونه 01_hello_world.py</p>
+
+    <pre class="out">Hello World!</pre>
+
+    <h3 data-t="ch01-017">شرح مثال</h3>
+
+    <ul>
+        <li data-t="ch01-018">متن باید داخل <strong>گیومه</strong> باشد. تک‌گیومه <code>'</code> و جفت‌گیومه <code>"</code> هیچ فرقی با هم ندارند، فقط باید گیومه‌ای که باز می‌کنید را با همان نوع ببندید.</li>
+        <li data-t="ch01-019">اگر گیومه را فراموش کنید، پایتون فکر می‌کند <code>Hello</code> نام یک متغیر است و خطای <code>NameError</code> می‌دهد.</li>
+        <li data-t="ch01-020">هر <code>print</code> یک خط چاپ می‌کند. پس چند دستور پشت سر هم، چند خط می‌سازد.</li>
+    </ul>
+
+    <pre class="code"><code># Every print() call writes one line, so these five calls draw a triangle.
+print('*')
+print('**')
+print('***')
+print('****')
+print('*****')
+
+# print() with no argument writes an empty line.
+print()
+
+# A single print() can take several values; they are separated by a space.
+print('Kadoos', 'Institute', 'Rasht')</code></pre>
+    <p class="code-caption" data-t="ch01-021">چند خط و چند مقدار: نمونه 02_print_lines.py</p>
+
+    <pre class="out">*
+**
+***
+****
+*****
+
+Kadoos Institute Rasht</pre>
+
+    <p data-t="ch01-022">
+        دو نکته در همین خروجی دیده می‌شود. اول اینکه <code>print()</code> خالی یک
+        خط خالی چاپ می‌کند. دوم اینکه وقتی چند مقدار را با ویرگول به
+        <code>print</code> می‌دهید، بینشان خودبه‌خود یک فاصله می‌گذارد.
+    </p>
+
+    <h2 id="s2" data-t="ch01-023">۲. پارامترهای sep و end</h2>
+
+    <p data-t="ch01-024">
+        آن فاصله بین مقدارها و آن رفتن به خط بعد، هر دو قابل تغییرند. دو پارامتر
+        برای این کار وجود دارد: <code>sep</code> یعنی جداکننده و <code>end</code>
+        یعنی چیزی که در پایان چاپ می‌شود.
+    </p>
+
+    <pre class="code"><code># 'sep' changes the separator and 'end' changes what is printed at the end.
+print('2026', '09', '08', sep='-')
+print('No new line here -&gt;', end=' ')
+print('...the next print continues on the same line.')</code></pre>
+    <p class="code-caption" data-t="ch01-025">جداکننده و پایان خط: نمونه 02_print_lines.py</p>
+
+    <pre class="out">2026-09-08
+No new line here -&gt; ...the next print continues on the same line.</pre>
+
+    <h3 data-t="ch01-026">شرح مثال</h3>
+
+    <ul>
+        <li data-t="ch01-027"><code>sep='-'</code> یعنی به جای فاصله، بین مقدارها خط تیره بگذار.</li>
+        <li data-t="ch01-028"><code>end=' '</code> یعنی بعد از چاپ، به جای رفتن به خط بعد، فقط یک فاصله بگذار. برای همین دستور بعدی روی همان خط ادامه پیدا می‌کند.</li>
+        <li data-t="ch01-029">مقدار پیش‌فرض <code>sep</code> یک فاصله است و مقدار پیش‌فرض <code>end</code> کاراکتر خط جدید است. اگر ننویسیدشان، همان‌ها به کار می‌روند.</li>
+    </ul>
+
+    <div class="tip">
+        <span class="box-title" data-t="ch01-030">کجا به کار می‌آید</span>
+        <p data-t="ch01-031"><code>end=''</code> در فصل هفتم، وقتی بخواهید ستاره‌ها را کنار هم و در یک خط چاپ کنید، حیاتی می‌شود. در همین مرحله آن را به خاطر بسپارید.</p>
+    </div>
+
+    <h2 id="s3" data-t="ch01-032">۳. توضیحات</h2>
+
+    <p data-t="ch01-033">
+        هر چیزی که بعد از علامت <code>#</code> بیاید، پایتون کاملاً نادیده می‌گیرد.
+        به این <strong>توضیح</strong> یا comment می‌گویند و برای آدم‌ها نوشته
+        می‌شود، نه برای کامپیوتر.
+    </p>
+
+    <pre class="code"><code># Everything after a '#' on a line is a comment: Python ignores it.
+# Comments explain WHY the code does something, not WHAT it does.
+
+print('Hello Kadoos!')  # a comment can also sit at the end of a line
+
+# Python has no real multi-line comment, but a triple-quoted string that is not
+# assigned to anything is often used for the same purpose.
+'''
+These three lines are a string that nobody uses,
+so in practice they behave like a multi-line comment.
+'''
+
+print('The program continues here.')</code></pre>
+    <p class="code-caption" data-t="ch01-034">توضیح یک‌خطی و چندخطی: نمونه 06_comments.py</p>
+
+    <h3 data-t="ch01-035">شرح مثال</h3>
+
+    <ul>
+        <li data-t="ch01-036">توضیح می‌تواند یک خط کامل باشد یا در انتهای یک خط کد بیاید.</li>
+        <li data-t="ch01-037">پایتون توضیح چندخطی واقعی ندارد. آنچه در مثال می‌بینید یک رشته سه‌گیومه‌ای است که به هیچ متغیری داده نشده، پس عملاً کاری نمی‌کند.</li>
+        <li data-t="ch01-038">در VS Code با <code>Ctrl + /</code> می‌توانید خط جاری را توضیح کنید یا از حالت توضیح در بیاورید.</li>
+    </ul>
+
+    <div class="note">
+        <span class="box-title" data-t="ch01-039">توضیح خوب چه شکلی است</span>
+        <p data-t="ch01-040">
+            توضیح بد: <code># adds one to x</code> در حالی که خط کد
+            <code>x = x + 1</code> است. این را خودمان می‌بینیم. توضیح خوب:
+            <code># the counter starts at 1 because the user counts from 1</code>.
+            یعنی <strong>چرا</strong>، نه <strong>چه</strong>.
+        </p>
+    </div>
+
+    <h2 id="s4" data-t="ch01-041">۴. متغیرها</h2>
+
+    <p data-t="ch01-042">
+        <strong>متغیر</strong> یک نام است که به یک مقدار اشاره می‌کند. مثل برچسبی
+        که روی یک جعبه می‌چسبانید تا بعداً بدانید داخلش چیست. با علامت مساوی
+        ساخته می‌شود: سمت چپ نام، سمت راست مقدار.
+    </p>
+
+    <pre class="code"><code># A variable is a name that refers to a value.
+name = 'Kadoos'      # text
+age = 18             # whole number
+score = 19.5         # number with a decimal part
+single = True        # True or False
+
+print(name)
+print(age)
+print(score)
+print(single)
+
+# A variable can be re-assigned at any time.
+age = 19
+print('The new age is:', age)</code></pre>
+    <p class="code-caption" data-t="ch01-043">ساختن و چاپ متغیر: نمونه 03_variables.py</p>
+
+    <pre class="out">Kadoos
+18
+19.5
+True
+The new age is: 19</pre>
+
+    <h3 data-t="ch01-044">شرح مثال</h3>
+
+    <ul>
+        <li data-t="ch01-045">علامت <code>=</code> در اینجا عملگر <strong>انتساب</strong> است، نه عملگر مقایسه. یعنی مقدار سمت راست را محاسبه کن و آن را به نام سمت چپ نسبت بده.</li>
+        <li data-t="ch01-046">متغیر همان‌طور که از نامش پیداست تغییر می‌کند. خط <code>age = 19</code> مقدار قبلی را دور می‌ریزد و مقدار تازه را می‌گذارد.</li>
+        <li data-t="ch01-047">وقتی نام متغیر را داخل <code>print</code> می‌نویسید، بدون گیومه بنویسید. اگر بنویسید <code>print('name')</code> خود کلمه name چاپ می‌شود، نه مقدارش.</li>
+    </ul>
+
+    <div class="warn">
+        <span class="box-title" data-t="ch01-048">فرق دو خط زیر را خوب ببینید</span>
+        <p data-t="ch01-049">
+            <code>print(name)</code> مقدار متغیر را چاپ می‌کند، یعنی
+            <code>Kadoos</code>. اما <code>print('name')</code> خود کلمه
+            <code>name</code> را چاپ می‌کند. گیومه یعنی «این یک متن ثابت است»،
+            بدون گیومه یعنی «این نام یک متغیر است».
+        </p>
+    </div>
+
+    <h2 id="s5" data-t="ch01-050">۵. قوانین نام‌گذاری</h2>
+
+    <p data-t="ch01-051">هر نامی مجاز نیست. قوانین اجباری پایتون این موارد هستند:</p>
+
+    <ul>
+        <li data-t="ch01-052">فقط حرف انگلیسی، رقم و زیرخط <code>_</code>.</li>
+        <li data-t="ch01-053">هرگز با رقم شروع نشود. <code>2name</code> غلط است، <code>name2</code> درست است.</li>
+        <li data-t="ch01-054">فاصله ندارد. <code>my name</code> غلط است، <code>my_name</code> درست است.</li>
+        <li data-t="ch01-055">کلمات کلیدی پایتون مانند <code>if</code> و <code>for</code> و <code>class</code> نمی‌توانند نام متغیر باشند.</li>
+        <li data-t="ch01-056">حروف بزرگ و کوچک فرق دارند: <code>Age</code> و <code>age</code> دو متغیر متفاوت‌اند.</li>
+    </ul>
+
+    <p data-t="ch01-057">و این موارد قانون اجباری نیستند، ولی عرف حرفه‌ای‌ها هستند:</p>
+
+    <ul>
+        <li data-t="ch01-058">نام معنادار انتخاب کنید. <code>student_score</code> بهتر از <code>x</code> است.</li>
+        <li data-t="ch01-059">از سبک <strong>snake_case</strong> استفاده کنید: همه حروف کوچک، کلمات با زیرخط جدا شوند.</li>
+        <li data-t="ch01-060">نام توابع آماده پایتون را برای متغیرهایتان به کار نبرید. متغیری به نام <code>print</code> یا <code>sum</code> یا <code>list</code> بعداً دردسر می‌شود. در فصل ششم یک نمونه واقعی از این دردسر می‌بینید.</li>
+    </ul>
+
+    <h2 id="s6" data-t="ch01-061">۶. چهار نوع داده پایه</h2>
+
+    <p data-t="ch01-062">هر مقداری در پایتون یک <strong>نوع</strong> دارد. نوع تعیین می‌کند چه کارهایی روی آن مقدار مجاز است. چهار نوع پایه که از همین امروز لازمتان می‌شود این موارد هستند:</p>
+
+    <pre class="code"><code># Python has four basic (scalar) data types that we use from day one.
+name = 'Kadoos'      # str   -&gt; text, always inside quotes
+age = 18             # int   -&gt; integer number
+score = 19.5         # float -&gt; decimal number
+single = True        # bool  -&gt; only True or False
+
+print(name, age, score, single)
+
+# Single quotes and double quotes are equivalent in Python.
+city = "Rasht"
+print(city)</code></pre>
+    <p class="code-caption" data-t="ch01-063">چهار نوع پایه: نمونه 04_data_types.py</p>
+
+    <div class="table-scroll">
+        <table>
+            <thead>
+                <tr><th data-t="ch01-064">نوع</th><th data-t="ch01-065">نام کامل</th><th data-t="ch01-066">یعنی چه</th><th data-t="ch01-067">نمونه</th></tr>
+            </thead>
+            <tbody>
+                <tr><td><code>str</code></td><td>string</td><td data-t="ch01-068">رشته یا متن، همیشه داخل گیومه</td><td><code>'Kadoos'</code></td></tr>
+                <tr><td><code>int</code></td><td>integer</td><td data-t="ch01-069">عدد صحیح، بدون اعشار</td><td><code>18</code></td></tr>
+                <tr><td><code>float</code></td><td>floating point</td><td data-t="ch01-070">عدد اعشاری</td><td><code>19.5</code></td></tr>
+                <tr><td><code>bool</code></td><td>boolean</td><td data-t="ch01-071">فقط دو مقدار: درست یا نادرست</td><td><code>True</code></td></tr>
+            </tbody>
+        </table>
+    </div>
+
+    <div class="warn">
+        <span class="box-title" data-t="ch01-072">دو دام کوچک</span>
+        <p data-t="ch01-073">اول: <code>True</code> و <code>False</code> با حرف بزرگ شروع می‌شوند. <code>true</code> در پایتون وجود ندارد و خطا ایجاد می‌کند. دوم: <code>18</code> و <code>'18'</code> دو چیز کاملاً متفاوت‌اند. اولی عدد است و می‌شود با آن حساب کرد، دومی متن است و فقط شکل ظاهری‌اش عدد است.</p>
+    </div>
+
+    <h2 id="s7" data-t="ch01-074">۷. تابع type</h2>
+
+    <p data-t="ch01-075">
+        اگر نمی‌دانید یک مقدار چه نوعی دارد، از پایتون بپرسید. تابع
+        <code>type</code> دقیقاً همین کار را می‌کند.
+    </p>
+
+    <pre class="code"><code># type() tells us which data type a value belongs to.
+name = 'Kadoos'
+age = 18
+score = 19.5
+single = True
+
+print(type(name))    # &lt;class 'str'&gt;
+print(type(age))     # &lt;class 'int'&gt;
+print(type(score))   # &lt;class 'float'&gt;
+print(type(single))  # &lt;class 'bool'&gt;</code></pre>
+    <p class="code-caption" data-t="ch01-076">پرسیدن نوع یک مقدار: نمونه 05_type_function.py</p>
+
+    <pre class="out">&lt;class 'str'&gt;
+&lt;class 'int'&gt;
+&lt;class 'float'&gt;
+&lt;class 'bool'&gt;</pre>
+
+    <p data-t="ch01-077">
+        کلمه <code>class</code> در خروجی فعلاً مهم نیست؛ در فصل بیست و یکم معنایش
+        را می‌فهمید. آنچه الان مهم است، کلمه بعد از آن است.
+        <code>type</code> ابزار اصلی شما برای عیب‌یابی است: هر وقت برنامه رفتار
+        عجیبی داشت، اولین کاری که باید بکنید این است که نوع متغیرهایتان را چاپ
+        کنید.
+    </p>
+
+    <h2 id="s8" data-t="ch01-078">۸. گرفتن ورودی از کاربر</h2>
+
+    <p data-t="ch01-079">
+        تا اینجا برنامه‌های ما هر بار دقیقاً یک کار می‌کردند. تابع
+        <code>input</code> است که برنامه را زنده می‌کند: پیامی نشان می‌دهد، منتظر
+        می‌ماند تا کاربر چیزی تایپ کند و اینتر بزند، و بعد آنچه تایپ شده را
+        برمی‌گرداند.
+    </p>
+
+    <pre class="code"><code># input() shows a message, waits for the user to type something and press Enter,
+# then returns whatever was typed AS TEXT (str).
+user_input = input('Please enter your name: ')
+
+print(user_input)
+print(type(user_input))  # always &lt;class 'str'&gt;</code></pre>
+    <p class="code-caption" data-t="ch01-080">اولین ورودی: نمونه 07_input.py</p>
+
+    <pre class="out">Please enter your name: Ali
+Ali
+&lt;class 'str'&gt;</pre>
+
+    <h3 data-t="ch01-081">شرح مثال</h3>
+
+    <ul>
+        <li data-t="ch01-082">متنی که داخل پرانتز <code>input</code> می‌گذارید، همان پیامی است که روی صفحه ظاهر می‌شود. عادت خوبی است که آخرش یک فاصله بگذارید تا تایپ کاربر به علامت دونقطه نچسبد.</li>
+        <li data-t="ch01-083">برنامه در همان خط <strong>متوقف</strong> می‌ماند تا کاربر اینتر بزند.</li>
+        <li data-t="ch01-084">مهم‌ترین نکته این فصل: <code>input</code> <strong>همیشه</strong> رشته برمی‌گرداند. حتی اگر کاربر عدد تایپ کند.</li>
+    </ul>
+
+    <pre class="code"><code># Reading a value and using it inside a message.
+user_input = input('Please enter your name: ')
+
+# print() separates its arguments with a space by default.
+print('Welcome', user_input, '!')
+
+# With sep='' there is no space, so the exclamation mark sticks to the name.
+print('Welcome ', user_input, '!', sep='')</code></pre>
+    <p class="code-caption" data-t="ch01-085">استفاده از ورودی داخل پیام: نمونه 08_input_welcome.py</p>
+
+    <pre class="out">Please enter your name: Ali
+Welcome Ali !
+Welcome Ali!</pre>
+
+    <p data-t="ch01-086">
+        فرق دو خروجی را ببینید. در خط اول، علامت تعجب با یک فاصله از نام جدا شده
+        است، چون <code>print</code> بین مقدارها فاصله می‌گذارد. در خط دوم با
+        <code>sep=''</code> آن فاصله برداشته شده است. در فصل سوم راه تمیزتری برای
+        همین کار می‌بینید که نامش f-string است.
+    </p>
+
+    <h2 id="s9" data-t="ch01-087">۹. تبدیل نوع</h2>
+
+    <p data-t="ch01-088">
+        حالا به مهم‌ترین مشکل روز اول می‌رسیم. اگر کاربر عدد ۵ را تایپ کند، آنچه
+        شما می‌گیرید عدد ۵ نیست، رشته <code>'5'</code> است. و رشته را نمی‌شود
+        جمع زد. راه حل، <strong>تبدیل نوع</strong> است.
+    </p>
+
+    <pre class="code"><code># input() always returns a string, even when the user types digits.
+# To calculate with it we must convert (cast) it to a number first.
+user_input = input('Enter a number: ')
+
+print('Before conversion:', type(user_input))   # &lt;class 'str'&gt;
+
+number = int(user_input)                        # str -&gt; int
+print('After conversion: ', type(number))       # &lt;class 'int'&gt;
+
+number = number + 2
+print('Your number plus 2 is:', number)
+
+# Other useful conversions:
+print(float('3.5'))   # str   -&gt; float
+print(int(3.9))       # float -&gt; int (the decimal part is cut off, NOT rounded)
+print(str(25))        # int   -&gt; str</code></pre>
+    <p class="code-caption" data-t="ch01-089">تبدیل نوع: نمونه 09_type_conversion.py</p>
+
+    <pre class="out">Enter a number: 7
+Before conversion: &lt;class 'str'&gt;
+After conversion:  &lt;class 'int'&gt;
+Your number plus 2 is: 9
+3.5
+3
+25</pre>
+
+    <h3 data-t="ch01-090">شرح مثال</h3>
+
+    <ul>
+        <li data-t="ch01-091"><code>int(x)</code> یعنی «x را به عدد صحیح تبدیل کن»، <code>float(x)</code> یعنی به اعشاری، <code>str(x)</code> یعنی به متن.</li>
+        <li data-t="ch01-092">به خروجی <code>int(3.9)</code> دقت کنید: نتیجه ۳ است، نه ۴. تبدیل به عدد صحیح، اعشار را <strong>می‌بُرد</strong> و گرد نمی‌کند. برای گرد کردن، تابع <code>round</code> هست که در فصل شانزدهم می‌بینید.</li>
+        <li data-t="ch01-093">اگر کاربر به جای عدد، متن تایپ کند، <code>int('hello')</code> خطای <code>ValueError</code> می‌دهد و برنامه می‌ایستد. فعلاً چاره‌ای نداریم؛ در فصل هشتم با حلقه و در فصل نوزدهم با <code>try</code> جلویش را می‌گیریم.</li>
+    </ul>
+
+    <div class="warn">
+        <span class="box-title" data-t="ch01-094">اشتباه کلاسیک روز اول</span>
+        <p data-t="ch01-095">
+            اگر تبدیل را فراموش کنید و بنویسید
+            <code>a = input('a: ')</code> و بعد <code>a + 1</code>، پایتون خطای
+            <code>TypeError</code> می‌دهد: نمی‌شود رشته را با عدد جمع زد. اما بدتر
+            از آن، اگر هر دو ورودی رشته باشند، <code>'2' + '3'</code> خطا نمی‌دهد
+            و نتیجه‌اش <code>'23'</code> است، چون جمع دو رشته یعنی چسباندنشان به
+            هم. برنامه اجرا می‌شود ولی جواب غلط می‌دهد و این بدترین نوع خطاست.
+        </p>
+    </div>
+
+    <h2 id="s10" data-t="ch01-096">۱۰. اولین برنامه واقعی</h2>
+
+    <p data-t="ch01-097">
+        همه چیزهایی که تا اینجا یاد گرفتیم را کنار هم بگذاریم: دو عدد از کاربر
+        بگیریم و مجموعشان را چاپ کنیم.
+    </p>
+
+    <pre class="code"><code># First complete mini program: read two numbers and print their sum.
+# float() is used instead of int() so the user may also enter 3.5
+
+user_input = input('Enter the first number: ')
+num1 = float(user_input)
+
+user_input = input('Enter the second number: ')
+num2 = float(user_input)
+
+total = num1 + num2
+
+print('The sum is:', total)</code></pre>
+    <p class="code-caption" data-t="ch01-098">جمع دو عدد: نمونه 10_sum_of_two_numbers.py</p>
+
+    <pre class="out">Enter the first number: 3.5
+Enter the second number: 2
+The sum is: 5.5</pre>
+
+    <h3 data-t="ch01-099">شرح مثال</h3>
+
+    <ul>
+        <li data-t="ch01-100">اینجا <code>float</code> به کار رفته نه <code>int</code>، تا کاربر بتواند عدد اعشاری هم وارد کند. <code>float</code> عدد صحیح را هم قبول می‌کند.</li>
+        <li data-t="ch01-101">متغیر <code>user_input</code> دو بار استفاده شده است. اشکالی ندارد، چون بعد از تبدیل، مقدارش را در <code>num1</code> ذخیره کرده‌ایم و دیگر لازمش نداریم.</li>
+        <li data-t="ch01-102">می‌شد کوتاه‌تر نوشت: <code>num1 = float(input('Enter the first number: '))</code>. هر دو درست‌اند؛ شکل کوتاه‌تر رایج‌تر است ولی شکل دو خطی برای شروع خواناتر است.</li>
+        <li data-t="ch01-103">ساختار این برنامه، ساختار تقریباً همه برنامه‌هاست: <strong>ورودی</strong>، سپس <strong>پردازش</strong>، سپس <strong>خروجی</strong>.</li>
+    </ul>
+
+    <div class="folder-ref">
+        <span class="box-title" data-t="ch01-104">فایل‌های تمرینی این فصل</span>
+        <p data-t="ch01-105">
+            پوشه <code>S01-first-steps</code> شامل نمونه‌های
+            <code>01_hello_world.py</code> تا <code>10_sum_of_two_numbers.py</code>.
+        </p>
+    </div>
+
+    <h2 data-t="ch01-106">خلاصه فصل</h2>
+
+    <div class="table-scroll">
+        <table>
+            <thead>
+                <tr><th data-t="ch01-107">ابزار</th><th data-t="ch01-108">وظیفه آن</th></tr>
+            </thead>
+            <tbody>
+                <tr><td><code>print(x)</code></td><td data-t="ch01-109">چاپ روی صفحه و رفتن به خط بعد</td></tr>
+                <tr><td data-t="ch01-110"><code>sep</code> و <code>end</code></td><td data-t="ch01-111">تغییر جداکننده مقدارها و تغییر پایان خط</td></tr>
+                <tr><td><code>#</code></td><td data-t="ch01-112">توضیح. پایتون تا آخر آن خط را نادیده می‌گیرد</td></tr>
+                <tr><td><code>x = 5</code></td><td data-t="ch01-113">ساختن متغیر: مقدار سمت راست را در نام سمت چپ بریز</td></tr>
+                <tr><td><code>str</code> <code>int</code> <code>float</code> <code>bool</code></td><td data-t="ch01-114">چهار نوع داده پایه</td></tr>
+                <tr><td><code>type(x)</code></td><td data-t="ch01-115">گفتن نوع یک مقدار</td></tr>
+                <tr><td><code>input(msg)</code></td><td data-t="ch01-116">گرفتن ورودی از کاربر. خروجی همیشه رشته است</td></tr>
+                <tr><td><code>int(x)</code> <code>float(x)</code> <code>str(x)</code></td><td data-t="ch01-117">تبدیل نوع</td></tr>
+            </tbody>
+        </table>
+    </div>
+
+    <div class="exercise">
+        <h3 data-t="ch01-118">تمرین‌های فصل یک</h3>
+        <ol>
+            <li data-t="ch01-119">نام، نام خانوادگی و شهر خود را در سه خط جداگانه چاپ کنید.</li>
+            <li data-t="ch01-120">متغیرهای <code>name</code> و <code>age</code> و <code>city</code> را بسازید و در یک جمله چاپشان کنید.</li>
+            <li data-t="ch01-121">نام کاربر را بگیرید و پیام <code>Hello &lt;name&gt;, welcome to Kadoos!</code> را چاپ کنید.</li>
+            <li data-t="ch01-122">دو عدد از کاربر بگیرید و تفاضلشان را چاپ کنید.</li>
+            <li data-t="ch01-123">یک عدد از کاربر بگیرید و خود عدد، دو برابرش و سه برابرش را چاپ کنید.</li>
+            <li data-t="ch01-124">نوع مقدارهای <code>'12'</code> و <code>12</code> و <code>12.0</code> و <code>True</code> را چاپ کنید و توضیح دهید فرق <code>'12'</code> با <code>12</code> چیست.</li>
+            <li data-t="ch01-125">دمای هوا را به سانتی‌گراد از کاربر بگیرید و به فارنهایت تبدیل و چاپ کنید. فرمول: <code>F = C * 9 / 5 + 32</code></li>
+            <li data-t="ch01-126">تاریخ امروز را با <code>sep='/'</code> در یک <code>print</code> چاپ کنید، به شکل سال و ماه و روز.</li>
+        </ol>
+    </div>
+
+    <div class="pager">
+        <a href="chapter-00.html">فصل قبل: مقدمه و نصب</a>
+        <a href="chapter-02.html">فصل بعد: عملگرها</a>
+    </div>
+
+</main>
+
+</body>
+</html>

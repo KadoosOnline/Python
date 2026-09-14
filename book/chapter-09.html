@@ -1,0 +1,487 @@
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="فصل نه: لیست در پایتون، اندیس و برش، تغییرپذیری، متدهای افزودن و حذف، جست‌وجو، پیمایش، پشته و دام کپی">
+    <title>فصل ۹: لیست‌ها</title>
+    <link rel="icon" href="logokm.png" type="image/png">
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<header class="book-bar">
+    <a class="name" href="index.html">برنامه‌نویسی پایتون</a>
+    <a href="index.html">فهرست مطالب</a>
+</header>
+
+<main class="paper">
+
+    <div class="chapter-head">
+        <span class="chapter-num">فصل ۹</span>
+        <h1 data-t="ch09-001">لیست‌ها</h1>
+        <p class="lead" data-t="ch09-002">
+            تا اینجا هر متغیر یک مقدار داشت. برای نگه داشتن نمره سی دانش‌آموز،
+            سی متغیر لازم بود. لیست این مشکل را حل می‌کند و در عمل پرکاربردترین
+            ساختمان داده پایتون است.
+        </p>
+    </div>
+
+    <div class="mini-toc">
+        <span class="box-title" data-t="ch09-003">در این فصل می‌خوانید</span>
+        <ol>
+            <li data-t="ch09-004"><a href="#s1">ساختن لیست</a></li>
+            <li data-t="ch09-005"><a href="#s2">اندیس و برش</a></li>
+            <li data-t="ch09-006"><a href="#s3">لیست تغییرپذیر است</a></li>
+            <li data-t="ch09-007"><a href="#s4">اضافه کردن عضو</a></li>
+            <li data-t="ch09-008"><a href="#s5">حذف کردن عضو</a></li>
+            <li data-t="ch09-009"><a href="#s6">جست‌وجو در لیست</a></li>
+            <li data-t="ch09-010"><a href="#s7">پیمایش لیست</a></li>
+            <li data-t="ch09-011"><a href="#s8">ساختن لیست از ورودی کاربر</a></li>
+            <li data-t="ch09-012"><a href="#s9">برنامه: میانگین طول نام‌ها</a></li>
+            <li data-t="ch09-013"><a href="#s10">لیست به عنوان پشته و صف</a></li>
+            <li data-t="ch09-014"><a href="#s11">دام کپی کردن لیست</a></li>
+        </ol>
+    </div>
+
+    <h2 id="s1" data-t="ch09-015">۱. ساختن لیست</h2>
+
+    <p data-t="ch09-016">
+        لیست مجموعه‌ای <strong>مرتب</strong> از مقدارهاست که داخل کروشه نوشته
+        می‌شوند و با ویرگول از هم جدا می‌شوند.
+    </p>
+
+    <pre class="code"><code># A list holds several values in one variable, in a fixed order,
+# written between square brackets and separated by commas.
+animals = ['Cat', 'Lion', 'Dog', 'Wolf']
+numbers = [5, 7, 15, 32, 104, 1]
+empty = []                         # a list with nothing in it
+
+print(animals)
+print(numbers)
+print(empty)
+
+print(animals[0])                  # the first item
+print(type(animals))               # &lt;class 'list'&gt;
+print(len(animals))                # how many items -&gt; 4
+
+# A list may even mix different types (rarely a good idea, but it is allowed).
+mixed = ['Ali', 20, 19.5, True]
+print(mixed)</code></pre>
+    <p class="code-caption" data-t="ch09-017">ساختن لیست: نمونه 01_create_list.py</p>
+
+    <pre class="out">['Cat', 'Lion', 'Dog', 'Wolf']
+[5, 7, 15, 32, 104, 1]
+[]
+Cat
+&lt;class 'list'&gt;
+4
+['Ali', 20, 19.5, True]</pre>
+
+    <h3 data-t="ch09-018">شرح مثال</h3>
+
+    <ul>
+        <li data-t="ch09-019">لیست خالی <code>[]</code> نقطه شروع بسیاری از برنامه‌هاست: لیست را خالی می‌سازید و بعد پرش می‌کنید.</li>
+        <li data-t="ch09-020"><code>len</code> همان تابعی است که روی رشته دیدیم و اینجا تعداد اعضا را می‌دهد.</li>
+        <li data-t="ch09-021">لیست می‌تواند انواع مختلف را با هم داشته باشد، ولی این کار معمولاً نشانه طراحی بد است. لیست باید مجموعه‌ای از چیزهای <strong>هم‌جنس</strong> باشد.</li>
+    </ul>
+
+    <h2 id="s2" data-t="ch09-022">۲. اندیس و برش</h2>
+
+    <p data-t="ch09-023">
+        همه چیزهایی که در فصل سوم درباره اندیس و برش رشته یاد گرفتید، عیناً برای
+        لیست هم صادق است.
+    </p>
+
+    <pre class="code"><code># Indexes and slices work exactly like they do on strings.
+cars = ['BMW', 'Benz', 'Pride', 'Paykan', 'Ford']
+
+print(cars[0])      # 'BMW'
+print(cars[-1])     # 'Ford'   -&gt; the last one
+print(cars[1:3])    # ['Benz', 'Pride']
+print(cars[:2])     # ['BMW', 'Benz']
+print(cars[2:])     # ['Pride', 'Paykan', 'Ford']
+print(cars[::-1])   # the list reversed</code></pre>
+    <p class="code-caption" data-t="ch09-024">اندیس و برش لیست: نمونه 02_indexing_slicing.py</p>
+
+    <p data-t="ch09-025">
+        دقت کنید که <code>cars[0]</code> یک <strong>رشته</strong> می‌دهد ولی
+        <code>cars[1:3]</code> یک <strong>لیست</strong>. اندیس یک عضو می‌دهد،
+        برش همیشه لیست می‌دهد، حتی اگر فقط یک عضو داشته باشد.
+    </p>
+
+    <h2 id="s3" data-t="ch09-026">۳. لیست تغییرپذیر است</h2>
+
+    <p data-t="ch09-027">
+        این مهم‌ترین تفاوت لیست با رشته است. رشته را نمی‌شد عوض کرد، لیست را
+        می‌شود.
+    </p>
+
+    <pre class="code"><code># A list is MUTABLE: an item can be replaced without creating a new list.
+cars = ['BMW', 'Benz', 'Pride']
+
+cars[2] = 'Peugeot'
+print(cars)             # ['BMW', 'Benz', 'Peugeot']
+
+# A whole slice can be replaced as well.
+cars[0:2] = ['Mazda', 'Kia']
+print(cars)
+
+# Remember: a string cannot be changed like this,
+#   name = 'kadoos'
+#   name[0] = 'K'      -&gt;  TypeError</code></pre>
+    <p class="code-caption" data-t="ch09-028">تغییرپذیری: نمونه 03_mutable.py</p>
+
+    <div class="table-scroll">
+        <table>
+            <thead>
+                <tr><th></th><th data-t="ch09-029">رشته</th><th data-t="ch09-030">لیست</th></tr>
+            </thead>
+            <tbody>
+                <tr><td data-t="ch09-031">تغییر یک عضو</td><td data-t="ch09-032">ممکن نیست</td><td data-t="ch09-033">ممکن است</td></tr>
+                <tr><td data-t="ch09-034">متدها</td><td data-t="ch09-035">رشته تازه برمی‌گردانند</td><td data-t="ch09-036">خود لیست را عوض می‌کنند</td></tr>
+                <tr><td data-t="ch09-037">نمونه</td><td><code>s = s.upper()</code></td><td><code>lst.append(x)</code></td></tr>
+            </tbody>
+        </table>
+    </div>
+
+    <p data-t="ch09-038">
+        این تفاوت را خوب به خاطر بسپارید: متدهای لیست معمولاً <strong>چیزی
+        برنمی‌گردانند</strong> و مستقیم خود لیست را عوض می‌کنند. نوشتن
+        <code>numbers = numbers.append(5)</code> یک اشتباه رایج است که مقدار
+        <code>None</code> را در متغیر می‌ریزد و لیست را از دست می‌دهید.
+    </p>
+
+    <h2 id="s4" data-t="ch09-039">۴. اضافه کردن عضو</h2>
+
+    <pre class="code"><code>numbers = [10, 20, 30]
+
+# append() adds ONE item at the end.
+numbers.append(40)
+print(numbers)          # [10, 20, 30, 40]
+
+# insert() adds an item at a chosen position.
+numbers.insert(0, 5)
+print(numbers)          # [5, 10, 20, 30, 40]
+
+# extend() adds all the items of another list.
+numbers.extend([50, 60])
+print(numbers)          # [5, 10, 20, 30, 40, 50, 60]
+
+# Careful: append() with a list adds the LIST itself as one single item.
+numbers.append([70, 80])
+print(numbers)          # [..., 60, [70, 80]]
+
+# '+' builds a new list without touching the originals.
+print([1, 2] + [3, 4])</code></pre>
+    <p class="code-caption" data-t="ch09-040">اضافه کردن: نمونه 04_add_items.py</p>
+
+    <div class="table-scroll">
+        <table>
+            <thead>
+                <tr><th data-t="ch09-041">متد</th><th data-t="ch09-042">وظیفه آن</th></tr>
+            </thead>
+            <tbody>
+                <tr><td><code>append(x)</code></td><td data-t="ch09-043">یک عضو به انتها اضافه می‌کند</td></tr>
+                <tr><td><code>insert(i, x)</code></td><td data-t="ch09-044">یک عضو در جای مشخص جا می‌دهد</td></tr>
+                <tr><td><code>extend(lst)</code></td><td data-t="ch09-045">همه اعضای یک لیست دیگر را اضافه می‌کند</td></tr>
+                <tr><td><code>+</code></td><td data-t="ch09-046">لیست تازه می‌سازد، اصلی‌ها دست‌نخورده می‌مانند</td></tr>
+            </tbody>
+        </table>
+    </div>
+
+    <div class="warn">
+        <span class="box-title" data-t="ch09-047">فرق append و extend</span>
+        <p data-t="ch09-048">
+            <code>append([70, 80])</code> کل لیست را به عنوان <strong>یک</strong>
+            عضو اضافه می‌کند، پس لیستی تودرتو می‌سازید.
+            <code>extend([70, 80])</code> اعضایش را <strong>یکی‌یکی</strong>
+            اضافه می‌کند. هر دو مجازند و هر کدام کاربرد خودش را دارد، ولی قاطی
+            کردنشان باگ‌های عجیب می‌سازد.
+        </p>
+    </div>
+
+    <h2 id="s5" data-t="ch09-049">۵. حذف کردن عضو</h2>
+
+    <pre class="code"><code>numbers = [5, 20, -7, 8, 14]
+
+# pop() removes an item BY POSITION and returns it.
+last = numbers.pop()        # no argument -&gt; the last item
+print('Removed:', last, '-&gt;', numbers)
+
+first = numbers.pop(0)      # by index
+print('Removed:', first, '-&gt;', numbers)
+
+# remove() removes the first item equal to the given VALUE.
+numbers.remove(8)
+print(numbers)
+
+# del removes by index (or by slice) without returning anything.
+del numbers[0]
+print(numbers)
+
+# clear() empties the list.
+numbers.clear()
+print(numbers)              # []</code></pre>
+    <p class="code-caption" data-t="ch09-050">حذف کردن: نمونه 05_remove_items.py</p>
+
+    <div class="table-scroll">
+        <table>
+            <thead>
+                <tr><th data-t="ch09-051">روش</th><th data-t="ch09-052">بر اساس</th><th data-t="ch09-053">مقدار برمی‌گرداند</th></tr>
+            </thead>
+            <tbody>
+                <tr><td><code>pop()</code></td><td data-t="ch09-054">جایگاه، پیش‌فرض آخری</td><td data-t="ch09-055">بله</td></tr>
+                <tr><td><code>remove(x)</code></td><td data-t="ch09-056">مقدار، اولین تطابق</td><td data-t="ch09-057">خیر</td></tr>
+                <tr><td><code>del lst[i]</code></td><td data-t="ch09-058">جایگاه یا برش</td><td data-t="ch09-059">خیر</td></tr>
+                <tr><td><code>clear()</code></td><td data-t="ch09-060">همه چیز</td><td data-t="ch09-061">خیر</td></tr>
+            </tbody>
+        </table>
+    </div>
+
+    <p data-t="ch09-062">
+        اگر <code>remove</code> مقداری را پیدا نکند، خطای <code>ValueError</code>
+        می‌دهد. پس پیش از حذف، با <code>in</code> بررسی کنید که واقعاً وجود دارد.
+    </p>
+
+    <h2 id="s6" data-t="ch09-063">۶. جست‌وجو در لیست</h2>
+
+    <pre class="code"><code>cars = ['BMW', 'Benz', 'Pride', 'Paykan', 'Ford', 'Benz']
+
+car = input('Enter the car name: ')
+
+# 'in' tells us whether a value exists in the list.
+if car in cars:
+    print(car, 'found.')
+else:
+    print(car, 'not found!')
+
+# index() gives the position of the FIRST occurrence.
+print(cars.index('Pride'))
+
+# count() says how many times a value appears.
+print(cars.count('Benz'))    # 2</code></pre>
+    <p class="code-caption" data-t="ch09-064">جست‌وجو: نمونه 06_search_in_list.py</p>
+
+    <p data-t="ch09-065">سه ابزار جست‌وجو: <code>in</code> برای «هست یا نیست»، <code>index</code> برای «کجاست» و <code>count</code> برای «چند تا». مثل <code>remove</code>، اگر <code>index</code> چیزی پیدا نکند خطا ایجاد می‌کند، پس معمولاً اول با <code>in</code> بررسی می‌کنند.</p>
+
+    <h2 id="s7" data-t="ch09-066">۷. پیمایش لیست</h2>
+
+    <pre class="code"><code>numbers = [200, 350, 40, 1000, 270]
+
+# Way 1 (the usual one): loop directly over the items.
+for number in numbers:
+    print(number, end=' ')
+print()
+
+# Way 2: loop over the indexes. Useful when we also need the position,
+# or when we want to CHANGE the items.
+for i in range(len(numbers)):
+    print(f'index {i} -&gt; {numbers[i]}')
+
+# Changing every item needs the index version.
+for i in range(len(numbers)):
+    numbers[i] = numbers[i] * 2
+
+print(numbers)</code></pre>
+    <p class="code-caption" data-t="ch09-067">دو روش پیمایش: نمونه 07_loop_over_list.py</p>
+
+    <h3 data-t="ch09-068">شرح مثال</h3>
+
+    <ul>
+        <li data-t="ch09-069">روش اول تمیزتر و پایتونی‌تر است. هر وقت فقط به <strong>مقدار</strong> نیاز دارید، همین را به کار ببرید.</li>
+        <li data-t="ch09-070">روش دوم وقتی لازم است که به <strong>جایگاه</strong> هم نیاز دارید، یا می‌خواهید اعضا را عوض کنید.</li>
+        <li data-t="ch09-071">چرا برای تغییر باید اندیس داشته باشیم؟ چون در روش اول، <code>number</code> فقط یک کپی از مقدار است. اگر بنویسید <code>number = number * 2</code>، لیست اصلی هیچ تغییری نمی‌کند.</li>
+        <li data-t="ch09-072">در فصل بیست و پنجم ابزار <code>enumerate</code> را می‌بینید که هم مقدار و هم اندیس را با هم می‌دهد و از هر دوی این موارد بهتر است.</li>
+    </ul>
+
+    <h2 id="s8" data-t="ch09-073">۸. ساختن لیست از ورودی کاربر</h2>
+
+    <pre class="code"><code># Starting from an empty list and filling it with append().
+numbers = []
+
+while True:
+    user_input = input('Enter a number (or "exit"): ')
+
+    if user_input == 'exit':
+        break
+
+    numbers.append(float(user_input))
+
+print('You entered:', numbers)
+print('How many:', len(numbers))
+
+if len(numbers) &gt; 0:
+    total = 0
+    for number in numbers:
+        total += number
+    print('Average:', total / len(numbers))</code></pre>
+    <p class="code-caption" data-t="ch09-074">پر کردن لیست: نمونه 08_build_from_input.py</p>
+
+    <p data-t="ch09-075">
+        اینجا سه چیزی که تا حالا یاد گرفته‌اید کنار هم آمده‌اند: حلقه نگهبان از
+        فصل هشتم، الگوی انباره از فصل ششم و لیست از این فصل. تقریباً همه
+        برنامه‌های واقعی همین شکل را دارند: <strong>جمع کن، بعد پردازش کن</strong>.
+    </p>
+
+    <h2 id="s9" data-t="ch09-076">۹. برنامه: میانگین طول نام‌ها</h2>
+
+    <pre class="code"><code># Reading names into a list and computing the average length of the names.
+names = []
+
+while True:
+    user_input = input('Enter a name (or "exit"): ')
+
+    if user_input == 'exit':
+        break
+
+    names.append(user_input)
+
+if len(names) == 0:
+    print('No name was entered.')
+else:
+    total = 0
+    for name in names:
+        total += len(name)
+
+    print('Average length of the names:', total / len(names))</code></pre>
+    <p class="code-caption" data-t="ch09-077">میانگین طول نام‌ها: نمونه 09_names_length.py</p>
+
+    <p data-t="ch09-078">
+        باز هم بررسی لیست خالی پیش از تقسیم. این را به عادت تبدیل کنید: هر جا
+        <code>len(...)</code> در مخرج یک تقسیم است، حالت صفر را جدا بررسی کنید.
+    </p>
+
+    <h2 id="s10" data-t="ch09-079">۱۰. لیست به عنوان پشته و صف</h2>
+
+    <p data-t="ch09-080">
+        <strong>پشته</strong> ساختاری است که «آخرین ورودی، اولین خروجی» است.
+        درست مثل دسته بشقاب: بشقابی که آخر گذاشته‌اید، اول برداشته می‌شود.
+    </p>
+
+    <pre class="code"><code># A stack is a "last in, first out" container.
+# A Python list is already a perfect stack: append() to push, pop() to pop.
+my_stack = []
+
+my_stack.append(5)
+my_stack.append(20)
+my_stack.append(-7)
+print(my_stack)          # [5, 20, -7]
+
+item = my_stack.pop()    # takes the LAST item
+print('Popped:', item)   # -7
+print(my_stack)          # [5, 20]
+
+my_stack.pop()
+print(my_stack)          # [5]
+
+# By popping index 0 instead, the list behaves as a queue (first in, first out).
+queue = [5, 20, -7, 8, 14]
+queue.pop(0)
+queue.pop(0)
+print(queue)             # [-7, 8, 14]</code></pre>
+    <p class="code-caption" data-t="ch09-081">پشته و صف: نمونه 10_stack.py</p>
+
+    <h3 data-t="ch09-082">شرح مثال</h3>
+
+    <ul>
+        <li data-t="ch09-083">پشته با <code>append</code> و <code>pop()</code> ساخته می‌شود. دکمه بازگشت در مرورگر و دکمه undo در ویرایشگر، همگی پشته‌اند.</li>
+        <li data-t="ch09-084"><strong>صف</strong> برعکس است: «اولین ورودی، اولین خروجی»، مثل صف نانوایی. با <code>pop(0)</code> ساخته می‌شود.</li>
+        <li data-t="ch09-085">نکته فنی: <code>pop(0)</code> کند است، چون همه اعضا باید یک خانه جابه‌جا شوند. برای صف‌های بزرگ، پایتون ابزار بهتری به نام <code>deque</code> در ماژول <code>collections</code> دارد که در فصل پانزدهم می‌بینید.</li>
+    </ul>
+
+    <h2 id="s11" data-t="ch09-086">۱۱. دام کپی کردن لیست</h2>
+
+    <p data-t="ch09-087">
+        این بخش را با دقت بخوانید. یکی از گیج‌کننده‌ترین رفتارهای پایتون برای
+        تازه‌کارها همین است.
+    </p>
+
+    <pre class="code"><code># IMPORTANT TRAP: '=' does not copy a list, it only gives it a second name.
+list1 = [1, 2, 3]
+list2 = list1
+
+list2.append(4)
+print(list1)      # [1, 2, 3, 4]  -&gt; list1 changed too!
+
+# To get a real copy use copy(), list() or a full slice.
+list3 = list1.copy()
+list3.append(5)
+print(list1)      # [1, 2, 3, 4]  -&gt; unchanged
+print(list3)      # [1, 2, 3, 4, 5]
+
+list4 = list1[:]     # the same idea with a slice
+print(list4)</code></pre>
+    <p class="code-caption" data-t="ch09-088">دام کپی: نمونه 11_copy_list.py</p>
+
+    <h3 data-t="ch09-089">شرح مثال</h3>
+
+    <ul>
+        <li data-t="ch09-090">خط <code>list2 = list1</code> لیست تازه‌ای نمی‌سازد. فقط یک <strong>نام دوم</strong> برای همان لیست می‌گذارد. مثل اینکه یک نفر دو اسم داشته باشد؛ همان یک نفر است.</li>
+        <li data-t="ch09-091">پس هر تغییری از راه یکی از نام‌ها، از راه دیگری هم دیده می‌شود.</li>
+        <li data-t="ch09-092">برای کپی واقعی سه راه هست: <code>list1.copy()</code>، <code>list(list1)</code> و <code>list1[:]</code>. هر سه یکی‌اند.</li>
+        <li data-t="ch09-093">چرا با عدد و رشته چنین مشکلی نداریم؟ چون آنها تغییرناپذیرند و اصلاً نمی‌شود عوضشان کرد. این دام فقط برای انواع تغییرپذیر مثل لیست پیش می‌آید.</li>
+    </ul>
+
+    <div class="note">
+        <span class="box-title" data-t="ch09-094">همین دام در جای دیگری هم هست</span>
+        <p data-t="ch09-095">
+            وقتی لیستی را به یک تابع بدهید، تابع همان لیست را می‌گیرد، نه کپی‌اش
+            را. اگر تابع تغییرش دهد، لیست اصلی شما هم عوض می‌شود. در فصل
+            دوازدهم دقیقاً روی همین موضوع مکث می‌کنیم.
+        </p>
+    </div>
+
+    <div class="folder-ref">
+        <span class="box-title" data-t="ch09-096">فایل‌های تمرینی این فصل</span>
+        <p data-t="ch09-097">
+            پوشه <code>S09-lists</code> شامل نمونه‌های
+            <code>01_create_list.py</code> تا <code>11_copy_list.py</code>.
+        </p>
+    </div>
+
+    <h2 data-t="ch09-098">خلاصه فصل</h2>
+
+    <div class="table-scroll">
+        <table>
+            <thead>
+                <tr><th data-t="ch09-099">ابزار</th><th data-t="ch09-100">وظیفه آن</th></tr>
+            </thead>
+            <tbody>
+                <tr><td><code>[a, b, c]</code></td><td data-t="ch09-101">ساختن لیست. <code>[]</code> یعنی لیست خالی</td></tr>
+                <tr><td data-t="ch09-102"><code>lst[i]</code> و <code>lst[a:b]</code></td><td data-t="ch09-103">اندیس و برش، دقیقاً مثل رشته</td></tr>
+                <tr><td><code>lst[i] = x</code></td><td data-t="ch09-104">تغییر یک عضو. رشته این را ندارد</td></tr>
+                <tr><td><code>append insert extend</code></td><td data-t="ch09-105">اضافه کردن</td></tr>
+                <tr><td><code>pop remove del clear</code></td><td data-t="ch09-106">حذف کردن</td></tr>
+                <tr><td><code>in index count len</code></td><td data-t="ch09-107">جست‌وجو و شمارش</td></tr>
+                <tr><td><code>for x in lst</code></td><td data-t="ch09-108">پیمایش مقدارها</td></tr>
+                <tr><td><code>for i in range(len(lst))</code></td><td data-t="ch09-109">پیمایش اندیس‌ها، برای تغییر دادن</td></tr>
+                <tr><td data-t="ch09-110">پشته و صف</td><td data-t="ch09-111"><code>append</code> با <code>pop()</code> یا با <code>pop(0)</code></td></tr>
+                <tr><td><code>lst2 = lst1</code></td><td data-t="ch09-112">کپی <strong>نیست</strong>. برای کپی: <code>copy()</code> یا <code>[:]</code></td></tr>
+            </tbody>
+        </table>
+    </div>
+
+    <div class="exercise">
+        <h3 data-t="ch09-113">تمرین‌های فصل نه</h3>
+        <ol>
+            <li data-t="ch09-114">لیستی از پنج شهر بسازید و هر کدام را در یک خط چاپ کنید.</li>
+            <li data-t="ch09-115">پنج عدد در یک لیست بگیرید و لیست را برعکس چاپ کنید.</li>
+            <li data-t="ch09-116">لیستی از نام‌ها بگیرید و فقط آنهایی که با <code>A</code> شروع می‌شوند را چاپ کنید.</li>
+            <li data-t="ch09-117">عدد بگیرید تا <code>exit</code>، و بگویید چند تایشان زوج بودند.</li>
+            <li data-t="ch09-118">عضوهای تکراری یک لیست را حذف کنید، بدون استفاده از <code>set</code> که هنوز نخوانده‌ایم.</li>
+            <li data-t="ch09-119">لیستی از اعداد بگیرید و لیست دومی بسازید که فقط اعداد مثبت را دارد.</li>
+            <li data-t="ch09-120">یک جمله بگیرید، با <code>split()</code> به کلمات بشکنیدش و بلندترین کلمه را چاپ کنید.</li>
+            <li data-t="ch09-121">یک برنامه «فهرست خرید» با منو بنویسید: افزودن کالا، حذف کالا، نمایش فهرست و خروج.</li>
+        </ol>
+    </div>
+
+    <div class="pager">
+        <a href="chapter-08.html">فصل قبل: حلقه while</a>
+        <a href="chapter-10.html">فصل بعد: الگوریتم‌های لیست</a>
+    </div>
+
+</main>
+
+</body>
+</html>

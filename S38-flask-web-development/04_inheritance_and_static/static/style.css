@@ -1,0 +1,70 @@
+/* Static files live here: css, js, pictures.
+   Flask serves this folder at /static/ automatically. */
+
+* { box-sizing: border-box; margin: 0; padding: 0; }
+
+body {
+    font-family: Tahoma, Arial, sans-serif;
+    background: #f4f6fa;
+    color: #222;
+    line-height: 1.6;
+}
+
+header {
+    background: #2c3e73;
+    color: #fff;
+    padding: 18px 24px;
+}
+
+header h1 { font-size: 20px; }
+
+nav { margin-top: 8px; }
+
+nav a {
+    color: #cfd8ff;
+    text-decoration: none;
+    margin-right: 16px;
+}
+
+nav a:hover { color: #fff; text-decoration: underline; }
+
+main {
+    max-width: 900px;
+    margin: 24px auto;
+    padding: 0 16px;
+}
+
+h2 { margin-bottom: 12px; }
+h3 { margin: 20px 0 10px; }
+
+.cards { display: flex; flex-wrap: wrap; gap: 16px; }
+
+.card {
+    background: #fff;
+    border: 1px solid #e2e6ef;
+    border-radius: 10px;
+    padding: 16px;
+    min-width: 220px;
+    flex: 1;
+}
+
+.card h4 { margin-bottom: 6px; }
+.price { color: #2c3e73; font-weight: bold; }
+
+table {
+    width: 100%;
+    background: #fff;
+    border-collapse: collapse;
+    margin-top: 12px;
+}
+
+th, td { border: 1px solid #e2e6ef; padding: 10px; text-align: left; }
+th { background: #eef1f8; }
+tr.total td { font-weight: bold; background: #f7f9ff; }
+
+footer {
+    text-align: center;
+    color: #666;
+    padding: 24px;
+    font-size: 13px;
+}

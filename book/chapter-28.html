@@ -1,0 +1,633 @@
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="فصل بیست و هشت: محیط مجازی و pip، فایل requirements، کتابخانه requests، وب‌سرویس REST، XML و RSS">
+    <title>فصل ۲۸: بسته‌ها، REST API و XML</title>
+    <link rel="icon" href="logokm.png" type="image/png">
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<header class="book-bar">
+    <a class="name" href="index.html">برنامه‌نویسی پایتون</a>
+    <a href="index.html">فهرست مطالب</a>
+</header>
+
+<main class="paper">
+
+    <div class="chapter-head">
+        <span class="chapter-num">فصل ۲۸</span>
+        <h1 data-t="ch28-001">بسته‌ها، REST API و XML</h1>
+        <p class="lead" data-t="ch28-002">
+            تا اینجا فقط از کتابخانه استاندارد استفاده کردیم. حالا از پایتون
+            بیرون می‌رویم: بسته نصب می‌کنیم، به اینترنت وصل می‌شویم و داده
+            واقعی می‌گیریم.
+        </p>
+    </div>
+
+    <div class="mini-toc">
+        <span class="box-title" data-t="ch28-003">در این فصل می‌خوانید</span>
+        <ol>
+            <li data-t="ch28-004"><a href="#s1">چرا محیط مجازی</a></li>
+            <li data-t="ch28-005"><a href="#s2">دستورهای pip</a></li>
+            <li data-t="ch28-006"><a href="#s3">فایل requirements.txt</a></li>
+            <li data-t="ch28-007"><a href="#s4">اولین بسته نصب‌شده</a></li>
+            <li data-t="ch28-008"><a href="#s5">چند بسته محبوب</a></li>
+            <li data-t="ch28-009"><a href="#s6">وب‌سرویس REST چیست</a></li>
+            <li data-t="ch28-010"><a href="#s7">کتابخانه requests</a></li>
+            <li data-t="ch28-011"><a href="#s8">وب‌سرویس صفحه‌بندی‌شده</a></li>
+            <li data-t="ch28-012"><a href="#s9">ساختار XML</a></li>
+            <li data-t="ch28-013"><a href="#s10">خواندن XML</a></li>
+            <li data-t="ch28-014"><a href="#s11">نوشتن XML</a></li>
+            <li data-t="ch28-015"><a href="#s12">خواندن خوراک RSS</a></li>
+        </ol>
+    </div>
+
+    <h2 id="s1" data-t="ch28-016">۱. چرا محیط مجازی</h2>
+
+    <p data-t="ch28-017">
+        فرض کنید دو پروژه دارید. یکی با نسخه ۱ یک کتابخانه کار می‌کند و دیگری
+        با نسخه ۲. اگر همه چیز را روی پایتون سیستم نصب کنید، نمی‌شود هر دو را
+        داشت. <strong>محیط مجازی</strong> پوشه‌ای خصوصی است که نسخه‌ای از
+        پایتون و فقط بسته‌های <strong>همین پروژه</strong> را در خود دارد.
+    </p>
+
+    <pre class="code"><code>python -m venv .venv</code></pre>
+    <p class="code-caption" data-t="ch28-018">ساختن محیط مجازی. پوشه‌ای به نام venv. ساخته می‌شود</p>
+
+    <pre class="code"><code># Windows (Command Prompt)
+.venv\Scripts\activate
+
+# Windows (PowerShell)
+Set-ExecutionPolicy -Scope Process -ExecutionPolicy RemoteSigned
+.\.venv\Scripts\activate
+
+# Linux, macOS, Git Bash
+source .venv/bin/activate</code></pre>
+    <p class="code-caption" data-t="ch28-019">فعال کردن محیط</p>
+
+    <p data-t="ch28-020">
+        بعد از فعال شدن، نام محیط جلوی خط فرمان ظاهر می‌شود:
+        <code>(.venv)</code>. برای خروج، فقط <code>deactivate</code> بنویسید.
+    </p>
+
+    <div class="tip">
+        <span class="box-title" data-t="ch28-021">سه عادت خوب</span>
+        <ul>
+            <li data-t="ch28-022"><code>.venv/</code> را به <code>.gitignore</code> اضافه کنید. محیط مجازی هرگز نباید در گیت ذخیره شود.</li>
+            <li data-t="ch28-023"><code>requirements.txt</code> را <strong>حتماً</strong> در گیت بگذارید. این چیزی است که بقیه لازم دارند.</li>
+            <li data-t="ch28-024">هر پروژه، یک محیط مجازی. همیشه.</li>
+        </ul>
+    </div>
+
+    <h2 id="s2" data-t="ch28-025">۲. دستورهای pip</h2>
+
+    <pre class="code"><code>python -m pip install --upgrade pip
+pip install MODULE_NAME
+pip install MODULE_NAME==1.2.3      # a precise version
+pip list                            # what is installed
+pip show MODULE_NAME                # details of one package
+pip uninstall MODULE_NAME</code></pre>
+    <p class="code-caption" data-t="ch28-026">دستورهای اصلی pip</p>
+
+    <p data-t="ch28-027">
+        <code>pip</code> ابزار نصب بسته‌های پایتون است و بسته‌ها را از مخزن
+        جهانی PyPI می‌گیرد. بیش از پانصد هزار بسته آنجا هست.
+    </p>
+
+    <h2 id="s3" data-t="ch28-028">۳. فایل requirements.txt</h2>
+
+    <pre class="code"><code>pip freeze &gt; requirements.txt       # write down everything that is installed
+pip install -r requirements.txt     # rebuild the same environment elsewhere</code></pre>
+    <p class="code-caption" data-t="ch28-029">ذخیره و بازسازی محیط</p>
+
+    <p data-t="ch28-030">
+        این فایل فهرست دقیق بسته‌ها و نسخه‌هایشان است. هر کسی که پروژه شما را
+        بگیرد، با یک دستور دقیقاً همان محیط را می‌سازد. این استاندارد جهانی
+        پروژه‌های پایتون است.
+    </p>
+
+    <div class="warn">
+        <span class="box-title" data-t="ch28-031">باگی که در همه فایل‌های اصلی این دوره بود</span>
+        <p data-t="ch28-032">
+            در نسخه اصلی، فایل‌های <code>requirements.txt</code> با انکدینگ
+            UTF-16 ذخیره شده بودند، چون در ویندوز با
+            <code>&gt;</code> در PowerShell ساخته شده بودند. نتیجه این بود که
+            <code>pip install -r requirements.txt</code> اصلاً نمی‌توانست
+            بخواندشان. اگر با این مشکل روبه‌رو شدید، فایل را در VS Code باز
+            کنید و انکدینگش را به UTF-8 تغییر دهید.
+        </p>
+    </div>
+
+    <h2 id="s4" data-t="ch28-033">۴. اولین بسته نصب‌شده</h2>
+
+    <pre class="code"><code>'''A first third-party package: the Dilami (Gilaki) calendar.
+
+Before running:
+    python -m venv .venv
+    (activate it)
+    pip install -r requirements.txt
+'''
+
+from datetime import datetime
+
+# A package that is not installed raises ModuleNotFoundError, so we give a
+# clear message instead of a traceback.
+try:
+    from dilami_calendar import DilamiDatetime
+except ModuleNotFoundError:
+    raise SystemExit('Run "pip install -r requirements.txt" first.')
+
+
+def main() -&gt; None:
+    print('The Dilami date of today:')
+    print(DilamiDatetime.now())
+
+    print('Converting a Gregorian date to Dilami:')
+    gregorian_datetime = datetime(2026, 7, 19)
+    dilami_datetime = DilamiDatetime(gregorian_datetime)
+
+    print(f'    Year:  {dilami_datetime.year}')
+    print(f'    Month: {dilami_datetime.month}')
+    print(f'    Day:   {dilami_datetime.day}')</code></pre>
+    <p class="code-caption" data-t="ch28-034">تقویم دیلمی: نمونه 01_venv_and_pip</p>
+
+    <p data-t="ch28-035">
+        تقویم دیلمی، تقویم بومی گیلان است و بسته‌اش را یک برنامه‌نویس ایرانی
+        نوشته است. نمونه خوبی است از اینکه در PyPI برای هر نیازی چیزی پیدا
+        می‌شود.
+    </p>
+
+    <div class="tip">
+        <span class="box-title" data-t="ch28-036">الگوی بررسی نصب بودن بسته</span>
+        <p data-t="ch28-037">
+            آن <code>try</code> دور <code>import</code> عادت خوبی است: به جای
+            اینکه کاربر یک ردیابی ترسناک ببیند، جمله روشنی می‌خواند که به او
+            می‌گوید چه کار کند. در همه نمونه‌های این فصل همین الگو به کار
+            رفته است.
+        </p>
+    </div>
+
+    <h2 id="s5" data-t="ch28-038">۵. چند بسته محبوب</h2>
+
+    <div class="table-scroll">
+        <table>
+            <thead>
+                <tr><th data-t="ch28-039">بسته</th><th data-t="ch28-040">وظیفه آن</th><th data-t="ch28-041">پوشه نمونه</th></tr>
+            </thead>
+            <tbody>
+                <tr><td><code>matplotlib</code></td><td data-t="ch28-042">رسم نمودار</td><td><code>02_matplotlib</code></td></tr>
+                <tr><td><code>requests</code></td><td data-t="ch28-043">کار با وب و وب‌سرویس</td><td><code>03_requests_basics</code></td></tr>
+                <tr><td><code>Pillow</code></td><td data-t="ch28-044">پردازش تصویر</td><td><code>04_pillow</code></td></tr>
+                <tr><td><code>pandas</code></td><td data-t="ch28-045">تحلیل داده و جدول</td><td><code>05_pandas</code></td></tr>
+            </tbody>
+        </table>
+    </div>
+
+    <p data-t="ch28-046">
+        این چهار بسته، پرکاربردترین‌های دنیای پایتون‌اند. هر کدام خودشان یک
+        دوره کامل می‌طلبند؛ اینجا فقط می‌بینید که وجود دارند و چطور نصب و
+        استفاده می‌شوند.
+    </p>
+
+    <h2 id="s6" data-t="ch28-047">۶. وب‌سرویس REST چیست</h2>
+
+    <p data-t="ch28-048"><strong>API</strong> یعنی راهی که یک برنامه از راه اینترنت به برنامه دیگری داده می‌دهد. سبک <strong>REST</strong> رایج‌ترین شکلش است و واژگانش این مواردست:</p>
+
+    <div class="table-scroll">
+        <table>
+            <thead>
+                <tr><th data-t="ch28-049">مفهوم</th><th data-t="ch28-050">یعنی</th></tr>
+            </thead>
+            <tbody>
+                <tr><td>URL</td><td data-t="ch28-051">کدام منبع را می‌خواهیم</td></tr>
+                <tr><td data-t="ch28-052">متد</td><td data-t="ch28-053"><code>GET</code> خواندن، <code>POST</code> ساختن، <code>PUT</code> تغییر، <code>DELETE</code> حذف</td></tr>
+                <tr><td data-t="ch28-054">کد وضعیت</td><td data-t="ch28-055">۲۰۰ موفق، ۴۰۴ پیدا نشد، ۵۰۰ خطای سرور</td></tr>
+                <tr><td data-t="ch28-056">بدنه</td><td data-t="ch28-057">خود داده، تقریباً همیشه JSON</td></tr>
+            </tbody>
+        </table>
+    </div>
+
+    <h2 id="s7" data-t="ch28-058">۷. کتابخانه requests</h2>
+
+    <pre class="code"><code>try:
+    import requests
+except ModuleNotFoundError:
+    raise SystemExit('Run "pip install -r requirements.txt" first.')
+
+
+def main() -&gt; None:
+    # 1. A simple GET, with a timeout so the program cannot hang for ever.
+    try:
+        response = requests.get('https://api.github.com', timeout=10)
+        response.raise_for_status()      # raises when the status is 4xx or 5xx
+    except requests.RequestException as e:
+        print('The request failed:', e)
+        return
+
+    print('Status code:', response.status_code)      # 200 means success
+
+    # 2. The answer parsed as JSON -&gt; a Python dictionary.
+    data = response.json()
+    print('Example field user_url:', data['current_user_url'])
+
+    # 3. Query parameters: requests builds the ?q=python&amp;sort=stars part for us.
+    params = {'q': 'python', 'sort': 'stars'}
+    search = requests.get(
+        'https://api.github.com/search/repositories',
+        params=params,
+        timeout=10,
+    )
+    search.raise_for_status()
+
+    result = search.json()
+    print('Number of search results:', result['total_count'])
+    print('The final URL was:', search.url)
+
+    for repo in result['items'][:5]:
+        print(f"  {repo['full_name']:&lt;40} {repo['stargazers_count']:&gt;8} stars")</code></pre>
+    <p class="code-caption" data-t="ch28-059">اولین درخواست: نمونه 03_requests_basics</p>
+
+    <h3 data-t="ch28-060">چهار قانون کار با اینترنت</h3>
+
+    <ul>
+        <li data-t="ch28-061">
+            <strong>همیشه <code>timeout</code> بگذارید.</strong> بدون آن، اگر
+            سرور جواب ندهد، برنامه شما تا ابد منتظر می‌ماند. این یکی از
+            باگ‌های نسخه اصلی این دوره بود.
+        </li>
+        <li data-t="ch28-062">
+            <strong>همیشه <code>raise_for_status()</code> را در
+            <code>try</code> بگذارید.</strong> بدون گرفتنش، هر خطای شبکه
+            برنامه را می‌کشد.
+        </li>
+        <li data-t="ch28-063">
+            <strong><code>response.json()</code> را کورکورانه صدا نزنید.</strong>
+            اگر سرور HTML خطا برگرداند، خطای <code>JSONDecodeError</code>
+            می‌گیرید.
+        </li>
+        <li data-t="ch28-064">
+            <strong>پارامترها را با <code>params</code> بدهید</strong>، نه با
+            چسباندن رشته. کتابخانه خودش کاراکترهای خاص را درست کدگذاری می‌کند.
+        </li>
+    </ul>
+
+    <h2 id="s8" data-t="ch28-065">۸. وب‌سرویس صفحه‌بندی‌شده</h2>
+
+    <p data-t="ch28-066">
+        هیچ وب‌سرویسی ده هزار رکورد را یکجا نمی‌دهد. داده‌ها
+        <strong>صفحه‌بندی</strong> می‌شوند و شما باید صفحه به صفحه بگیریدشان.
+    </p>
+
+    <pre class="code"><code>def fetch_all_posts(endpoint: str) -&gt; list[dict]:
+    'Download every page of posts and return them in one list.'
+    all_posts: list[dict] = []
+    page = 1
+
+    while True:
+        try:
+            response = requests.get(
+                endpoint,
+                params={'page': page, 'per_page': PER_PAGE},
+                timeout=TIMEOUT,
+            )
+            response.raise_for_status()
+        except requests.RequestException as e:
+            print(f'Error fetching page {page}: {e}')
+            break
+
+        posts = response.json()
+        if not posts:                 # an empty page means we are done
+            break
+
+        all_posts.extend(posts)
+
+        # The API tells us how many pages exist, in a header.
+        total_pages = int(response.headers.get('X-WP-TotalPages', 1))
+        if page &gt;= total_pages:
+            break
+
+        page += 1
+
+    return all_posts</code></pre>
+    <p class="code-caption" data-t="ch28-067">گرفتن همه صفحه‌ها: نمونه 09_rest_api</p>
+
+    <h3 data-t="ch28-068">شرح مثال</h3>
+
+    <ul>
+        <li data-t="ch28-069">الگوی <code>while True</code> با <code>break</code> از فصل هشتم، اینجا دقیقاً همان چیزی است که لازم است: نمی‌دانیم چند صفحه وجود دارد.</li>
+        <li data-t="ch28-070">دو شرط خروج داریم: صفحه خالی، یا رسیدن به آخرین صفحه‌ای که خود سرور در سرآیند اعلام کرده است. داشتن هر دو، حلقه را در برابر رفتار عجیب سرور امن می‌کند.</li>
+        <li data-t="ch28-071">سرآیندها اطلاعات اضافی پاسخ‌اند. <code>headers.get(..., 1)</code> با مقدار پیش‌فرض خوانده شده تا اگر سرآیند نبود، برنامه خراب نشود.</li>
+        <li data-t="ch28-072">در پاسخ این وب‌سرویس، <code>post['title']</code> خودش یک شیء است و متن واقعی در <code>['rendered']</code> است. داده‌های واقعی وب همیشه تودرتو هستند؛ مهارت فصل پانزدهم اینجا لازم می‌شود.</li>
+    </ul>
+
+    <h2 id="s9" data-t="ch28-073">۹. ساختار XML</h2>
+
+    <p data-t="ch28-074">
+        <strong>XML</strong> قالب قدیمی‌تری برای داده ساختاریافته است. هنوز در
+        خیلی جاها استفاده می‌شود: RSS، فایل‌های آفیس، تنظیمات جاوا، و
+        فایل‌های <code>ui.</code> که در فصل سی و ششم می‌بینید.
+    </p>
+
+    <pre class="code"><code>&lt;?xml version="1.0" encoding="UTF-8"?&gt;
+&lt;products&gt;
+    &lt;product id="101" name="Intel Core i7-13700K" manufacturer="Intel"&gt;
+        &lt;tags&gt;
+            &lt;tag&gt;CPU&lt;/tag&gt;
+            &lt;tag&gt;13th Gen&lt;/tag&gt;
+        &lt;/tags&gt;
+        &lt;categories&gt;
+            &lt;category&gt;Processor&lt;/category&gt;
+        &lt;/categories&gt;
+    &lt;/product&gt;
+&lt;/products&gt;</code></pre>
+    <p class="code-caption" data-t="ch28-075">ساختار XML: فایل products.xml</p>
+
+    <p data-t="ch28-076">قواعد XML:</p>
+
+    <ul>
+        <li data-t="ch28-077">حتماً <strong>یک</strong> عنصر ریشه دارد. دو ریشه یعنی فایل نامعتبر.</li>
+        <li data-t="ch28-078">هر تگ باز باید بسته شود.</li>
+        <li data-t="ch28-079">عنصر می‌تواند <strong>ویژگی</strong> داشته باشد (داخل تگ باز) و <strong>متن</strong> (بین دو تگ).</li>
+        <li data-t="ch28-080">به حروف بزرگ و کوچک حساس است.</li>
+    </ul>
+
+    <div class="table-scroll">
+        <table>
+            <thead>
+                <tr><th></th><th>XML</th><th>JSON</th></tr>
+            </thead>
+            <tbody>
+                <tr><td data-t="ch28-081">حجم</td><td data-t="ch28-082">بیشتر، تگ‌ها تکرار می‌شوند</td><td data-t="ch28-083">کمتر</td></tr>
+                <tr><td data-t="ch28-084">خوانایی</td><td data-t="ch28-085">متوسط</td><td data-t="ch28-086">خوب</td></tr>
+                <tr><td data-t="ch28-087">ویژگی و متن</td><td data-t="ch28-088">هر دو دارد</td><td data-t="ch28-089">فقط کلید و مقدار</td></tr>
+                <tr><td data-t="ch28-090">امروز کجا</td><td data-t="ch28-091">RSS، آفیس، سیستم‌های قدیمی</td><td data-t="ch28-092">وب و موبایل</td></tr>
+            </tbody>
+        </table>
+    </div>
+
+    <div class="note">
+        <span class="box-title" data-t="ch28-093">یک فایل خراب برای یادگیری</span>
+        <p data-t="ch28-094">
+            در پوشه <code>06_xml_basics</code> فایلی به نام
+            <code>broken.xml</code> هست که عمداً دو ریشه دارد و ماژول XML
+            نمی‌تواند بخواندش. کنارش <code>fixed.xml</code> نسخه درستش است.
+            این همان اشتباهی بود که در فایل اصلی دوره وجود داشت و به جای حذف،
+            به یک درس تبدیل شد.
+        </p>
+    </div>
+
+    <h2 id="s10" data-t="ch28-095">۱۰. خواندن XML</h2>
+
+    <pre class="code"><code>'''The useful methods of ElementTree:
+    ET.parse(file)      -&gt; a tree
+    tree.getroot()      -&gt; the root element
+    element.find(tag)   -&gt; the FIRST child with that tag (None when missing)
+    element.findall(tag)-&gt; a list of every child with that tag
+    element.get(name)   -&gt; the value of an ATTRIBUTE (None when missing)
+    element.text        -&gt; the text between the tags
+'''
+
+import xml.etree.ElementTree as ET
+
+
+def parse_xml_to_list(filename: str) -&gt; list[dict]:
+    'Read products.xml and return a list of dictionaries.'
+    tree = ET.parse(filename)
+    root = tree.getroot()
+
+    products: list[dict] = []
+
+    for product_elem in root.findall('product'):
+        product: dict = {}
+
+        # The attributes of &lt;product ...&gt;
+        product['id'] = int(product_elem.get('id'))
+        product['name'] = product_elem.get('name')
+        product['manufacturer'] = product_elem.get('manufacturer')
+
+        # The nested &lt;tags&gt;&lt;tag&gt;...&lt;/tag&gt;&lt;/tags&gt;
+        # find() returns None when the element is missing, so we must test it.
+        tags_elem = product_elem.find('tags')
+        tag_list: list[str] = []
+        if tags_elem is not None:
+            for tag in tags_elem.findall('tag'):
+                tag_list.append(tag.text)
+        product['tags'] = tag_list
+
+        products.append(product)
+
+    return products</code></pre>
+    <p class="code-caption" data-t="ch28-096">خواندن XML: نمونه 07_read_xml</p>
+
+    <div class="warn">
+        <span class="box-title" data-t="ch28-097">دام مقایسه با None</span>
+        <p data-t="ch28-098">
+            متد <code>find</code> اگر چیزی پیدا نکند <code>None</code>
+            برمی‌گرداند. حتماً بنویسید <code>if elem is not None:</code> و
+            <strong>نه</strong> <code>if elem:</code>. دلیلش عجیب است: یک
+            عنصر XML بدون فرزند، در شرط نادرست حساب می‌شود، حتی اگر واقعاً
+            وجود داشته باشد. این یکی از مواردی است که در فصل بیست و پنجم درباره
+            تفاوت درستی‌پذیری و <code>is not None</code> گفتیم.
+        </p>
+    </div>
+
+    <p data-t="ch28-099">
+        استراتژی کلی: XML را در همان ابتدا به ساختارهای معمولی پایتون تبدیل
+        کنید. بعد از آن، همه ابزارهایی که بلدید کار می‌کنند و می‌توانید در یک
+        خط به JSON تبدیلش کنید.
+    </p>
+
+    <h2 id="s11" data-t="ch28-100">۱۱. نوشتن XML</h2>
+
+    <pre class="code"><code>'''Building an XML document with ElementTree.
+
+    ET.Element(tag)              -&gt; the root
+    ET.SubElement(parent, tag)   -&gt; a child
+    element.text = '...'         -&gt; its text (must be a STRING)
+    element.set('name', value)   -&gt; an attribute
+'''
+
+import xml.etree.ElementTree as ET
+
+
+def news_list_to_xml(news_list: list[dict]) -&gt; ET.ElementTree:
+    'Turn the list of articles into an XML tree.'
+    root = ET.Element('news')
+
+    for article in news_list:
+        article_elem = ET.SubElement(root, 'article')
+
+        # The id fits better as an attribute than as a child element.
+        article_elem.set('id', str(article['news_id']))
+
+        # .text must always be a string - that is why we call str().
+        ET.SubElement(article_elem, 'title').text = article['title']
+        ET.SubElement(article_elem, 'content').text = article['content']
+
+        tags_elem = ET.SubElement(article_elem, 'tags')
+        for tag in article['tags']:
+            ET.SubElement(tags_elem, 'tag').text = tag
+
+        comments_elem = ET.SubElement(article_elem, 'comments')
+        for comment in article['comments']:
+            comment_elem = ET.SubElement(comments_elem, 'comment')
+            ET.SubElement(comment_elem, 'user').text = comment['user']
+            ET.SubElement(comment_elem, 'likes').text = str(comment['likes'])
+
+    return ET.ElementTree(root)
+
+
+def main() -&gt; None:
+    tree = news_list_to_xml(create_sample_news())
+
+    # The simple modern way (Python 3.9+):
+    ET.indent(tree, space='  ')
+    tree.write('news_simple.xml', encoding='utf-8', xml_declaration=True)</code></pre>
+    <p class="code-caption" data-t="ch28-101">نوشتن XML: نمونه 08_write_xml</p>
+
+    <p data-t="ch28-102">نکته مهم: <code>text</code> و مقدار ویژگی‌ها <strong>حتماً</strong> باید رشته باشند. عدد دادن خطا ایجاد می‌کند، پس همیشه <code>str()</code> بزنید. تابع <code>ET.indent</code> هم از پایتون ۳٫۹ اضافه شده و فایل را خوانا و تورفته می‌کند؛ پیش از آن باید از <code>minidom</code> استفاده می‌شد.</p>
+
+    <h2 id="s12" data-t="ch28-103">۱۲. خواندن خوراک RSS</h2>
+
+    <p data-t="ch28-104">
+        <strong>RSS</strong> یک فایل XML است که تقریباً هر سایت خبری و
+        وبلاگی منتشر می‌کند، معمولاً در نشانی <code>feed/</code>. این آخرین
+        مثال، همه چیز این فصل را کنار هم می‌گذارد.
+    </p>
+
+    <pre class="code"><code>import json
+import xml.etree.ElementTree as ET
+import requests
+
+SITE_URL = 'https://kadoosedu.ir'
+OUTPUT_FILE = 'rss_posts.json'
+
+
+def text_of(parent: ET.Element, tag: str) -&gt; str:
+    'Return the text of a child element, or an empty string when it is missing.'
+    element = parent.find(tag)
+    if element is None or element.text is None:
+        return ''
+    return element.text.strip()
+
+
+def parse_rss(xml_content: bytes) -&gt; list[dict]:
+    '''Parse the XML of an RSS feed.
+
+    The structure is always:  rss &gt; channel &gt; item*
+    '''
+    # fromstring() parses a string/bytes; parse() parses a file.
+    root = ET.fromstring(xml_content)
+
+    channel = root.find('channel')
+    if channel is None:
+        raise ValueError('this document is not an RSS feed')
+
+    posts: list[dict] = []
+
+    for item in channel.findall('item'):
+        posts.append({
+            'title': text_of(item, 'title'),
+            'link': text_of(item, 'link'),
+            'description': text_of(item, 'description'),
+            'pubDate': text_of(item, 'pubDate'),
+        })
+
+    return posts
+
+
+def main() -&gt; None:
+    feed_url = f'{SITE_URL}/feed/'
+
+    try:
+        response = requests.get(feed_url, timeout=15)
+        response.raise_for_status()
+    except requests.RequestException as e:
+        print(f'Error fetching the RSS feed: {e}')
+        return
+
+    try:
+        posts = parse_rss(response.content)
+    except (ET.ParseError, ValueError) as e:
+        print(f'The feed could not be parsed: {e}')
+        return
+
+    for post in posts[:5]:
+        print(f"  - {post['title']}")
+
+    with open(OUTPUT_FILE, 'w', encoding='utf-8') as f:
+        json.dump(posts, f, ensure_ascii=False, indent=2)</code></pre>
+    <p class="code-caption" data-t="ch28-105">خواندن RSS: نمونه 10_read_rss</p>
+
+    <h3 data-t="ch28-106">شرح مثال</h3>
+
+    <ul>
+        <li data-t="ch28-107">سه تکنولوژی در یک برنامه: <code>requests</code> برای دانلود، <code>ElementTree</code> برای تجزیه، <code>json</code> برای ذخیره.</li>
+        <li data-t="ch28-108">تابع کمکی <code>text_of</code> تکرار بررسی <code>None</code> را حذف می‌کند. اگر تگی نبود، رشته خالی می‌دهد و برنامه ادامه پیدا می‌کند.</li>
+        <li data-t="ch28-109"><code>ET.fromstring</code> برای رشته و بایت است و <code>ET.parse</code> برای فایل. چون داده از شبکه آمده، اولی لازم است.</li>
+        <li data-t="ch28-110">هر دو مرحله جدا محافظت شده‌اند: خطای شبکه و خطای تجزیه. داده‌ای که از اینترنت می‌آید هرگز قابل اعتماد نیست.</li>
+        <li data-t="ch28-111">بررسی <code>if channel is None</code> از باگ نسخه اصلی می‌آید که فرض می‌کرد هر فایل XML حتماً RSS است.</li>
+    </ul>
+
+    <div class="folder-ref">
+        <span class="box-title" data-t="ch28-112">فایل‌های تمرینی این فصل</span>
+        <p data-t="ch28-113">
+            پوشه <code>S28-packages-rest-api-and-xml</code> شامل ده پوشه
+            نمونه، از <code>01_venv_and_pip</code> تا
+            <code>10_read_rss</code>. برای اجرای هر کدام، اول محیط مجازی
+            بسازید و <code>requirements.txt</code> همان پوشه را نصب کنید.
+        </p>
+    </div>
+
+    <h2 data-t="ch28-114">خلاصه فصل</h2>
+
+    <div class="table-scroll">
+        <table>
+            <thead>
+                <tr><th data-t="ch28-115">ابزار</th><th data-t="ch28-116">وظیفه آن</th></tr>
+            </thead>
+            <tbody>
+                <tr><td><code>python -m venv .venv</code></td><td data-t="ch28-117">ساختن محیط مجازی</td></tr>
+                <tr><td data-t="ch28-118"><code>activate</code> و <code>deactivate</code></td><td data-t="ch28-119">ورود و خروج از محیط</td></tr>
+                <tr><td><code>pip install</code> <code>list</code> <code>show</code></td><td data-t="ch28-120">مدیریت بسته‌ها</td></tr>
+                <tr><td><code>pip freeze &gt; requirements.txt</code></td><td data-t="ch28-121">ثبت بسته‌های پروژه</td></tr>
+                <tr><td><code>pip install -r requirements.txt</code></td><td data-t="ch28-122">بازسازی محیط</td></tr>
+                <tr><td><code>requests.get(url, timeout=...)</code></td><td data-t="ch28-123">درخواست وب. <code>timeout</code> اجباری</td></tr>
+                <tr><td><code>raise_for_status()</code></td><td data-t="ch28-124">تبدیل خطای سرور به استثنا</td></tr>
+                <tr><td><code>response.json()</code></td><td data-t="ch28-125">تبدیل پاسخ به شیء پایتون</td></tr>
+                <tr><td><code>params={...}</code></td><td data-t="ch28-126">پارامترهای پرس‌وجو</td></tr>
+                <tr><td data-t="ch28-127"><code>ET.parse</code> و <code>getroot</code></td><td data-t="ch28-128">خواندن XML از فایل</td></tr>
+                <tr><td><code>find</code> <code>findall</code> <code>get</code> <code>text</code></td><td data-t="ch28-129">گشتن در درخت XML</td></tr>
+                <tr><td data-t="ch28-130"><code>ET.Element</code> و <code>SubElement</code></td><td data-t="ch28-131">ساختن XML</td></tr>
+                <tr><td><code>ET.indent</code></td><td data-t="ch28-132">تورفته کردن خروجی XML</td></tr>
+                <tr><td>RSS</td><td data-t="ch28-133">خوراک XML سایت‌ها: rss سپس channel سپس item</td></tr>
+            </tbody>
+        </table>
+    </div>
+
+    <div class="exercise">
+        <h3 data-t="ch28-134">تمرین‌های فصل بیست و هشت</h3>
+        <ol>
+            <li data-t="ch28-135">برای یک پروژه تازه محیط مجازی بسازید، <code>requests</code> را در آن نصب کنید و <code>requirements.txt</code> تولید کنید.</li>
+            <li data-t="ch28-136">محیط را پاک کنید، از روی <code>requirements.txt</code> دوباره بسازیدش و ببینید برنامه هنوز کار می‌کند.</li>
+            <li data-t="ch28-137">یک وب‌سرویس عمومی رایگان صدا بزنید، مثلاً <code>https://api.github.com/users/&lt;name&gt;</code>، و پنج فیلد از پاسخش را چاپ کنید.</li>
+            <li data-t="ch28-138">پاسخ همان وب‌سرویس را در فایل JSON ذخیره کنید.</li>
+            <li data-t="ch28-139">با matplotlib نمودار میله‌ای نمره‌های <code>students.csv</code> فصل قبل را رسم کنید.</li>
+            <li data-t="ch28-140"><code>products.xml</code> را بخوانید و فایل XML تازه‌ای بنویسید که فقط کارت‌های گرافیک را دارد.</li>
+            <li data-t="ch28-141"><code>products.xml</code> را به JSON و دوباره به XML تبدیل کنید و دو فایل XML را مقایسه کنید.</li>
+            <li data-t="ch28-142">خوراک RSS سایتی که دوست دارید را بخوانید و پنج عنوان آخرش را با تاریخشان چاپ کنید.</li>
+        </ol>
+    </div>
+
+    <div class="pager">
+        <a href="chapter-27.html">فصل قبل: CSV و JSON</a>
+        <a href="chapter-29.html">فصل بعد: ارزشیابی میان‌ترم</a>
+    </div>
+
+</main>
+
+</body>
+</html>

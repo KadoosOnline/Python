@@ -1,0 +1,13 @@
+<rss version="2.0">
+    <channel>
+        <title>My Blog</title>
+        <item>
+            <title>New Article</title>
+            <link>https://example.com/post1</link>
+        </item>
+        <item>
+            <title>New Article 2</title>
+            <link>https://example.com/post2</link>
+        </item>
+    </channel>
+</rss>

@@ -1,0 +1,622 @@
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="فصل بیست و دو: کپسوله‌سازی، property، صفت خصوصی، متد ایستا و متد کلاس، ترکیب و دکوراتور dataclass">
+    <title>فصل ۲۲: کپسوله‌سازی و dataclass</title>
+    <link rel="icon" href="logokm.png" type="image/png">
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<header class="book-bar">
+    <a class="name" href="index.html">برنامه‌نویسی پایتون</a>
+    <a href="index.html">فهرست مطالب</a>
+</header>
+
+<main class="paper">
+
+    <div class="chapter-head">
+        <span class="chapter-num">فصل ۲۲</span>
+        <h1 data-t="ch22-001">کپسوله‌سازی و dataclass</h1>
+        <p class="lead" data-t="ch22-002">
+            در فصل قبل کلاس ساختیم ولی هر کسی می‌توانست هر مقداری داخل صفت‌هایش
+            بریزد. این فصل درباره محافظت از داده است، و درباره اینکه چطور کد
+            تکراری را به پایتون بسپاریم.
+        </p>
+    </div>
+
+    <div class="mini-toc">
+        <span class="box-title" data-t="ch22-003">در این فصل می‌خوانید</span>
+        <ol>
+            <li data-t="ch22-004"><a href="#s1">مشکل صفت آزاد</a></li>
+            <li data-t="ch22-005"><a href="#s2">راه حل کلاسیک: getter و setter</a></li>
+            <li data-t="ch22-006"><a href="#s3">دکوراتور property</a></li>
+            <li data-t="ch22-007"><a href="#s4">اعتبارسنجی و صفت محاسباتی</a></li>
+            <li data-t="ch22-008"><a href="#s5">صفت‌های خصوصی</a></li>
+            <li data-t="ch22-009"><a href="#s6">متد ایستا</a></li>
+            <li data-t="ch22-010"><a href="#s7">متد کلاس و سازنده جایگزین</a></li>
+            <li data-t="ch22-011"><a href="#s8">ترکیب</a></li>
+            <li data-t="ch22-012"><a href="#s9">دکوراتور dataclass</a></li>
+            <li data-t="ch22-013"><a href="#s10">dataclass پیشرفته</a></li>
+            <li data-t="ch22-014"><a href="#s11">نمونه کامل: جان‌های بازی</a></li>
+        </ol>
+    </div>
+
+    <h2 id="s1" data-t="ch22-015">۱. مشکل صفت آزاد</h2>
+
+    <pre class="code"><code># Nothing stops the outside world from writing nonsense into an attribute.
+class Student:
+    def __init__(self, name, score):
+        self.name = name
+        self.score = score
+
+
+s = Student('Ali', 18)
+print(s.score)
+
+s.score = 5000          # a score of 5000 out of 20?
+s.score = -3            # a negative score?
+s.score = 'excellent'   # not even a number!
+print(s.score)</code></pre>
+    <p class="code-caption" data-t="ch22-016">مشکل: نمونه 01_public_attribute_problem.py</p>
+
+    <p data-t="ch22-017">
+        <strong>کپسوله‌سازی</strong> یعنی: کلاس، و فقط کلاس، تصمیم می‌گیرد چه
+        مقداری معتبر است. شیء باید بتواند درباره داده خودش <strong>تضمین</strong>
+        بدهد.
+    </p>
+
+    <h2 id="s2" data-t="ch22-018">۲. راه حل کلاسیک: getter و setter</h2>
+
+    <pre class="code"><code># The classic solution (the one used in Java or C#): hide the attribute behind
+# two methods.
+class Student:
+    def __init__(self, name, score=0):
+        self._name = name        # a single underscore means "do not touch"
+        self._score = 0
+        self.set_score(score)    # reuse the validation of the setter
+
+    def get_score(self):
+        return self._score
+
+    def set_score(self, value):
+        if not isinstance(value, (int, float)):
+            raise TypeError('the score must be a number')
+        if value &lt; 0 or value &gt; 20:
+            raise ValueError('the score must be between 0 and 20')
+        self._score = value
+
+
+s = Student('Ali', 18)
+print(s.get_score())
+
+try:
+    s.set_score(5000)
+except ValueError as e:
+    print('Refused:', e)</code></pre>
+    <p class="code-caption" data-t="ch22-019">getter و setter دستی: نمونه 02_getters_setters.py</p>
+
+    <p data-t="ch22-020">
+        این کار می‌کند ولی زشت است: هر خواندن ساده به
+        <code>s.get_score()</code> تبدیل می‌شود. پایتون راه بهتری دارد. به
+        این نکته هم دقت کنید که سازنده خودش <code>set_score</code> را صدا
+        می‌زند تا اعتبارسنجی دوباره نوشته نشود.
+    </p>
+
+    <h2 id="s3" data-t="ch22-021">۳. دکوراتور property</h2>
+
+    <pre class="code"><code># @property turns a METHOD into something that is READ like an attribute.
+class Student:
+    def __init__(self, name, score=0):
+        self._name = name
+        self._score = score
+
+    @property
+    def score(self):
+        'Reading s.score really calls this method.'
+        return self._score
+
+    @score.setter
+    def score(self, value):
+        'Writing s.score = ... really calls this method.'
+        if value &lt; 0 or value &gt; 20:
+            raise ValueError('the score must be between 0 and 20')
+        self._score = value
+
+    @property
+    def passed(self):
+        'A computed property: there is no attribute behind it.'
+        return self._score &gt;= 10
+
+
+s = Student('Ali', 18)
+
+print(s.score)        # looks like an attribute, but calls the getter
+s.score = 19.5        # calls the setter
+print(s.score)
+print(s.passed)       # computed on the fly
+
+try:
+    s.score = 100
+except ValueError as e:
+    print('Refused:', e)</code></pre>
+    <p class="code-caption" data-t="ch22-022">دکوراتور property: نمونه 03_property.py</p>
+
+    <h3 data-t="ch22-023">شرح مثال</h3>
+
+    <ul>
+        <li data-t="ch22-024"><code>@property</code> یک متد را به چیزی تبدیل می‌کند که مثل صفت <strong>خوانده</strong> می‌شود. نه پرانتزی، نه <code>get_</code>ی.</li>
+        <li data-t="ch22-025"><code>@score.setter</code> متد نوشتن را تعریف می‌کند. نام هر دو متد باید یکی باشد.</li>
+        <li data-t="ch22-026">مقدار واقعی در <code>_score</code> با یک زیرخط نگه داشته می‌شود، تا با نام property تداخل نکند.</li>
+        <li data-t="ch22-027"><code>passed</code> فقط getter دارد، پس <strong>فقط‌خواندنی</strong> است. تلاش برای نوشتن روی آن <code>AttributeError</code> می‌دهد.</li>
+        <li data-t="ch22-028">بزرگ‌ترین مزیت: می‌توانید کلاس را ساده شروع کنید و بعداً بدون تغییر هیچ کد بیرونی، اعتبارسنجی اضافه کنید. در جاوا باید همان اول getter و setter می‌نوشتید.</li>
+    </ul>
+
+    <h2 id="s4" data-t="ch22-029">۴. اعتبارسنجی و صفت محاسباتی</h2>
+
+    <pre class="code"><code>'''A temperature that can be read in Celsius and in Fahrenheit.'''
+
+
+class Temperature:
+    def __init__(self, celsius: float = 0.0) -&gt; None:
+        self.celsius = celsius        # goes through the setter, so it is checked
+
+    @property
+    def celsius(self) -&gt; float:
+        return self._celsius
+
+    @celsius.setter
+    def celsius(self, value: float) -&gt; None:
+        if value &lt; -273.15:
+            raise ValueError('below the absolute zero!')
+        self._celsius = value
+
+    @property
+    def fahrenheit(self) -&gt; float:
+        'Computed from the Celsius value - nothing is stored.'
+        return self._celsius * 9 / 5 + 32
+
+    @fahrenheit.setter
+    def fahrenheit(self, value: float) -&gt; None:
+        'Writing Fahrenheit updates the Celsius value.'
+        self.celsius = (value - 32) * 5 / 9
+
+
+t = Temperature(25)
+print(t.celsius, t.fahrenheit)
+
+t.fahrenheit = 212
+print(t.celsius)          # 100.0</code></pre>
+    <p class="code-caption" data-t="ch22-030">دما: نمونه 04_property_validation.py</p>
+
+    <h3 data-t="ch22-031">شرح مثال</h3>
+
+    <ul>
+        <li data-t="ch22-032">فقط <strong>یک</strong> مقدار ذخیره می‌شود: سلسیوس. فارنهایت هر بار محاسبه می‌شود. پس هرگز نمی‌توانند با هم ناسازگار شوند.</li>
+        <li data-t="ch22-033">نوشتن روی فارنهایت، مقدار سلسیوس را عوض می‌کند و چون از راه setter می‌رود، اعتبارسنجی هم انجام می‌شود.</li>
+        <li data-t="ch22-034">در سازنده هم <code>self.celsius = celsius</code> نوشته شده، نه <code>self._celsius</code>. این عمدی است: می‌خواهیم مقدار اولیه هم بررسی شود.</li>
+    </ul>
+
+    <h2 id="s5" data-t="ch22-035">۵. صفت‌های خصوصی</h2>
+
+    <pre class="code"><code># Python has no real "private". It has two conventions instead.
+class Demo:
+    def __init__(self):
+        self.public = 1        # anybody may use it
+        self._protected = 2    # convention: "internal, do not touch"
+        self.__private = 3     # name mangling: becomes _Demo__private
+
+    def show(self):
+        print(self.public, self._protected, self.__private)
+
+
+d = Demo()
+d.show()
+
+print(d._protected)      # works: it is only a convention
+
+# print(d.__private)     -&gt;  AttributeError
+print(d._Demo__private)  # it is still reachable if you really insist</code></pre>
+    <p class="code-caption" data-t="ch22-036">خصوصی‌سازی: نمونه 05_private_attributes.py</p>
+
+    <div class="table-scroll">
+        <table>
+            <thead>
+                <tr><th data-t="ch22-037">شکل</th><th data-t="ch22-038">معنی</th><th data-t="ch22-039">واقعاً محافظت می‌شود</th></tr>
+            </thead>
+            <tbody>
+                <tr><td><code>name</code></td><td data-t="ch22-040">عمومی، هر کسی می‌تواند</td><td>-</td></tr>
+                <tr><td><code>_name</code></td><td data-t="ch22-041">«داخلی است، دست نزنید»</td><td data-t="ch22-042">خیر، فقط قرارداد</td></tr>
+                <tr><td><code>__name</code></td><td data-t="ch22-043">نام دستکاری می‌شود</td><td data-t="ch22-044">تقریباً، ولی قابل دور زدن</td></tr>
+            </tbody>
+        </table>
+    </div>
+
+    <div class="note">
+        <span class="box-title" data-t="ch22-045">فلسفه پایتون</span>
+        <p data-t="ch22-046">
+            پایتون <strong>هیچ</strong> صفت واقعاً خصوصی ندارد. فلسفه‌اش این
+            است: «همه ما بزرگسالیم». یک زیرخط یعنی «این جزو رابط عمومی نیست و
+            ممکن است فردا عوض شود؛ اگر استفاده‌اش کردی، مسئولیتش با خودت است».
+            دو زیرخط هم برای امنیت نیست، بلکه برای جلوگیری از
+            <strong>تصادم نام</strong> در وراثت است، که موضوع فصل بعد است.
+        </p>
+    </div>
+
+    <h2 id="s6" data-t="ch22-047">۶. متد ایستا</h2>
+
+    <pre class="code"><code># A @staticmethod is a plain function that we choose to store inside a class,
+# because it belongs to the same subject. It receives neither self nor cls.
+class Validator:
+    'A realistic use: a group of related checks.'
+
+    @staticmethod
+    def is_valid_email(text: str) -&gt; bool:
+        return '@' in text and '.' in text.split('@')[-1]
+
+    @staticmethod
+    def is_valid_phone(text: str) -&gt; bool:
+        return text.isdigit() and len(text) == 11
+
+
+print(Validator.is_valid_email('ali@kadoosedu.ir'))
+print(Validator.is_valid_phone('09121234567'))</code></pre>
+    <p class="code-caption" data-t="ch22-048">متد ایستا: نمونه 06_static_method.py</p>
+
+    <p data-t="ch22-049">
+        متد ایستا نه <code>self</code> می‌گیرد و نه به شیء کار دارد. فقط تابعی
+        است که <strong>موضوعش</strong> به کلاس مربوط است، پس آنجا نگهش
+        می‌داریم. از راه خود کلاس صدا زده می‌شود و نیازی به ساختن شیء نیست.
+    </p>
+
+    <h2 id="s7" data-t="ch22-050">۷. متد کلاس و سازنده جایگزین</h2>
+
+    <pre class="code"><code># A @classmethod receives the CLASS itself as its first parameter ('cls').
+# Its main use is to offer other ways of building an object.
+class Student:
+    school = 'Kadoos'            # class attribute
+    count = 0                    # how many students were created
+
+    def __init__(self, name: str, age: int) -&gt; None:
+        self.name = name
+        self.age = age
+        Student.count += 1       # shared counter
+
+    @classmethod
+    def from_string(cls, text: str) -&gt; 'Student':
+        'Build a Student out of "name,age".'
+        name, age = text.split(',')
+        return cls(name.strip(), int(age))
+
+    @classmethod
+    def from_dict(cls, data: dict) -&gt; 'Student':
+        'Build a Student out of a dictionary.'
+        return cls(data['name'], data['age'])
+
+    @classmethod
+    def change_school(cls, new_name: str) -&gt; None:
+        'Change the class attribute for every student at once.'
+        cls.school = new_name
+
+    def describe(self) -&gt; str:
+        return f'{self.name}, {self.age}, {self.school}'
+
+
+s1 = Student('Ali', 20)
+s2 = Student.from_string('Sara, 19')
+s3 = Student.from_dict({'name': 'Reza', 'age': 22})
+
+print('Students created:', Student.count)</code></pre>
+    <p class="code-caption" data-t="ch22-051">متد کلاس: نمونه 07_class_method.py</p>
+
+    <div class="table-scroll">
+        <table>
+            <thead>
+                <tr><th data-t="ch22-052">نوع متد</th><th data-t="ch22-053">اولین پارامتر</th><th data-t="ch22-054">به چه دسترسی دارد</th></tr>
+            </thead>
+            <tbody>
+                <tr><td data-t="ch22-055">معمولی</td><td><code>self</code></td><td data-t="ch22-056">داده همان شیء</td></tr>
+                <tr><td><code>@classmethod</code></td><td><code>cls</code></td><td data-t="ch22-057">خود کلاس و صفت‌های کلاس</td></tr>
+                <tr><td><code>@staticmethod</code></td><td data-t="ch22-058">هیچ</td><td data-t="ch22-059">فقط آرگومان‌های خودش</td></tr>
+            </tbody>
+        </table>
+    </div>
+
+    <h3 data-t="ch22-060">شرح مثال</h3>
+
+    <ul>
+        <li data-t="ch22-061"><strong>سازنده جایگزین</strong> پرکاربردترین استفاده متد کلاس است. یک کلاس فقط یک <code>__init__</code> دارد، ولی می‌تواند ده متد <code>from_...</code> داشته باشد.</li>
+        <li data-t="ch22-062">داخل متد کلاس، <code>cls(...)</code> یعنی «یک شیء از همین کلاس بساز». نوشتن <code>cls</code> به جای نام کلاس مهم است: اگر کسی از این کلاس ارث ببرد، سازنده جایگزین برای او هم درست کار می‌کند.</li>
+        <li data-t="ch22-063"><code>count</code> یک صفت کلاس است که هر بار در سازنده یکی زیاد می‌شود. یک نمونه واقعی از جایی که صفت کلاس واقعاً به کار می‌آید.</li>
+    </ul>
+
+    <h2 id="s8" data-t="ch22-064">۸. ترکیب</h2>
+
+    <pre class="code"><code># Composition: an object HAS another object.
+# It is usually a better idea than inheritance (session 23).
+class Engine:
+    def __init__(self, power: int) -&gt; None:
+        self.power = power
+        self.running = False
+
+    def start(self) -&gt; None:
+        self.running = True
+        print(f'Engine of {self.power} hp started.')
+
+    def stop(self) -&gt; None:
+        self.running = False
+        print('Engine stopped.')
+
+
+class Car:
+    def __init__(self, brand: str, engine: Engine) -&gt; None:
+        self.brand = brand
+        self.engine = engine        # the car HAS an engine
+
+    def start(self) -&gt; None:
+        print(f'{self.brand}:')
+        self.engine.start()         # the work is delegated to the engine
+
+    def stop(self) -&gt; None:
+        self.engine.stop()
+
+
+engine = Engine(150)
+car = Car('Mazda', engine)
+
+car.start()
+car.stop()</code></pre>
+    <p class="code-caption" data-t="ch22-065">ترکیب: نمونه 08_composition.py</p>
+
+    <p data-t="ch22-066">
+        <strong>ترکیب</strong> یعنی شیئی، شیء دیگری را <strong>دارد</strong>.
+        ماشین موتور دارد. کتابخانه کتاب دارد. سفارش، کالاها دارد. در فصل بعد
+        وراثت را می‌بینید که یعنی شیئی <strong>یک نوع</strong> شیء دیگر
+        <strong>است</strong>. قاعده حرفه‌ای: هر جا شک کردید، ترکیب را انتخاب
+        کنید.
+    </p>
+
+    <h2 id="s9" data-t="ch22-067">۹. دکوراتور dataclass</h2>
+
+    <pre class="code"><code># Writing __init__ by hand for a class that only holds data is tiring.
+# @dataclass writes __init__, __repr__ and __eq__ for us.
+from dataclasses import dataclass
+
+
+@dataclass
+class User:
+    name: str            # the type hint is REQUIRED here
+    age: int
+
+
+u1 = User('Adam', 25)
+print(u1)                # __repr__ for free: User(name='Adam', age=25)
+
+u2 = User('Adam', 25)
+
+# __eq__ for free: two dataclasses are equal when their fields are equal.
+if u1 == u2:
+    print('They are the same person!')
+
+# Without @dataclass the comparison would be False, because a normal class
+# compares the identity of the objects, not their content.
+class PlainUser:
+    def __init__(self, name, age):
+        self.name = name
+        self.age = age
+
+print(PlainUser('Adam', 25) == PlainUser('Adam', 25))     # False</code></pre>
+    <p class="code-caption" data-t="ch22-068">dataclass: نمونه 09_dataclass.py</p>
+
+    <pre class="out">User(name='Adam', age=25)
+They are the same person!
+False</pre>
+
+    <h3 data-t="ch22-069">شرح مثال</h3>
+
+    <ul>
+        <li data-t="ch22-070">یک خط <code>@dataclass</code> سه چیز رایگان می‌دهد: سازنده، نمایش خوانا، و مقایسه بر اساس محتوا.</li>
+        <li data-t="ch22-071">راهنمای نوع اینجا <strong>اجباری</strong> است. بدون آن، پایتون نمی‌فهمد کدام خط یک فیلد است.</li>
+        <li data-t="ch22-072">در کلاس معمولی، <code>==</code> فقط می‌پرسد «آیا این دو، دقیقاً یک شیء هستند؟» و جوابش برای دو شیء متفاوت با محتوای یکسان، <code>False</code> است. dataclass این را عوض می‌کند.</li>
+        <li data-t="ch22-073">در فصل بعد می‌بینید که همه این موارد را می‌شود دستی هم نوشت؛ <code>@dataclass</code> فقط شما را از نوشتنشان معاف می‌کند.</li>
+    </ul>
+
+    <h2 id="s10" data-t="ch22-074">۱۰. dataclass پیشرفته</h2>
+
+    <pre class="code"><code>from dataclasses import dataclass, field, asdict
+
+
+@dataclass
+class Product:
+    name: str
+    price: float = 0.0                       # a default value
+    tags: list[str] = field(default_factory=list)   # NEVER write tags: list = []
+
+    def with_vat(self, rate: float = 0.09) -&gt; float:
+        'A dataclass can have normal methods too.'
+        return self.price * (1 + rate)
+
+    def __post_init__(self) -&gt; None:
+        '__post_init__ runs right after the generated __init__: validate here.'
+        if self.price &lt; 0:
+            raise ValueError('the price cannot be negative')
+
+
+p1 = Product('Notebook', 15_000)
+p2 = Product('Pencil')
+p1.tags.append('paper')
+
+print(p2.tags)                # [] - each product has its OWN list
+print(asdict(p1))             # turn it into a dictionary
+
+
+# order=True generates &lt;, &lt;=, &gt; and &gt;= so the objects can be sorted.
+@dataclass(order=True)
+class Score:
+    value: int
+    student: str
+
+scores = [Score(18, 'Ali'), Score(20, 'Sara'), Score(15, 'Reza')]
+print(sorted(scores))
+
+
+# frozen=True makes the object immutable (and hashable).
+@dataclass(frozen=True)
+class Point:
+    x: int
+    y: int
+
+p = Point(1, 2)
+# p.x = 5    -&gt;  FrozenInstanceError
+print({Point(1, 2): 'origin-ish'})     # usable as a dictionary key</code></pre>
+    <p class="code-caption" data-t="ch22-075">dataclass پیشرفته: نمونه 10_dataclass_advanced.py</p>
+
+    <div class="table-scroll">
+        <table>
+            <thead>
+                <tr><th data-t="ch22-076">ابزار</th><th data-t="ch22-077">وظیفه آن</th></tr>
+            </thead>
+            <tbody>
+                <tr><td><code>field(default_factory=list)</code></td><td data-t="ch22-078">لیست تازه برای هر شیء. تنها راه درست</td></tr>
+                <tr><td><code>__post_init__</code></td><td data-t="ch22-079">اعتبارسنجی، بعد از سازنده خودکار</td></tr>
+                <tr><td><code>asdict(obj)</code></td><td data-t="ch22-080">تبدیل به دیکشنری. برای JSON عالی است</td></tr>
+                <tr><td><code>order=True</code></td><td data-t="ch22-081">ساختن عملگرهای مقایسه، برای مرتب‌سازی</td></tr>
+                <tr><td><code>frozen=True</code></td><td data-t="ch22-082">شیء تغییرناپذیر و قابل استفاده به عنوان کلید</td></tr>
+            </tbody>
+        </table>
+    </div>
+
+    <div class="warn">
+        <span class="box-title" data-t="ch22-083">همان دام، بار سوم</span>
+        <p data-t="ch22-084">
+            نوشتن <code>tags: list = []</code> در یک dataclass خطای صریح
+            می‌دهد؛ خوشبختانه پایتون اینجا جلویتان را می‌گیرد. راه درست
+            <code>field(default_factory=list)</code> است که برای هر شیء لیست
+            تازه‌ای می‌سازد. این همان دام فصل سیزدهم و فصل بیست و یکم است.
+        </p>
+    </div>
+
+    <h2 id="s11" data-t="ch22-085">۱۱. نمونه کامل: جان‌های بازی</h2>
+
+    <pre class="code"><code>class Hearts:
+    MAX = 9                                  # class constant
+    SAVE_FILE = 'save.txt'
+
+    def __init__(self, value: int = 5) -&gt; None:
+        self.value = value                   # goes through the setter
+
+    @property
+    def value(self) -&gt; int:
+        return self._value
+
+    @value.setter
+    def value(self, new_value: int) -&gt; None:
+        if not isinstance(new_value, int):
+            raise TypeError('the number of hearts must be a whole number')
+        # Keep the value inside 0 .. MAX instead of raising: a game should not
+        # crash because the player lost one life too many.
+        self._value = max(0, min(new_value, self.MAX))
+
+    @property
+    def is_alive(self) -&gt; bool:
+        return self._value &gt; 0
+
+    def add(self, amount: int = 1) -&gt; None:
+        self.value = self._value + amount
+
+    def remove(self, amount: int = 1) -&gt; None:
+        self.value = self._value - amount
+
+    def save(self) -&gt; None:
+        'Write the current number of hearts into a file.'
+        with open(self.SAVE_FILE, 'w', encoding='utf-8') as f:
+            f.write(str(self._value))
+
+    @classmethod
+    def load(cls) -&gt; 'Hearts':
+        'Build a Hearts object from the save file (or a new one).'
+        if not os.path.exists(cls.SAVE_FILE):
+            return cls()
+
+        try:
+            with open(cls.SAVE_FILE, encoding='utf-8') as f:
+                return cls(int(f.read().strip()))
+        except ValueError:
+            print('[warning] the save file is damaged, starting a new game')
+            return cls()
+
+    def __str__(self) -&gt; str:
+        return 'Hearts: ' + '*' * self._value</code></pre>
+    <p class="code-caption" data-t="ch22-086">کلاس جان‌ها: نمونه 11_hearts_game_state.py</p>
+
+    <h3 data-t="ch22-087">شرح مثال</h3>
+
+    <p data-t="ch22-088">این کلاس همه چیز این فصل را کنار هم دارد:</p>
+
+    <ul>
+        <li data-t="ch22-089"><strong>ثابت کلاس:</strong> <code>MAX</code> و <code>SAVE_FILE</code> برای همه اشیاء یکسان‌اند.</li>
+        <li data-t="ch22-090"><strong>property با محدودسازی:</strong> به جای خطا دادن، مقدار را در بازه صفر تا <code>MAX</code> نگه می‌دارد. این تصمیم طراحی است: بازی نباید به خاطر یک جان اضافه از کار بیفتد. در حساب بانکی برعکس بود و خطا دادن درست‌تر بود.</li>
+        <li data-t="ch22-091"><strong>property فقط‌خواندنی:</strong> <code>is_alive</code> از روی مقدار محاسبه می‌شود.</li>
+        <li data-t="ch22-092"><strong>سازنده جایگزین:</strong> <code>load</code> یک متد کلاس است که یا از فایل می‌خواند یا شیء تازه می‌سازد. حتی فایل خراب را هم مدیریت می‌کند.</li>
+        <li data-t="ch22-093"><strong>متد <code>__str__</code>:</strong> تعیین می‌کند شیء موقع <code>print</code> چطور نمایش داده شود. موضوع فصل بیست و چهارم.</li>
+        <li data-t="ch22-094">همه متدها از راه <code>self.value</code> کار می‌کنند، نه <code>self._value</code>، تا اعتبارسنجی همیشه انجام شود.</li>
+    </ul>
+
+    <div class="folder-ref">
+        <span class="box-title" data-t="ch22-095">فایل‌های تمرینی این فصل</span>
+        <p data-t="ch22-096">
+            پوشه <code>S22-oop-encapsulation-and-dataclasses</code> شامل
+            نمونه‌های <code>01_public_attribute_problem.py</code> تا
+            <code>11_hearts_game_state.py</code>.
+        </p>
+    </div>
+
+    <h2 data-t="ch22-097">خلاصه فصل</h2>
+
+    <div class="table-scroll">
+        <table>
+            <thead>
+                <tr><th data-t="ch22-098">ابزار</th><th data-t="ch22-099">وظیفه آن</th></tr>
+            </thead>
+            <tbody>
+                <tr><td data-t="ch22-100">کپسوله‌سازی</td><td data-t="ch22-101">کلاس تصمیم می‌گیرد چه مقداری معتبر است</td></tr>
+                <tr><td><code>@property</code></td><td data-t="ch22-102">متدی که مثل صفت خوانده می‌شود</td></tr>
+                <tr><td><code>@x.setter</code></td><td data-t="ch22-103">متدی که موقع نوشتن روی صفت اجرا می‌شود</td></tr>
+                <tr><td data-t="ch22-104">property بدون setter</td><td data-t="ch22-105">صفت فقط‌خواندنی یا محاسباتی</td></tr>
+                <tr><td><code>_x</code></td><td data-t="ch22-106">«داخلی است». فقط قرارداد</td></tr>
+                <tr><td><code>__x</code></td><td data-t="ch22-107">دستکاری نام. برای جلوگیری از تصادم در وراثت</td></tr>
+                <tr><td><code>@staticmethod</code></td><td data-t="ch22-108">تابعی که موضوعش به کلاس مربوط است</td></tr>
+                <tr><td><code>@classmethod</code></td><td data-t="ch22-109">متدی با <code>cls</code>. برای سازنده جایگزین</td></tr>
+                <tr><td data-t="ch22-110">ترکیب</td><td data-t="ch22-111">شیئی که شیء دیگری را دارد</td></tr>
+                <tr><td><code>@dataclass</code></td><td data-t="ch22-112">سازنده و نمایش و مقایسه، رایگان</td></tr>
+                <tr><td><code>field(default_factory=list)</code></td><td data-t="ch22-113">تنها راه درست پیش‌فرض تغییرپذیر</td></tr>
+                <tr><td><code>frozen=True</code></td><td data-t="ch22-114">شیء تغییرناپذیر</td></tr>
+            </tbody>
+        </table>
+    </div>
+
+    <div class="exercise">
+        <h3 data-t="ch22-115">تمرین‌های فصل بیست و دو</h3>
+        <ol>
+            <li data-t="ch22-116">به کلاس <code>Rectangle</code> فصل قبل، property به نام <code>area</code> اضافه کنید.</li>
+            <li data-t="ch22-117">کلاس <code>Password</code> را بنویسید که setter آن رمز کوتاه‌تر از هشت کاراکتر را رد کند.</li>
+            <li data-t="ch22-118">کلاس <code>Person</code> را با property فقط‌خواندنی <code>full_name</code> بنویسید.</li>
+            <li data-t="ch22-119">به کلاس <code>Book</code> خود، متد کلاس <code>from_string()</code> اضافه کنید.</li>
+            <li data-t="ch22-120">به همان کلاس، متد ایستای <code>is_valid_isbn()</code> اضافه کنید.</li>
+            <li data-t="ch22-121">کلاس <code>Book</code> را به شکل <code>@dataclass</code> بازنویسی کنید.</li>
+            <li data-t="ch22-122">یک <code>@dataclass(frozen=True)</code> به نام <code>Coordinate</code> بنویسید و از آن به عنوان کلید دیکشنری استفاده کنید.</li>
+            <li data-t="ch22-123">کلاس <code>Library</code> را بنویسید که لیستی از <code>Book</code> ها را <strong>دارد</strong>، با متدهای <code>add</code> و <code>remove</code> و <code>find_by_author</code>.</li>
+        </ol>
+    </div>
+
+    <div class="pager">
+        <a href="chapter-21.html">فصل قبل: شیءگرایی</a>
+        <a href="chapter-23.html">فصل بعد: وراثت و چندریختی</a>
+    </div>
+
+</main>
+
+</body>
+</html>

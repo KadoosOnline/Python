@@ -1,0 +1,532 @@
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="فصل ده: الگوریتم‌های لیست، مجموع و میانگین، بیشینه و کمینه، جست‌وجوی خطی، مرتب‌سازی، لیست دوبعدی و دام سایه‌اندازی نام">
+    <title>فصل ۱۰: الگوریتم‌های لیست</title>
+    <link rel="icon" href="logokm.png" type="image/png">
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<header class="book-bar">
+    <a class="name" href="index.html">برنامه‌نویسی پایتون</a>
+    <a href="index.html">فهرست مطالب</a>
+</header>
+
+<main class="paper">
+
+    <div class="chapter-head">
+        <span class="chapter-num">فصل ۱۰</span>
+        <h1 data-t="ch10-001">الگوریتم‌های لیست</h1>
+        <p class="lead" data-t="ch10-002">
+            در این فصل الگوریتم‌های کلاسیک را اول با دست می‌نویسیم و بعد
+            می‌بینیم پایتون همه‌شان را آماده دارد. اول با دست، چون کسی که فقط
+            ابزار آماده را بلد باشد، وقتی ابزار نبود می‌ماند.
+        </p>
+    </div>
+
+    <div class="mini-toc">
+        <span class="box-title" data-t="ch10-003">در این فصل می‌خوانید</span>
+        <ol>
+            <li data-t="ch10-004"><a href="#s1">مجموع و میانگین با دست</a></li>
+            <li data-t="ch10-005"><a href="#s2">پیدا کردن بیشینه</a></li>
+            <li data-t="ch10-006"><a href="#s3">پیدا کردن کمینه</a></li>
+            <li data-t="ch10-007"><a href="#s4">میانگین با شرط</a></li>
+            <li data-t="ch10-008"><a href="#s5">توابع آماده پایتون</a></li>
+            <li data-t="ch10-009"><a href="#s6">جست‌وجوی خطی</a></li>
+            <li data-t="ch10-010"><a href="#s7">مرتب‌سازی</a></li>
+            <li data-t="ch10-011"><a href="#s8">دام سایه‌اندازی نام</a></li>
+            <li data-t="ch10-012"><a href="#s9">لیست دوبعدی</a></li>
+            <li data-t="ch10-013"><a href="#s10">عملیات روی ماتریس</a></li>
+            <li data-t="ch10-014"><a href="#s11">برنامه کامل گزارش‌گیری</a></li>
+        </ol>
+    </div>
+
+    <h2 id="s1" data-t="ch10-015">۱. مجموع و میانگین با دست</h2>
+
+    <pre class="code"><code># Adding every item of a list, the manual way.
+numbers = [200, 350, 40, 1000, 270]
+
+total = 0
+for number in numbers:
+    total = total + number
+    # short form: total += number
+
+print('Total:', total)
+print('Average:', total / len(numbers))</code></pre>
+    <p class="code-caption" data-t="ch10-016">مجموع و میانگین: نمونه 01_sum_of_list.py</p>
+
+    <pre class="out">Total: 1860
+Average: 372.0</pre>
+
+    <p data-t="ch10-017">
+        همان الگوی انباره فصل ششم، این بار روی لیست به جای <code>range</code>.
+        این الگو پایه همه الگوریتم‌های این فصل است.
+    </p>
+
+    <h2 id="s2" data-t="ch10-018">۲. پیدا کردن بیشینه</h2>
+
+    <p data-t="ch10-019">
+        منطقش شبیه مسابقه است: عضو اول را «قهرمان فعلی» فرض می‌کنیم و بقیه را
+        یکی‌یکی با او مقایسه می‌کنیم. هر کس بهتر بود، قهرمان تازه می‌شود.
+    </p>
+
+    <pre class="code"><code># Finding the biggest item.
+# The trick: start with the FIRST item as the current champion,
+# then compare it with every other item.
+numbers = [30, 20, 45, 18, -7, 22]
+
+largest = numbers[0]
+
+for number in numbers:
+    if number &gt; largest:
+        largest = number
+
+print('Max:', largest)
+
+# Starting from 0 instead of numbers[0] would be a bug:
+# with a list of only negative numbers the answer would wrongly be 0.</code></pre>
+    <p class="code-caption" data-t="ch10-020">بیشینه: نمونه 02_max_of_list.py</p>
+
+    <div class="warn">
+        <span class="box-title" data-t="ch10-021">چرا نباید از صفر شروع کرد</span>
+        <p data-t="ch10-022">
+            وسوسه‌انگیز است که بنویسید <code>largest = 0</code>. ولی اگر همه
+            اعداد لیست منفی باشند، هیچ‌کدام از صفر بزرگ‌تر نیستند و جواب صفر در
+            می‌آید، در حالی که صفر اصلاً عضو لیست نیست. شروع از
+            <code>numbers[0]</code> همیشه درست است، چون قطعاً یکی از اعضای واقعی
+            است.
+        </p>
+    </div>
+
+    <h2 id="s3" data-t="ch10-023">۳. پیدا کردن کمینه</h2>
+
+    <pre class="code"><code># Same algorithm, with the comparison turned around.
+numbers = [30, 20, 45, 18, -7, 22]
+
+smallest = numbers[0]
+
+for number in numbers:
+    if number &lt; smallest:
+        smallest = number
+
+print('Min:', smallest)</code></pre>
+    <p class="code-caption" data-t="ch10-024">کمینه: نمونه 03_min_of_list.py</p>
+
+    <p data-t="ch10-025">
+        تنها تفاوت، جهت علامت مقایسه است. اگر بخواهید
+        <strong>جایگاه</strong> کوچک‌ترین را هم بدانید، باید با اندیس کار کنید و
+        در کنار مقدار، اندیسش را هم نگه دارید.
+    </p>
+
+    <h2 id="s4" data-t="ch10-026">۴. میانگین با شرط</h2>
+
+    <pre class="code"><code># Average of the even numbers only: we need a total AND a counter,
+# because we do not know in advance how many even numbers there are.
+numbers = [30, 20, 45, 18, -7, 22]
+
+total = 0
+counter = 0
+
+for number in numbers:
+    if number % 2 == 0:
+        total += number
+        counter += 1
+
+# Guard against a list without any even number.
+if counter == 0:
+    print('There is no even number in the list.')
+else:
+    print('Average of the even numbers:', total / counter)</code></pre>
+    <p class="code-caption" data-t="ch10-027">میانگین اعداد زوج: نمونه 04_average_of_evens.py</p>
+
+    <p data-t="ch10-028">
+        وقتی شرط دارید، دیگر نمی‌توانید بر <code>len(numbers)</code> تقسیم کنید،
+        چون طول کل لیست با تعداد اعضایی که شرط را دارند فرق می‌کند. پس شمارنده
+        جداگانه لازم است. و باز هم بررسی صفر بودن شمارنده.
+    </p>
+
+    <h2 id="s5" data-t="ch10-029">۵. توابع آماده پایتون</h2>
+
+    <p data-t="ch10-030">
+        حالا که الگوریتم‌ها را با دست نوشتید، خبر خوب: پایتون همه‌شان را از قبل
+        دارد.
+    </p>
+
+    <pre class="code"><code># Python already knows how to do all of that. Use the built-in functions:
+# they are shorter, faster and impossible to get wrong.
+numbers = [30, 20, 45, 18, -7, 22]
+
+print('len:', len(numbers))
+print('sum:', sum(numbers))
+print('max:', max(numbers))
+print('min:', min(numbers))
+print('avg:', sum(numbers) / len(numbers))
+
+# They work on strings too.
+words = ['pear', 'apple', 'banana']
+print(max(words))            # the last one in alphabetical order
+print(min(words, key=len))   # the shortest word</code></pre>
+    <p class="code-caption" data-t="ch10-031">توابع آماده: نمونه 05_builtin_functions.py</p>
+
+    <div class="table-scroll">
+        <table>
+            <thead>
+                <tr><th data-t="ch10-032">تابع</th><th data-t="ch10-033">وظیفه آن</th></tr>
+            </thead>
+            <tbody>
+                <tr><td><code>len(lst)</code></td><td data-t="ch10-034">تعداد اعضا</td></tr>
+                <tr><td><code>sum(lst)</code></td><td data-t="ch10-035">مجموع. فقط روی عدد کار می‌کند</td></tr>
+                <tr><td><code>max(lst)</code> <code>min(lst)</code></td><td data-t="ch10-036">بزرگ‌ترین و کوچک‌ترین</td></tr>
+                <tr><td><code>max(lst, key=len)</code></td><td data-t="ch10-037">بزرگ‌ترین بر اساس معیار دلخواه</td></tr>
+                <tr><td><code>sorted(lst)</code></td><td data-t="ch10-038">لیست مرتب‌شده تازه</td></tr>
+            </tbody>
+        </table>
+    </div>
+
+    <p data-t="ch10-039">
+        پارامتر <code>key</code> خیلی قدرتمند است: می‌گوید «مقایسه را بر اساس
+        این معیار انجام بده». <code>min(words, key=len)</code> یعنی کوتاه‌ترین
+        کلمه، نه کلمه‌ای که در الفبا اول است. در فصل بیست و ششم به این پارامتر
+        برمی‌گردیم و کاملش می‌کنیم.
+    </p>
+
+    <div class="tip">
+        <span class="box-title" data-t="ch10-040">پس چرا با دست نوشتیم</span>
+        <p data-t="ch10-041">
+            به سه دلیل. اول اینکه در آزمون و مصاحبه شغلی این را از شما
+            می‌پرسند. دوم اینکه خیلی وقت‌ها معیار شما دقیقاً همان چیزی نیست که
+            تابع آماده انجام می‌دهد، مثلاً «بزرگ‌ترین عدد زوج». سوم اینکه فهم
+            الگوریتم، فهم برنامه‌نویسی است. در کد واقعی البته همیشه تابع آماده
+            را به کار ببرید.
+        </p>
+    </div>
+
+    <h2 id="s6" data-t="ch10-042">۶. جست‌وجوی خطی</h2>
+
+    <pre class="code"><code># Linear search: walk through the list until the value is found.
+numbers = [30, 20, 45, 18, -7, 22]
+
+target = int(input('Which number are you looking for? '))
+
+found_at = -1                     # -1 means "not found yet"
+
+for i in range(len(numbers)):
+    if numbers[i] == target:
+        found_at = i
+        break                     # stop at the first match
+
+if found_at == -1:
+    print('Not found.')
+else:
+    print(f'Found at index {found_at}.')
+
+# Python offers the same thing directly:
+if target in numbers:
+    print('index() says:', numbers.index(target))</code></pre>
+    <p class="code-caption" data-t="ch10-043">جست‌وجوی خطی: نمونه 06_search.py</p>
+
+    <h3 data-t="ch10-044">شرح مثال</h3>
+
+    <ul>
+        <li data-t="ch10-045">متغیر <code>found_at</code> با منفی یک شروع می‌شود، یعنی «هنوز پیدا نشده». چون منفی یک نمی‌تواند نتیجه واقعی جست‌وجو باشد، به عنوان علامت مناسب است.</li>
+        <li data-t="ch10-046"><code>break</code> بعد از پیدا شدن، از ادامه بی‌فایده جلوگیری می‌کند.</li>
+        <li data-t="ch10-047">اینجا از پیمایش با اندیس استفاده شده، چون به جایگاه نیاز داریم نه فقط مقدار.</li>
+        <li data-t="ch10-048">راه آماده پایتون همان <code>in</code> و <code>index</code> است که در فصل قبل دیدیم. باز هم اول <code>in</code>، چون <code>index</code> روی مقدار ناموجود خطا ایجاد می‌کند.</li>
+    </ul>
+
+    <h2 id="s7" data-t="ch10-049">۷. مرتب‌سازی</h2>
+
+    <pre class="code"><code>numbers = [30, 20, 45, 18, -7, 22]
+
+# sorted() returns a NEW sorted list and leaves the original alone.
+ordered = sorted(numbers)
+print('sorted():', ordered)
+print('original:', numbers)
+
+# sort() sorts the list IN PLACE and returns None.
+numbers.sort()
+print('after sort():', numbers)
+
+# Descending order.
+numbers.sort(reverse=True)
+print('descending:', numbers)
+
+# reverse() just turns the list around, it does not sort.
+numbers.reverse()
+print('reversed:', numbers)
+
+# Sorting text.
+names = ['Reza', 'ali', 'Maryam']
+print(sorted(names))                    # capitals come first
+print(sorted(names, key=str.lower))     # case-insensitive order</code></pre>
+    <p class="code-caption" data-t="ch10-050">مرتب‌سازی: نمونه 07_sorting.py</p>
+
+    <div class="table-scroll">
+        <table>
+            <thead>
+                <tr><th data-t="ch10-051">ابزار</th><th data-t="ch10-052">لیست اصلی</th><th data-t="ch10-053">خروجی</th></tr>
+            </thead>
+            <tbody>
+                <tr><td><code>sorted(lst)</code></td><td data-t="ch10-054">دست‌نخورده</td><td data-t="ch10-055">لیست تازه مرتب‌شده</td></tr>
+                <tr><td><code>lst.sort()</code></td><td data-t="ch10-056">خودش مرتب می‌شود</td><td><code>None</code></td></tr>
+                <tr><td><code>lst.reverse()</code></td><td data-t="ch10-057">خودش برعکس می‌شود</td><td><code>None</code></td></tr>
+                <tr><td><code>lst[::-1]</code></td><td data-t="ch10-058">دست‌نخورده</td><td data-t="ch10-059">لیست تازه برعکس</td></tr>
+            </tbody>
+        </table>
+    </div>
+
+    <div class="warn">
+        <span class="box-title" data-t="ch10-060">اشتباهی که همه یک بار می‌کنند</span>
+        <p data-t="ch10-061">
+            نوشتن <code>numbers = numbers.sort()</code>. متد
+            <code>sort()</code> هیچ چیز برنمی‌گرداند، پس <code>None</code> در
+            متغیر می‌نشیند و لیستتان را کاملاً از دست می‌دهید. یا
+            <code>numbers.sort()</code> تنها بنویسید، یا
+            <code>numbers = sorted(numbers)</code>.
+        </p>
+    </div>
+
+    <p data-t="ch10-062">
+        درباره مرتب‌سازی متن: حروف بزرگ در جدول کاراکترها پیش از حروف کوچک
+        می‌آیند، پس <code>'Reza'</code> پیش از <code>'ali'</code> قرار می‌گیرد.
+        با <code>key=str.lower</code> این مشکل حل می‌شود.
+    </p>
+
+    <h2 id="s8" data-t="ch10-063">۸. دام سایه‌اندازی نام</h2>
+
+    <p data-t="ch10-064">
+        در فصل ششم به این اشاره کردیم؛ حالا که واقعاً از <code>sum</code> و
+        <code>max</code> استفاده می‌کنیم، وقتش رسیده که کامل ببینیمش.
+    </p>
+
+    <pre class="code"><code># 'sum', 'max', 'min', 'list', 'str', 'input' ... are names of built-in things.
+# If you use them as variable names, the built-in version disappears.
+numbers = [1, 2, 3]
+
+sum = 0                 # BAD: the built-in function sum() is now hidden
+for n in numbers:
+    sum += n
+print(sum)              # works ...
+
+# ... but now this line would raise:
+#   TypeError: 'int' object is not callable
+# print(sum(numbers))
+
+# Always prefer a descriptive name instead:
+total = 0
+for n in numbers:
+    total += n
+print(total)
+print(sum)              # still the integer, the damage is done in this file</code></pre>
+    <p class="code-caption" data-t="ch10-065">سایه‌اندازی: نمونه 08_shadowing_trap.py</p>
+
+    <div class="table-scroll">
+        <table>
+            <thead>
+                <tr><th data-t="ch10-066">نام ممنوع</th><th data-t="ch10-067">جایگزین پیشنهادی</th></tr>
+            </thead>
+            <tbody>
+                <tr><td><code>sum</code></td><td><code>total</code></td></tr>
+                <tr><td><code>max</code> <code>min</code></td><td><code>largest</code> <code>smallest</code></td></tr>
+                <tr><td><code>list</code></td><td><code>items</code> <code>numbers</code> <code>names</code></td></tr>
+                <tr><td><code>str</code></td><td><code>text</code></td></tr>
+                <tr><td><code>input</code></td><td><code>user_input</code></td></tr>
+                <tr><td><code>type</code></td><td><code>kind</code></td></tr>
+                <tr><td><code>id</code></td><td><code>user_id</code></td></tr>
+            </tbody>
+        </table>
+    </div>
+
+    <p data-t="ch10-068">
+        نکته مهم: پایتون هیچ خطایی نمی‌دهد و اجازه می‌دهد این کار را بکنید.
+        مشکل بعداً و در جای دیگری از برنامه ظاهر می‌شود، جایی که تازه‌کار به
+        هیچ وجه دنبال علتش نمی‌گردد. ویرایشگرهای خوب مثل VS Code این نام‌ها را
+        رنگ متفاوتی می‌دهند؛ اگر متغیرتان همان رنگ توابع آماده شد، نامش را عوض
+        کنید.
+    </p>
+
+    <h2 id="s9" data-t="ch10-069">۹. لیست دوبعدی</h2>
+
+    <p data-t="ch10-070">
+        عضو یک لیست می‌تواند خودش لیست باشد. به این ساختار
+        <strong>ماتریس</strong> یا لیست دوبعدی می‌گویند و برای جدول، صفحه بازی و
+        تصویر به کار می‌رود.
+    </p>
+
+    <pre class="code"><code># A list whose items are themselves lists is a 2-D list (a matrix).
+matrix = [
+    [4, 17, 81],
+    [11, 41, 17],
+    [20, 12, 13],
+]
+
+# Two indexes: first the row, then the column.
+print(matrix[1][1])      # 41
+print(matrix[0])         # the whole first row
+
+# A new row can be appended like any other item.
+matrix.append([4, 5, 6])
+
+# Printing a matrix needs two loops.
+for row in matrix:
+    for value in row:
+        print(value, end='\t')
+    print()</code></pre>
+    <p class="code-caption" data-t="ch10-071">ماتریس: نمونه 09_two_dimensional_list.py</p>
+
+    <pre class="out">41
+[4, 17, 81]
+4	17	81	
+11	41	17	
+20	12	13	
+4	5	6	</pre>
+
+    <h3 data-t="ch10-072">شرح مثال</h3>
+
+    <ul>
+        <li data-t="ch10-073"><code>matrix[1][1]</code> را از چپ بخوانید: اول سطر شماره ۱ را بگیر، بعد از آن سطر، عضو شماره ۱ را بردار.</li>
+        <li data-t="ch10-074">ترتیب همیشه سطر و بعد ستون است. جابه‌جا کردنشان، خطای رایج ماتریس‌هاست.</li>
+        <li data-t="ch10-075">چاپ ماتریس دقیقاً همان حلقه تودرتوی فصل هفتم است. تنها فرق این است که به جای ستاره، مقدار خانه چاپ می‌شود.</li>
+        <li data-t="ch10-076">ویرگول بعد از آخرین سطر (آن ویرگول انتهایی) اجباری نیست ولی مجاز است و عادت خوبی است: افزودن سطر بعدی، فقط یک خط تغییر می‌شود.</li>
+    </ul>
+
+    <h2 id="s10" data-t="ch10-077">۱۰. عملیات روی ماتریس</h2>
+
+    <pre class="code"><code># Classic operations on a square matrix.
+matrix = [
+    [4, 17, 81],
+    [11, 41, 17],
+    [20, 12, 13],
+]
+
+SIZE = len(matrix)
+
+# Total of every row.
+for i in range(SIZE):
+    print(f'sum of row {i}:', sum(matrix[i]))
+
+# Total of every column: the column index stays fixed while the row moves.
+for column in range(SIZE):
+    column_total = 0
+    for row in range(SIZE):
+        column_total += matrix[row][column]
+    print(f'sum of column {column}:', column_total)
+
+# The main diagonal is made of the items where row == column.
+diagonal_total = 0
+for i in range(SIZE):
+    diagonal_total += matrix[i][i]
+print('sum of the diagonal:', diagonal_total)
+
+# The biggest value of the whole matrix.
+largest = matrix[0][0]
+for row in matrix:
+    for value in row:
+        if value &gt; largest:
+            largest = value
+print('largest value:', largest)</code></pre>
+    <p class="code-caption" data-t="ch10-078">عملیات ماتریسی: نمونه 10_matrix_operations.py</p>
+
+    <h3 data-t="ch10-079">شرح مثال</h3>
+
+    <ul>
+        <li data-t="ch10-080"><strong>جمع سطر</strong> ساده است: هر سطر خودش یک لیست است، پس <code>sum(matrix[i])</code> کافی است.</li>
+        <li data-t="ch10-081"><strong>جمع ستون</strong> سخت‌تر است، چون ستون یک لیست جدا نیست. باید اندیس ستون را ثابت نگه دارید و اندیس سطر را حرکت دهید: <code>matrix[row][column]</code>.</li>
+        <li data-t="ch10-082"><strong>قطر اصلی</strong> خانه‌هایی است که شماره سطر و ستونشان برابر است، پس یک حلقه ساده کافی است.</li>
+        <li data-t="ch10-083">برای بیشینه کل ماتریس، حلقه تودرتو لازم است و نقطه شروع <code>matrix[0][0]</code> است، به همان دلیلی که در بخش دوم گفتیم.</li>
+    </ul>
+
+    <h2 id="s11" data-t="ch10-084">۱۱. برنامه کامل گزارش‌گیری</h2>
+
+    <pre class="code"><code># A complete little program: read numbers until 'exit',
+# then report several statistics about them.
+numbers = []
+
+while True:
+    user_input = input('Enter a number (or "exit"): ')
+
+    if user_input == 'exit':
+        break
+
+    numbers.append(float(user_input))
+
+if len(numbers) == 0:
+    print('Nothing to report.')
+else:
+    even_total = 0
+    for number in numbers:
+        if number % 2 == 0:
+            even_total += number
+
+    print('Count:  ', len(numbers))
+    print('Sum:    ', sum(numbers))
+    print('Average:', sum(numbers) / len(numbers))
+    print('Max:    ', max(numbers))
+    print('Min:    ', min(numbers))
+    print('Sum of the even ones:', even_total)
+    print('Sorted: ', sorted(numbers))</code></pre>
+    <p class="code-caption" data-t="ch10-085">گزارش کامل: نمونه 11_sum_of_positive_input.py</p>
+
+    <p data-t="ch10-086">
+        این برنامه پایان بخش اول دوره است و همه چیزهایی که تا اینجا خواندید را
+        در خود دارد: ورودی، حلقه، شرط، لیست، توابع آماده و مراقبت از حالت خالی.
+        از فصل بعد یاد می‌گیریم چطور همین کد را به تکه‌های کوچک و قابل استفاده
+        مجدد تقسیم کنیم.
+    </p>
+
+    <div class="folder-ref">
+        <span class="box-title" data-t="ch10-087">فایل‌های تمرینی این فصل</span>
+        <p data-t="ch10-088">
+            پوشه <code>S10-list-algorithms</code> شامل نمونه‌های
+            <code>01_sum_of_list.py</code> تا <code>11_sum_of_positive_input.py</code>.
+        </p>
+    </div>
+
+    <h2 data-t="ch10-089">خلاصه فصل</h2>
+
+    <div class="table-scroll">
+        <table>
+            <thead>
+                <tr><th data-t="ch10-090">مورد</th><th data-t="ch10-091">نکته</th></tr>
+            </thead>
+            <tbody>
+                <tr><td data-t="ch10-092">مجموع با دست</td><td data-t="ch10-093">انباره صفر، جمع در حلقه</td></tr>
+                <tr><td data-t="ch10-094">بیشینه با دست</td><td data-t="ch10-095">شروع از <code>lst[0]</code>، نه از صفر</td></tr>
+                <tr><td data-t="ch10-096">میانگین با شرط</td><td data-t="ch10-097">انباره و شمارنده جداگانه</td></tr>
+                <tr><td><code>sum max min len sorted</code></td><td data-t="ch10-098">نسخه آماده و بهتر همه این موارد</td></tr>
+                <tr><td><code>key=</code></td><td data-t="ch10-099">تعیین معیار مقایسه</td></tr>
+                <tr><td data-t="ch10-100">جست‌وجوی خطی</td><td data-t="ch10-101">پرچم منفی یک، حلقه با اندیس، <code>break</code></td></tr>
+                <tr><td data-t="ch10-102"><code>sort()</code> و <code>sorted()</code></td><td data-t="ch10-103">اولی خود لیست را، دومی لیست تازه</td></tr>
+                <tr><td data-t="ch10-104">سایه‌اندازی</td><td data-t="ch10-105">هرگز متغیری به نام <code>sum</code> یا <code>list</code> نسازید</td></tr>
+                <tr><td><code>matrix[r][c]</code></td><td data-t="ch10-106">اول سطر، بعد ستون</td></tr>
+                <tr><td data-t="ch10-107">جمع ستون</td><td data-t="ch10-108">ستون ثابت، سطر متحرک</td></tr>
+            </tbody>
+        </table>
+    </div>
+
+    <div class="exercise">
+        <h3 data-t="ch10-109">تمرین‌های فصل ده</h3>
+        <ol>
+            <li data-t="ch10-110">ده عدد بگیرید و بزرگ‌ترین و کوچک‌ترین و میانگین را <strong>بدون</strong> <code>max</code> و <code>min</code> و <code>sum</code> چاپ کنید.</li>
+            <li data-t="ch10-111">لیستی از اعداد بگیرید و دومین عدد بزرگ را چاپ کنید.</li>
+            <li data-t="ch10-112">لیستی از نمره‌ها بگیرید و بگویید چند نفر قبول شده‌اند، یعنی نمره ۱۰ یا بیشتر.</li>
+            <li data-t="ch10-113">لیستی از نام‌ها را الفبایی مرتب کنید، بدون حساسیت به حروف بزرگ و کوچک.</li>
+            <li data-t="ch10-114">یک ماتریس سه در سه از کاربر بگیرید و سطر به سطر چاپش کنید.</li>
+            <li data-t="ch10-115">ترانهاده یک ماتریس را چاپ کنید، یعنی سطرها ستون شوند.</li>
+            <li data-t="ch10-116">دو لیست بگیرید و اعضایی که در هر دو هستند را چاپ کنید.</li>
+            <li data-t="ch10-117">لیستی از اعداد بگیرید و آن را به دو لیست زوج و فرد تقسیم کنید.</li>
+        </ol>
+    </div>
+
+    <div class="pager">
+        <a href="chapter-09.html">فصل قبل: لیست‌ها</a>
+        <a href="chapter-11.html">فصل بعد: توابع</a>
+    </div>
+
+</main>
+
+</body>
+</html>

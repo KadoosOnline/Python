@@ -1,0 +1,728 @@
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="فصل سی: پایگاه داده رابطه‌ای و زبان SQL، ساخت جدول، درج و به‌روزرسانی، شرط، توابع تجمعی، JOIN و تزریق SQL">
+    <title>فصل ۳۰: پایگاه داده و زبان SQL</title>
+    <link rel="icon" href="logokm.png" type="image/png">
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<header class="book-bar">
+    <a class="name" href="index.html">برنامه‌نویسی پایتون</a>
+    <a href="index.html">فهرست مطالب</a>
+</header>
+
+<main class="paper">
+
+    <div class="chapter-head">
+        <span class="chapter-num">فصل ۳۰</span>
+        <h1 data-t="ch30-001">پایگاه داده و زبان SQL</h1>
+        <p class="lead" data-t="ch30-002">
+            در این جلسه اصلاً پایتون نمی‌نویسیم. زبان تازه‌ای یاد می‌گیریم که
+            زبان خود پایگاه‌های داده است. همه دستورها را در برنامه
+            <strong>DB Browser for SQLite</strong> تایپ می‌کنید.
+        </p>
+    </div>
+
+    <div class="mini-toc">
+        <span class="box-title" data-t="ch30-003">در این فصل می‌خوانید</span>
+        <ol>
+            <li data-t="ch30-004"><a href="#s1">چرا فایل کافی نیست</a></li>
+            <li data-t="ch30-005"><a href="#s2">ساختن جدول</a></li>
+            <li data-t="ch30-006"><a href="#s3">محدودیت‌ها</a></li>
+            <li data-t="ch30-007"><a href="#s4">کلید خارجی</a></li>
+            <li data-t="ch30-008"><a href="#s5">درج داده</a></li>
+            <li data-t="ch30-009"><a href="#s6">دستور SELECT و WHERE</a></li>
+            <li data-t="ch30-010"><a href="#s7">به‌روزرسانی و حذف</a></li>
+            <li data-t="ch30-011"><a href="#s8">مرتب‌سازی و محدود کردن</a></li>
+            <li data-t="ch30-012"><a href="#s9">جست‌وجوی پیشرفته</a></li>
+            <li data-t="ch30-013"><a href="#s10">مقدار NULL</a></li>
+            <li data-t="ch30-014"><a href="#s11">توابع تجمعی</a></li>
+            <li data-t="ch30-015"><a href="#s12">گروه‌بندی</a></li>
+            <li data-t="ch30-016"><a href="#s13">پیوند جدول‌ها</a></li>
+            <li data-t="ch30-017"><a href="#s14">رابطه چندبه‌چند</a></li>
+            <li data-t="ch30-018"><a href="#s15">رفتار هنگام حذف</a></li>
+            <li data-t="ch30-019"><a href="#s16">تزریق SQL</a></li>
+        </ol>
+    </div>
+
+    <h2 id="s1" data-t="ch30-020">۱. چرا فایل کافی نیست</h2>
+
+    <p data-t="ch30-021">
+        در فصل هجدهم داده را در فایل متنی ذخیره کردیم و در فصل بیست و هفتم در
+        CSV و JSON. برای برنامه کوچک خوب است، ولی به محض بزرگ شدن، مشکلات
+        شروع می‌شوند:
+    </p>
+
+    <ul>
+        <li data-t="ch30-022">برای پیدا کردن یک رکورد باید <strong>کل</strong> فایل خوانده شود.</li>
+        <li data-t="ch30-023">هیچ چیز جلوی داده تکراری یا نامعتبر را نمی‌گیرد.</li>
+        <li data-t="ch30-024">اگر دو برنامه همزمان بنویسند، فایل خراب می‌شود.</li>
+        <li data-t="ch30-025">ارتباط بین داده‌ها (دانشجو، درس، نمره) باید دستی مدیریت شود.</li>
+    </ul>
+
+    <p data-t="ch30-026"><strong>پایگاه داده رابطه‌ای</strong> همه این موارد را حل می‌کند. داده در <strong>جدول</strong> نگه داشته می‌شود: هر جدول ستون‌هایی دارد (فیلدها) و سطرهایی (رکوردها). زبان کار با آن، <strong>SQL</strong> است.</p>
+
+    <div class="note">
+        <span class="box-title" data-t="ch30-027">چرا SQLite</span>
+        <p data-t="ch30-028">
+            بیشتر پایگاه‌های داده مثل MySQL و PostgreSQL یک
+            <strong>سرور</strong> جداگانه‌اند که باید نصب و پیکربندی شود.
+            SQLite فقط <strong>یک فایل</strong> است، هیچ سروری ندارد و همراه
+            خود پایتون می‌آید. با این حال یک پایگاه داده کامل و واقعی است و در
+            میلیاردها دستگاه، از جمله هر گوشی اندرویدی، استفاده می‌شود.
+        </p>
+    </div>
+
+    <h2 id="s2" data-t="ch30-029">۲. ساختن جدول</h2>
+
+    <pre class="code"><code>-- DROP TABLE removes the table completely (data included).
+-- "IF EXISTS" avoids an error the first time the script is run.
+DROP TABLE IF EXISTS students;
+
+CREATE TABLE students (
+    -- PRIMARY KEY: the column that identifies a row uniquely.
+    -- AUTOINCREMENT: SQLite fills it in for us, 1, 2, 3, ...
+    student_id INTEGER PRIMARY KEY AUTOINCREMENT,
+
+    -- NOT NULL: this column can never be empty.
+    first_name TEXT NOT NULL,
+    last_name  TEXT NOT NULL,
+
+    -- SQLite has no real DATE type; dates are stored as TEXT 'YYYY-MM-DD'.
+    birth_date DATE,
+
+    -- UNIQUE: two students can never have the same phone number.
+    phone TEXT UNIQUE
+);</code></pre>
+    <p class="code-caption" data-t="ch30-030">اولین جدول: فایل 01_create_students.sql</p>
+
+    <div class="table-scroll">
+        <table>
+            <thead>
+                <tr><th data-t="ch30-031">نوع</th><th data-t="ch30-032">یعنی</th></tr>
+            </thead>
+            <tbody>
+                <tr><td><code>INTEGER</code></td><td data-t="ch30-033">عدد صحیح</td></tr>
+                <tr><td><code>TEXT</code></td><td data-t="ch30-034">متن</td></tr>
+                <tr><td><code>REAL</code></td><td data-t="ch30-035">عدد اعشاری</td></tr>
+                <tr><td><code>BLOB</code></td><td data-t="ch30-036">داده دودویی، مثل تصویر</td></tr>
+            </tbody>
+        </table>
+    </div>
+
+    <p data-t="ch30-037">
+        در SQL، توضیح با دو خط تیره <code>--</code> نوشته می‌شود. دستورها با
+        نقطه‌ویرگول تمام می‌شوند و کلمات کلیدی معمولاً با حروف بزرگ نوشته
+        می‌شوند، هرچند اجباری نیست.
+    </p>
+
+    <h2 id="s3" data-t="ch30-038">۳. محدودیت‌ها</h2>
+
+    <p data-t="ch30-039">
+        <strong>محدودیت</strong> قانونی است که پایگاه داده خودش اجرایش می‌کند.
+        این یعنی حتی اگر برنامه شما باگ داشته باشد، داده خراب نمی‌شود.
+    </p>
+
+    <div class="table-scroll">
+        <table>
+            <thead>
+                <tr><th data-t="ch30-040">محدودیت</th><th data-t="ch30-041">معنی</th></tr>
+            </thead>
+            <tbody>
+                <tr><td><code>PRIMARY KEY</code></td><td data-t="ch30-042">ستونی که هر سطر را یکتا مشخص می‌کند</td></tr>
+                <tr><td><code>AUTOINCREMENT</code></td><td data-t="ch30-043">خود پایگاه داده شماره می‌دهد</td></tr>
+                <tr><td><code>NOT NULL</code></td><td data-t="ch30-044">این ستون هرگز خالی نمی‌ماند</td></tr>
+                <tr><td><code>UNIQUE</code></td><td data-t="ch30-045">مقدار تکراری پذیرفته نمی‌شود</td></tr>
+                <tr><td><code>DEFAULT</code></td><td data-t="ch30-046">مقدار پیش‌فرض وقتی چیزی داده نشود</td></tr>
+                <tr><td><code>CHECK</code></td><td data-t="ch30-047">قاعده دلخواه، مثل بازه مجاز</td></tr>
+            </tbody>
+        </table>
+    </div>
+
+    <pre class="code"><code>CREATE TABLE teachers (
+    teacher_id   INTEGER PRIMARY KEY AUTOINCREMENT,
+    teacher_name TEXT NOT NULL,
+
+    -- DEFAULT: the value used when the INSERT does not mention this column.
+    department   TEXT DEFAULT 'عمومی'
+);</code></pre>
+    <p class="code-caption" data-t="ch30-048">مقدار پیش‌فرض: فایل 02_create_teachers.sql</p>
+
+    <h2 id="s4" data-t="ch30-049">۴. کلید خارجی</h2>
+
+    <pre class="code"><code>CREATE TABLE courses (
+    course_id INTEGER PRIMARY KEY AUTOINCREMENT,
+    title     TEXT NOT NULL,
+
+    -- CHECK: a rule the value must respect, tested at every INSERT/UPDATE.
+    unit      INTEGER CHECK (unit &gt; 0 AND unit &lt; 5),
+
+    -- A FOREIGN KEY says: this column must contain a teacher_id that really
+    -- exists in the teachers table. This is what makes the data "relational".
+    teacher_id INTEGER,
+    FOREIGN KEY (teacher_id) REFERENCES teachers(teacher_id)
+);
+
+-- IMPORTANT: SQLite ignores foreign keys unless you switch them on,
+-- once per connection:
+PRAGMA foreign_keys = ON;</code></pre>
+    <p class="code-caption" data-t="ch30-050">کلید خارجی: فایل 03_create_courses.sql</p>
+
+    <div class="warn">
+        <span class="box-title" data-t="ch30-051">مهم‌ترین نکته SQLite</span>
+        <p data-t="ch30-052">
+            SQLite به طور پیش‌فرض کلیدهای خارجی را <strong>نادیده
+            می‌گیرد</strong>. باید در هر اتصال یک بار
+            <code>PRAGMA foreign_keys = ON;</code> بنویسید، وگرنه می‌توانید
+            درسی با شناسه استاد ناموجود درج کنید و هیچ‌کس جلویتان را
+            نمی‌گیرد. این دقیقاً یکی از باگ‌های نسخه اصلی برنامه کتابخانه این
+            دوره بود.
+        </p>
+    </div>
+
+    <p data-t="ch30-053">
+        <strong>کلید خارجی</strong> همان چیزی است که به پایگاه داده صفت
+        «رابطه‌ای» می‌دهد: جدول درس‌ها به جدول استادها
+        <strong>اشاره</strong> می‌کند و پایگاه داده تضمین می‌کند که این
+        اشاره‌ها همیشه معتبرند.
+    </p>
+
+    <h2 id="s5" data-t="ch30-054">۵. درج داده</h2>
+
+    <pre class="code"><code>-- Several rows in a single INSERT: much faster than several statements.
+-- The last student has NULL as a phone number: "we do not know it".
+-- NULL is not 0 and not an empty string - it means "no value".
+INSERT INTO students (first_name, last_name, birth_date, phone) VALUES
+('سارا', 'احمدی', '2001-05-22', '09122222222'),
+('رضا',  'کریمی', '1999-11-02', '09123333333'),
+('مریم', 'حسینی', '2002-09-10', NULL);</code></pre>
+    <p class="code-caption" data-t="ch30-055">درج چند سطر: فایل 05_insert_many_students.sql</p>
+
+    <pre class="code"><code>-- The teachers must exist BEFORE the courses that point at them.
+INSERT INTO teachers (teacher_name, department) VALUES
+('دکتر محمدی', 'کامپیوتر'),
+('دکتر رضایی', 'ریاضی');
+
+-- AUTOINCREMENT gave teacher_id = 1 to the first one and 2 to the second.
+INSERT INTO courses (title, unit, teacher_id) VALUES
+('پایگاه داده', 3, 1),
+('ریاضی عمومی', 3, 2),
+('برنامه نویسی پیشرفته', 4, 1);</code></pre>
+    <p class="code-caption" data-t="ch30-056">ترتیب درج: فایل 06_insert_teachers_and_courses.sql</p>
+
+    <p data-t="ch30-057">
+        ترتیب مهم است: چون درس به استاد اشاره می‌کند، استاد باید
+        <strong>اول</strong> وجود داشته باشد. ستون <code>student_id</code>
+        را ننوشتیم، چون <code>AUTOINCREMENT</code> خودش پرش می‌کند.
+    </p>
+
+    <h2 id="s6" data-t="ch30-058">۶. دستور SELECT و WHERE</h2>
+
+    <pre class="code"><code>-- WHERE keeps only the rows for which the condition is true.
+SELECT * FROM students WHERE first_name = 'علی';
+
+-- The comparison operators: =  &lt;&gt;  !=  &lt;  &gt;  &lt;=  &gt;=
+SELECT * FROM students WHERE student_id &gt; 2;
+SELECT * FROM students WHERE first_name &lt;&gt; 'علی';</code></pre>
+    <p class="code-caption" data-t="ch30-059">شرط: فایل 08_where.sql</p>
+
+    <pre class="code"><code>-- AND: both conditions must be true.
+SELECT first_name, last_name, birth_date FROM students
+WHERE first_name = 'علی' AND last_name = 'علوی';
+
+-- OR: at least one of them.
+SELECT * FROM students
+WHERE first_name = 'علی' OR first_name = 'رضا';
+
+-- NOT reverses a condition.
+SELECT * FROM students WHERE NOT first_name = 'علی';
+
+-- Use parentheses whenever AND and OR are mixed: AND binds tighter than OR.
+SELECT * FROM students
+WHERE (first_name = 'علی' OR first_name = 'رضا')
+  AND birth_date &gt; '1999-01-01';</code></pre>
+    <p class="code-caption" data-t="ch30-060">ترکیب شرط‌ها: فایل 10_and_or.sql</p>
+
+    <p data-t="ch30-061">
+        همه چیز آشناست، درست مثل فصل چهارم پایتون. دو تفاوت کوچک:
+        <code>=</code> برای مقایسه به کار می‌رود نه <code>==</code>، و
+        <code>&lt;&gt;</code> شکل استاندارد نامساوی است، هرچند
+        <code>!=</code> هم کار می‌کند.
+    </p>
+
+    <h2 id="s7" data-t="ch30-062">۷. به‌روزرسانی و حذف</h2>
+
+    <pre class="code"><code>-- UPDATE changes existing rows.
+-- NEVER forget the WHERE: without it, EVERY row is changed.
+UPDATE students
+SET phone = '09120000000'
+WHERE first_name = 'علی' AND last_name = 'علوی';
+
+-- Several columns at once.
+UPDATE students
+SET phone = '09129999999', birth_date = '2000-02-20'
+WHERE student_id = 1;</code></pre>
+    <p class="code-caption" data-t="ch30-063">به‌روزرسانی: فایل 11_update.sql</p>
+
+    <pre class="code"><code>-- DELETE removes rows. Here again, the WHERE is what protects the data.
+-- Tip: run the same condition as a SELECT first, to see what will disappear.
+SELECT * FROM students WHERE phone IS NULL;
+
+DELETE FROM students WHERE phone IS NULL;
+
+-- "DELETE FROM students;" without a WHERE empties the whole table.</code></pre>
+    <p class="code-caption" data-t="ch30-064">حذف: فایل 12_delete.sql</p>
+
+    <div class="warn">
+        <span class="box-title" data-t="ch30-065">خطرناک‌ترین دو کلمه در SQL</span>
+        <p data-t="ch30-066">
+            <code>UPDATE</code> و <code>DELETE</code> بدون <code>WHERE</code>
+            روی <strong>همه</strong> سطرها اجرا می‌شوند، بی هیچ سؤال و هشداری،
+            و برگشتی هم ندارد. عادت حرفه‌ای‌ها این است: اول همان شرط را با
+            <code>SELECT</code> اجرا کنید و ببینید چه چیزی برمی‌گردد، بعد
+            کلمه <code>SELECT *</code> را با <code>DELETE</code> عوض کنید.
+        </p>
+    </div>
+
+    <h2 id="s8" data-t="ch30-067">۸. مرتب‌سازی و محدود کردن</h2>
+
+    <pre class="code"><code>-- ASC = ascending (the default), DESC = descending.
+SELECT * FROM students ORDER BY last_name ASC;
+SELECT * FROM students ORDER BY last_name DESC;
+
+-- Sorting on several columns: first by last name, then by first name.
+SELECT * FROM students ORDER BY last_name ASC, first_name ASC;</code></pre>
+    <p class="code-caption" data-t="ch30-068">مرتب‌سازی: فایل 13_order_by.sql</p>
+
+    <pre class="code"><code>-- LIMIT returns at most N rows.
+SELECT * FROM students LIMIT 2;
+
+-- OFFSET skips the first rows: this is how pagination is done.
+SELECT * FROM students LIMIT 2 OFFSET 2;   -- rows 3 and 4
+
+-- LIMIT together with ORDER BY answers "the top N".
+SELECT * FROM students ORDER BY birth_date DESC LIMIT 1;   -- the youngest</code></pre>
+    <p class="code-caption" data-t="ch30-069">محدود کردن: فایل 14_limit.sql</p>
+
+    <p data-t="ch30-070">
+        ترکیب <code>ORDER BY</code> با <code>LIMIT</code> جواب سؤال «N تای
+        برتر» است. و <code>LIMIT</code> با <code>OFFSET</code> دقیقاً همان
+        صفحه‌بندی وب‌سرویس فصل قبل است، این بار در سمت پایگاه داده.
+    </p>
+
+    <h2 id="s9" data-t="ch30-071">۹. جست‌وجوی پیشرفته</h2>
+
+    <pre class="code"><code>-- BETWEEN a AND b: both limits are INCLUDED.
+SELECT * FROM students
+WHERE birth_date BETWEEN '2000-01-01' AND '2002-12-31';
+
+-- IN tests a list of values.
+SELECT * FROM students
+WHERE first_name IN ('علی', 'رضا');
+
+-- NOT IN is the opposite.
+SELECT * FROM students
+WHERE first_name NOT IN ('علی', 'رضا');
+
+-- LIKE searches a pattern. '%' means "any number of characters".
+SELECT * FROM students WHERE first_name LIKE 'س%';    -- starts with س
+SELECT * FROM students WHERE last_name  LIKE '%ی';    -- ends with ی
+SELECT * FROM students WHERE last_name  LIKE '%می%';  -- contains می
+
+-- DISTINCT removes the duplicated rows from the RESULT.
+SELECT DISTINCT department FROM teachers;</code></pre>
+    <p class="code-caption" data-t="ch30-072">جست‌وجو: فایل‌های ۱۵ تا ۲۰</p>
+
+    <div class="table-scroll">
+        <table>
+            <thead>
+                <tr><th data-t="ch30-073">ابزار</th><th data-t="ch30-074">معادل پایتونی‌اش</th></tr>
+            </thead>
+            <tbody>
+                <tr><td><code>BETWEEN a AND b</code></td><td><code>a &lt;= x &lt;= b</code></td></tr>
+                <tr><td><code>IN (...)</code></td><td><code>x in (...)</code></td></tr>
+                <tr><td><code>LIKE 'a%'</code></td><td><code>x.startswith('a')</code></td></tr>
+                <tr><td><code>LIKE '%a'</code></td><td><code>x.endswith('a')</code></td></tr>
+                <tr><td><code>LIKE '%a%'</code></td><td><code>'a' in x</code></td></tr>
+                <tr><td><code>DISTINCT</code></td><td><code>set(...)</code></td></tr>
+            </tbody>
+        </table>
+    </div>
+
+    <p data-t="ch30-075">
+        در <code>LIKE</code>، علامت <code>%</code> یعنی «هر تعداد کاراکتر» و
+        زیرخط <code>_</code> یعنی «دقیقاً یک کاراکتر».
+    </p>
+
+    <h2 id="s10" data-t="ch30-076">۱۰. مقدار NULL</h2>
+
+    <pre class="code"><code>-- NULL is not a value, so it can never be compared with '='.
+-- This query returns NOTHING, even when a phone number is missing:
+SELECT * FROM students WHERE phone = NULL;
+
+-- The correct way:
+SELECT * FROM students WHERE phone IS NULL;
+SELECT * FROM students WHERE phone IS NOT NULL;
+
+-- COALESCE replaces NULL with a value of our choice.
+SELECT first_name, COALESCE(phone, 'no phone') AS phone FROM students;</code></pre>
+    <p class="code-caption" data-t="ch30-077">مقدار تهی: فایل 19_is_null.sql</p>
+
+    <div class="warn">
+        <span class="box-title" data-t="ch30-078">NULL هیچ چیز نیست، حتی برابر خودش نیست</span>
+        <p data-t="ch30-079">
+            <code>NULL</code> نه صفر است و نه رشته خالی؛ یعنی «نمی‌دانیم».
+            به همین دلیل هیچ مقایسه‌ای با <code>=</code> رویش کار نمی‌کند،
+            حتی <code>NULL = NULL</code>. همیشه از <code>IS NULL</code> و
+            <code>IS NOT NULL</code> استفاده کنید. این یکی از رایج‌ترین
+            سؤال‌های مصاحبه شغلی هم هست.
+        </p>
+    </div>
+
+    <h2 id="s11" data-t="ch30-080">۱۱. توابع تجمعی</h2>
+
+    <pre class="code"><code>-- An aggregate function turns many rows into ONE value.
+SELECT COUNT(*) AS number_of_students FROM students;
+
+-- COUNT(column) ignores the NULLs - compare the two numbers:
+SELECT COUNT(*) AS all_rows, COUNT(phone) AS rows_with_a_phone FROM students;
+
+SELECT MIN(birth_date) AS oldest, MAX(birth_date) AS youngest FROM students;
+
+SELECT SUM(unit) AS total_units, AVG(unit) AS average_units FROM courses;
+
+-- ROUND makes the result readable.
+SELECT ROUND(AVG(unit), 2) AS average_units FROM courses;</code></pre>
+    <p class="code-caption" data-t="ch30-081">توابع تجمعی: فایل 21_aggregates.sql</p>
+
+    <p data-t="ch30-082">
+        این توابع، چندین سطر را به <strong>یک</strong> مقدار تبدیل می‌کنند.
+        کلمه <code>AS</code> به ستون نتیجه نام می‌دهد. و به تفاوت
+        <code>COUNT(*)</code> با <code>COUNT(phone)</code> دقت کنید: دومی
+        سطرهایی که <code>NULL</code> دارند را نمی‌شمارد.
+    </p>
+
+    <h2 id="s12" data-t="ch30-083">۱۲. گروه‌بندی</h2>
+
+    <pre class="code"><code>-- GROUP BY splits the rows into groups and applies the aggregate to each group.
+-- "How many teachers per department?"
+SELECT department, COUNT(*) AS number_of_teachers
+FROM teachers
+GROUP BY department;
+
+-- "How many courses does each teacher give?"
+SELECT teacher_id, COUNT(*) AS number_of_courses, SUM(unit) AS total_units
+FROM courses
+GROUP BY teacher_id;
+
+-- Rule: every column of the SELECT must either be in the GROUP BY
+-- or be inside an aggregate function.</code></pre>
+    <p class="code-caption" data-t="ch30-084">گروه‌بندی: فایل 22_group_by.sql</p>
+
+    <pre class="code"><code>-- WHERE filters the ROWS (before grouping).
+-- HAVING filters the GROUPS (after grouping).
+SELECT teacher_id, COUNT(*) AS number_of_courses
+FROM courses
+GROUP BY teacher_id
+HAVING COUNT(*) &gt; 1;
+
+-- The two can be used together.
+SELECT teacher_id, COUNT(*) AS number_of_courses
+FROM courses
+WHERE unit &gt;= 3                 -- keep only the courses of 3 units or more
+GROUP BY teacher_id
+HAVING COUNT(*) &gt;= 1            -- then keep only the teachers who have some
+ORDER BY number_of_courses DESC;</code></pre>
+    <p class="code-caption" data-t="ch30-085">فیلتر گروه‌ها: فایل 23_having.sql</p>
+
+    <div class="tip">
+        <span class="box-title" data-t="ch30-086">فرق WHERE و HAVING در یک جمله</span>
+        <p data-t="ch30-087">
+            <code>WHERE</code> پیش از گروه‌بندی، <strong>سطرها</strong> را
+            فیلتر می‌کند. <code>HAVING</code> پس از گروه‌بندی،
+            <strong>گروه‌ها</strong> را. به همین دلیل تابع تجمعی فقط در
+            <code>HAVING</code> مجاز است، نه در <code>WHERE</code>.
+        </p>
+    </div>
+
+    <h2 id="s13" data-t="ch30-088">۱۳. پیوند جدول‌ها</h2>
+
+    <p data-t="ch30-089">
+        اینجا قلب پایگاه داده رابطه‌ای است: <strong>JOIN</strong> دو جدول را
+        بر اساس یک ستون مشترک به هم می‌چسباند.
+    </p>
+
+    <pre class="code"><code>-- A JOIN reads two tables at once, matching them on a common column.
+-- INNER JOIN keeps only the rows that HAVE a match on both sides.
+SELECT
+    courses.title         AS 'نام درس',
+    teachers.teacher_name AS 'نام استاد',
+    courses.unit          AS 'تعداد واحد'
+FROM courses
+INNER JOIN teachers ON courses.teacher_id = teachers.teacher_id;
+
+-- Table aliases make a long query much shorter.
+SELECT c.title, t.teacher_name, c.unit
+FROM courses c
+INNER JOIN teachers t ON c.teacher_id = t.teacher_id
+ORDER BY t.teacher_name;</code></pre>
+    <p class="code-caption" data-t="ch30-090">پیوند درونی: فایل 24_inner_join.sql</p>
+
+    <pre class="code"><code>-- Add a course without a teacher, so that the difference becomes visible.
+INSERT INTO courses (title, unit, teacher_id) VALUES ('زبان تخصصی', 2, NULL);
+
+-- INNER JOIN: the course without a teacher DISAPPEARS from the result.
+SELECT c.title, t.teacher_name
+FROM courses c
+INNER JOIN teachers t ON c.teacher_id = t.teacher_id;
+
+-- LEFT JOIN: every row of the LEFT table is kept; the missing right side
+-- becomes NULL.
+SELECT c.title, COALESCE(t.teacher_name, 'no teacher yet') AS teacher
+FROM courses c
+LEFT JOIN teachers t ON c.teacher_id = t.teacher_id;</code></pre>
+    <p class="code-caption" data-t="ch30-091">پیوند چپ: فایل 25_left_join.sql</p>
+
+    <div class="table-scroll">
+        <table>
+            <thead>
+                <tr><th data-t="ch30-092">نوع پیوند</th><th data-t="ch30-093">چه سطرهایی می‌مانند</th></tr>
+            </thead>
+            <tbody>
+                <tr><td><code>INNER JOIN</code></td><td data-t="ch30-094">فقط سطرهایی که در هر دو طرف تطابق دارند</td></tr>
+                <tr><td><code>LEFT JOIN</code></td><td data-t="ch30-095">همه سطرهای جدول چپ. طرف راست اگر نبود <code>NULL</code></td></tr>
+            </tbody>
+        </table>
+    </div>
+
+    <p data-t="ch30-096">
+        درسی که استاد ندارد در <code>INNER JOIN</code> کاملاً ناپدید می‌شود.
+        این رایج‌ترین علت این است که کسی می‌گوید «چرا رکوردهایم گم شدند».
+        اگر می‌خواهید همه سطرهای یک جدول را حتماً ببینید،
+        <code>LEFT JOIN</code> لازم است.
+    </p>
+
+    <h2 id="s14" data-t="ch30-097">۱۴. رابطه چندبه‌چند</h2>
+
+    <pre class="code"><code>-- A student follows several courses, and a course has several students:
+-- this is a MANY-TO-MANY relation, and it always needs a third table.
+CREATE TABLE enrollments (
+    enrollment_id INTEGER PRIMARY KEY AUTOINCREMENT,
+    student_id    INTEGER,
+    course_id     INTEGER,
+    grade         REAL,
+    enroll_date   DATE DEFAULT CURRENT_DATE,
+
+    FOREIGN KEY (student_id) REFERENCES students(student_id),
+    FOREIGN KEY (course_id)  REFERENCES courses(course_id),
+
+    -- A student cannot enrol twice in the same course.
+    UNIQUE (student_id, course_id)
+);
+
+-- Instead of typing the ids by hand, let SQL look them up.
+INSERT INTO enrollments (student_id, course_id, grade)
+SELECT s.student_id, c.course_id, 18.5
+FROM students s, courses c
+WHERE s.first_name = 'سارا' AND c.title = 'پایگاه داده';</code></pre>
+    <p class="code-caption" data-t="ch30-098">جدول واسط: فایل 26_enrollments.sql</p>
+
+    <pre class="code"><code>-- Four tables in one query: enrollments -&gt; students, courses -&gt; teachers.
+SELECT
+    s.first_name || ' ' || s.last_name AS 'نام دانشجو',
+    c.title                            AS 'نام درس',
+    t.teacher_name                     AS 'استاد',
+    e.grade                            AS 'نمره'
+FROM enrollments e
+JOIN students s ON e.student_id = s.student_id
+JOIN courses  c ON e.course_id  = c.course_id
+LEFT JOIN teachers t ON c.teacher_id = t.teacher_id
+ORDER BY s.last_name;
+
+-- The average grade of every course: a JOIN together with a GROUP BY.
+SELECT c.title, ROUND(AVG(e.grade), 2) AS average, COUNT(*) AS students
+FROM enrollments e
+JOIN courses c ON e.course_id = c.course_id
+GROUP BY c.title
+ORDER BY average DESC;</code></pre>
+    <p class="code-caption" data-t="ch30-099">چهار جدول در یک پرس‌وجو: فایل 27_results_three_joins.sql</p>
+
+    <h3 data-t="ch30-100">شرح مثال</h3>
+
+    <ul>
+        <li data-t="ch30-101">یک دانشجو چند درس دارد و یک درس چند دانشجو. این <strong>چندبه‌چند</strong> است و همیشه به جدول سومی نیاز دارد که دو طرف را به هم وصل کند.</li>
+        <li data-t="ch30-102">جدول واسط می‌تواند اطلاعات خودش را هم داشته باشد، مثل نمره و تاریخ ثبت‌نام.</li>
+        <li data-t="ch30-103"><code>UNIQUE (student_id, course_id)</code> یعنی ترکیب این دو ستون باید یکتا باشد. یک دانشجو نمی‌تواند دو بار در یک درس ثبت‌نام کند.</li>
+        <li data-t="ch30-104">ترفند درج با <code>SELECT</code>: به جای اینکه شناسه‌ها را دستی تایپ کنید، از خود SQL می‌خواهید پیدایشان کند. کد این‌طور مستقل از شماره‌های واقعی می‌شود.</li>
+        <li data-t="ch30-105">علامت <code>||</code> در SQLite رشته‌ها را به هم می‌چسباند، مثل <code>+</code> در پایتون.</li>
+    </ul>
+
+    <h2 id="s15" data-t="ch30-106">۱۵. رفتار هنگام حذف</h2>
+
+    <p data-t="ch30-107">
+        اگر دانشجویی حذف شود، ثبت‌نام‌هایش چه می‌شوند؟ سه جواب ممکن است و شما
+        باید یکی را انتخاب کنید.
+    </p>
+
+    <pre class="code"><code>PRAGMA foreign_keys = ON;      -- WITHOUT THIS LINE SQLITE IGNORES THE RULE!
+
+CREATE TABLE enrollments (
+    enrollment_id INTEGER PRIMARY KEY AUTOINCREMENT,
+    student_id    INTEGER,
+    course_id     INTEGER,
+    grade         REAL,
+
+    FOREIGN KEY (student_id) REFERENCES students(student_id) ON DELETE CASCADE,
+    FOREIGN KEY (course_id)  REFERENCES courses(course_id)  ON DELETE CASCADE
+);
+
+-- Now delete a course and look at the enrolments again:
+-- the matching rows disappeared by themselves.
+DELETE FROM courses WHERE title = 'ریاضی عمومی';</code></pre>
+    <p class="code-caption" data-t="ch30-108">حذف آبشاری: فایل 28_on_delete_cascade.sql</p>
+
+    <pre class="code"><code>-- A course whose teacher leaves is still a course: we only want to empty
+-- the reference, not to delete the course.
+CREATE TABLE courses (
+    course_id  INTEGER PRIMARY KEY AUTOINCREMENT,
+    title      TEXT NOT NULL,
+    unit       INTEGER CHECK (unit &gt; 0 AND unit &lt; 5),
+    teacher_id INTEGER,
+    FOREIGN KEY (teacher_id) REFERENCES teachers(teacher_id) ON DELETE SET NULL
+);
+
+-- Delete the teacher number 1: their courses stay, with teacher_id = NULL.
+DELETE FROM teachers WHERE teacher_id = 1;</code></pre>
+    <p class="code-caption" data-t="ch30-109">تهی کردن ارجاع: فایل 29_on_delete_set_null.sql</p>
+
+    <div class="table-scroll">
+        <table>
+            <thead>
+                <tr><th data-t="ch30-110">قاعده</th><th data-t="ch30-111">رفتار</th><th data-t="ch30-112">کی مناسب است</th></tr>
+            </thead>
+            <tbody>
+                <tr><td><code>ON DELETE CASCADE</code></td><td data-t="ch30-113">فرزندان هم حذف می‌شوند</td><td data-t="ch30-114">ثبت‌نام بدون دانشجو بی‌معناست</td></tr>
+                <tr><td><code>ON DELETE SET NULL</code></td><td data-t="ch30-115">ارجاع خالی می‌شود</td><td data-t="ch30-116">درس بدون استاد هنوز درس است</td></tr>
+                <tr><td data-t="ch30-117">هیچ‌کدام (پیش‌فرض)</td><td data-t="ch30-118">حذف رد می‌شود</td><td data-t="ch30-119">وقتی می‌خواهید عمداً جلوی حذف را بگیرید</td></tr>
+            </tbody>
+        </table>
+    </div>
+
+    <h2 id="s16" data-t="ch30-120">۱۶. تزریق SQL</h2>
+
+    <p data-t="ch30-121">
+        این بخش، مهم‌ترین بخش امنیتی کل دوره است. تصور کنید برنامه‌ای دستور
+        SQL خود را با چسباندن رشته‌ها می‌سازد:
+    </p>
+
+    <pre class="code"><code>name = input('name: ')
+cursor.execute("SELECT * FROM students WHERE first_name = '" + name + "'")</code></pre>
+    <p class="code-caption" data-t="ch30-122">کد بسیار خطرناک</p>
+
+    <p data-t="ch30-123">حالا ببینید کاربر بدخواه چه می‌تواند بکند:</p>
+
+    <div class="table-scroll">
+        <table>
+            <thead>
+                <tr><th data-t="ch30-124">کاربر تایپ می‌کند</th><th data-t="ch30-125">پایگاه داده دریافت می‌کند</th><th data-t="ch30-126">نتیجه</th></tr>
+            </thead>
+            <tbody>
+                <tr><td><code>' OR '1'='1</code></td><td><code>... WHERE first_name = '' OR '1'='1'</code></td><td data-t="ch30-127">همه دانشجویان برمی‌گردند</td></tr>
+                <tr><td><code>'; DROP TABLE students; --</code></td><td data-t="ch30-128">دو دستور جدا</td><td data-t="ch30-129">کل جدول نابود می‌شود</td></tr>
+            </tbody>
+        </table>
+    </div>
+
+    <div class="warn">
+        <span class="box-title" data-t="ch30-130">راه حل، و تنها راه حل</span>
+        <p data-t="ch30-131">
+            هرگز مقدارها را داخل متن SQL نچسبانید. از
+            <strong>پرس‌وجوی پارامتری</strong> استفاده کنید و بگذارید خود
+            درایور کار را انجام دهد:
+        </p>
+        <pre class="code"><code>cursor.execute('SELECT * FROM students WHERE first_name = ?', (name,))</code></pre>
+        <p data-t="ch30-132">
+            علامت سؤال یک جایگزینی متنی <strong>نیست</strong>. مقدار به شکل
+            داده جداگانه فرستاده می‌شود و هرگز نمی‌تواند به کد SQL تبدیل شود.
+            در فصل بعد این را کامل می‌بینید.
+        </p>
+    </div>
+
+    <p data-t="ch30-133">
+        تزریق SQL هنوز، بعد از بیست سال، یکی از سه آسیب‌پذیری اول وب در دنیاست.
+        نه به این دلیل که حل کردنش سخت است، بلکه به این دلیل که یک نفر در یک
+        جای پروژه فراموش می‌کند.
+    </p>
+
+    <div class="folder-ref">
+        <span class="box-title" data-t="ch30-134">فایل‌های تمرینی این فصل</span>
+        <p data-t="ch30-135">
+            پوشه <code>S30-sql-with-sqlite</code> شامل سی فایل
+            <code>sql.</code> است، از <code>01_create_students.sql</code> تا
+            <code>30_sql_injection.sql</code>. آنها را <strong>به
+            ترتیب</strong> اجرا کنید، چون هر کدام روی قبلی‌ها ساخته شده است.
+            نصب‌کننده DB Browser هم در پوشه <code>tools/</code> هست.
+        </p>
+    </div>
+
+    <h2 data-t="ch30-136">خلاصه فصل</h2>
+
+    <div class="table-scroll">
+        <table>
+            <thead>
+                <tr><th data-t="ch30-137">دستور</th><th data-t="ch30-138">وظیفه آن</th></tr>
+            </thead>
+            <tbody>
+                <tr><td><code>CREATE TABLE</code></td><td data-t="ch30-139">ساختن جدول</td></tr>
+                <tr><td><code>PRIMARY KEY</code> <code>NOT NULL</code> <code>UNIQUE</code> <code>CHECK</code></td><td data-t="ch30-140">محدودیت‌ها</td></tr>
+                <tr><td><code>FOREIGN KEY</code></td><td data-t="ch30-141">ارجاع به جدول دیگر</td></tr>
+                <tr><td><code>PRAGMA foreign_keys = ON;</code></td><td data-t="ch30-142">در SQLite اجباری است</td></tr>
+                <tr><td><code>INSERT INTO ... VALUES</code></td><td data-t="ch30-143">درج سطر</td></tr>
+                <tr><td><code>SELECT ... FROM ... WHERE</code></td><td data-t="ch30-144">خواندن با شرط</td></tr>
+                <tr><td><code>UPDATE ... SET ... WHERE</code></td><td data-t="ch30-145">تغییر داده‌ها؛ اجرای آن بدون WHERE بسیار خطرناک است</td></tr>
+                <tr><td><code>DELETE FROM ... WHERE</code></td><td data-t="ch30-146">حذف داده‌ها؛ اجرای آن بدون WHERE بسیار خطرناک است</td></tr>
+                <tr><td><code>ORDER BY</code> <code>LIMIT</code> <code>OFFSET</code></td><td data-t="ch30-147">مرتب‌سازی و صفحه‌بندی</td></tr>
+                <tr><td><code>BETWEEN</code> <code>IN</code> <code>LIKE</code> <code>DISTINCT</code></td><td data-t="ch30-148">جست‌وجوی پیشرفته</td></tr>
+                <tr><td><code>IS NULL</code></td><td data-t="ch30-149">تنها راه بررسی تهی بودن</td></tr>
+                <tr><td><code>COUNT SUM AVG MIN MAX</code></td><td data-t="ch30-150">توابع تجمعی</td></tr>
+                <tr><td data-t="ch30-151"><code>GROUP BY</code> و <code>HAVING</code></td><td data-t="ch30-152">گروه‌بندی و فیلتر گروه‌ها</td></tr>
+                <tr><td data-t="ch30-153"><code>INNER JOIN</code> و <code>LEFT JOIN</code></td><td data-t="ch30-154">پیوند جدول‌ها</td></tr>
+                <tr><td data-t="ch30-155">جدول واسط</td><td data-t="ch30-156">برای رابطه چندبه‌چند</td></tr>
+                <tr><td><code>ON DELETE CASCADE</code> / <code>SET NULL</code></td><td data-t="ch30-157">رفتار هنگام حذف والد</td></tr>
+                <tr><td data-t="ch30-158">پرس‌وجوی پارامتری</td><td data-t="ch30-159">تنها دفاع در برابر تزریق SQL</td></tr>
+            </tbody>
+        </table>
+    </div>
+
+    <div class="exercise">
+        <h3 data-t="ch30-160">تمرین‌های فصل سی</h3>
+        <p data-t="ch30-161">در DB Browser، روی پایگاه داده‌ای که فایل‌های ۰۱ تا ۰۶ ساخته‌اند کار کنید.</p>
+        <ol>
+            <li data-t="ch30-162">سه دانشجوی دلخواه اضافه کنید.</li>
+            <li data-t="ch30-163">دانشجویان متولد بعد از سال ۲۰۰۰ را مرتب‌شده بر اساس نام خانوادگی نشان دهید.</li>
+            <li data-t="ch30-164">دانشجویانی که نام خانوادگی‌شان حرف «ی» دارد را پیدا کنید.</li>
+            <li data-t="ch30-165">بشمارید چند دانشجو شماره تلفن ندارند.</li>
+            <li data-t="ch30-166">هر درس را همراه نام استادش نشان دهید.</li>
+            <li data-t="ch30-167">هر استاد را همراه تعداد درس‌هایش نشان دهید.</li>
+            <li data-t="ch30-168">استادانی که بیش از یک درس دارند را با <code>HAVING</code> پیدا کنید.</li>
+            <li data-t="ch30-169">برای هر درس، میانگین نمره دانشجویانش را نشان دهید.</li>
+            <li data-t="ch30-170">یک <code>CHECK</code> اضافه کنید که نمره حتماً بین ۰ تا ۲۰ باشد.</li>
+            <li data-t="ch30-171">جدول <code>payments</code> بسازید که با <code>ON DELETE CASCADE</code> به دانشجو وصل باشد و امتحان کنید که حذف دانشجو، پرداخت‌هایش را هم پاک می‌کند.</li>
+            <li data-t="ch30-172">فرق <code>WHERE</code> و <code>HAVING</code> را با زبان خودتان توضیح دهید.</li>
+            <li data-t="ch30-173">توضیح دهید اگر برنامه‌ای دستور SQL خود را با <code>+</code> بسازد و کاربر <code>' OR '1'='1</code> تایپ کند، چه اتفاقی می‌افتد.</li>
+        </ol>
+    </div>
+
+    <div class="pager">
+        <a href="chapter-29.html">فصل قبل: ارزشیابی میان‌ترم</a>
+        <a href="chapter-31.html">فصل بعد: sqlite3 در پایتون</a>
+    </div>
+
+</main>
+
+</body>
+</html>

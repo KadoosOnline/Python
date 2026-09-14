@@ -1,0 +1,16 @@
+{% extends 'base.html' %}
+
+{% block title %}Home &mdash; {{ site_name }}{% endblock %}
+
+{% block content %}
+    <h2>Welcome!</h2>
+    <p>We teach Python in Rasht, in two terms of twenty sessions.</p>
+
+    <h3>Our courses</h3>
+    <div class="cards">
+        {% for course in courses %}
+            {# One file, reused for every card. `course` is visible inside. #}
+            {% include 'course_card.html' %}
+        {% endfor %}
+    </div>
+{% endblock %}

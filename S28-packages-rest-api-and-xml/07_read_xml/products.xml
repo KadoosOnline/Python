@@ -1,0 +1,121 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<products>
+    <product id="101" name="Intel Core i7-13700K" serial="CN-13700K-9A3B" manufacturer="Intel" production_date="2024-03-12">
+        <tags>
+            <tag>CPU</tag>
+            <tag>13th Gen</tag>
+            <tag>Overclockable</tag>
+            <tag>LGA1700</tag>
+        </tags>
+        <categories>
+            <category>Processor</category>
+            <category>Desktop</category>
+        </categories>
+    </product>
+    <product id="102" name="AMD Ryzen 7 7800X3D" serial="US-7800X3D-C74F" manufacturer="AMD" production_date="2024-05-20">
+        <tags>
+            <tag>CPU</tag>
+            <tag>3D V-Cache</tag>
+            <tag>Gaming</tag>
+            <tag>AM5</tag>
+        </tags>
+        <categories>
+            <category>Processor</category>
+            <category>Desktop</category>
+        </categories>
+    </product>
+    <product id="201" name="NVIDIA GeForce RTX 4070" serial="TW-4070-112X" manufacturer="NVIDIA" production_date="2023-11-15">
+        <tags>
+            <tag>GPU</tag>
+            <tag>Ada Lovelace</tag>
+            <tag>Ray Tracing</tag>
+            <tag>DLSS 3</tag>
+        </tags>
+        <categories>
+            <category>Graphics Card</category>
+            <category>Gaming</category>
+        </categories>
+    </product>
+    <product id="202" name="AMD Radeon RX 7800 XT" serial="KR-7800XT-8E2D" manufacturer="AMD" production_date="2024-01-08">
+        <tags>
+            <tag>GPU</tag>
+            <tag>RDNA 3</tag>
+            <tag>16GB VRAM</tag>
+        </tags>
+        <categories>
+            <category>Graphics Card</category>
+            <category>Gaming</category>
+        </categories>
+    </product>
+    <product id="301" name="Corsair Vengeance 32GB DDR5" serial="TW-32GD5-5600C" manufacturer="Corsair" production_date="2024-02-28">
+        <tags>
+            <tag>RAM</tag>
+            <tag>DDR5</tag>
+            <tag>5600MHz</tag>
+            <tag>32GB</tag>
+        </tags>
+        <categories>
+            <category>Memory</category>
+            <category>Desktop</category>
+        </categories>
+    </product>
+    <product id="401" name="Samsung 990 Pro 2TB SSD" serial="KR-990P2TB-4N5M" manufacturer="Samsung" production_date="2023-09-05">
+        <tags>
+            <tag>SSD</tag>
+            <tag>NVMe</tag>
+            <tag>PCIe 4.0</tag>
+            <tag>2TB</tag>
+        </tags>
+        <categories>
+            <category>Storage</category>
+            <category>Internal</category>
+        </categories>
+    </product>
+    <product id="501" name="ASUS ROG STRIX B650-A" serial="CN-B650-A-WF6G" manufacturer="ASUS" production_date="2024-04-10">
+        <tags>
+            <tag>Motherboard</tag>
+            <tag>AM5</tag>
+            <tag>WiFi 6E</tag>
+            <tag>ATX</tag>
+        </tags>
+        <categories>
+            <category>Motherboard</category>
+            <category>Desktop</category>
+        </categories>
+    </product>
+    <product id="601" name="Corsair RM850x PSU" serial="CN-RM850X-22KL" manufacturer="Corsair" production_date="2023-12-01">
+        <tags>
+            <tag>PSU</tag>
+            <tag>850W</tag>
+            <tag>80+ Gold</tag>
+            <tag>Modular</tag>
+        </tags>
+        <categories>
+            <category>Power Supply</category>
+            <category>Desktop</category>
+        </categories>
+    </product>
+    <product id="701" name="Noctua NH-D15 Cooler" serial="AT-NHD15-9M8P" manufacturer="Noctua" production_date="2024-06-18">
+        <tags>
+            <tag>Cooler</tag>
+            <tag>Air Cooling</tag>
+            <tag>Dual Tower</tag>
+        </tags>
+        <categories>
+            <category>Cooling</category>
+            <category>Desktop</category>
+        </categories>
+    </product>
+    <product id="801" name="Fractal Design Pop Air Case" serial="SE-POPAIR-RGB3" manufacturer="Fractal Design" production_date="2024-07-25">
+        <tags>
+            <tag>Case</tag>
+            <tag>Mid Tower</tag>
+            <tag>RGB</tag>
+            <tag>Tempered Glass</tag>
+        </tags>
+        <categories>
+            <category>Case</category>
+            <category>Desktop</category>
+        </categories>
+    </product>
+</products>

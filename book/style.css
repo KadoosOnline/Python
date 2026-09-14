@@ -1,0 +1,597 @@
+/* ==========================================================
+   کتاب برنامه‌نویسی پایتون
+   مؤسسه فنی و آموزشی کادوس، رشت
+   پوسته رنگی: آبی و زرد پایتون
+   نویسنده: علیرضا م. احمدی
+   ========================================================== */
+
+:root {
+    --primary: #306998;         /* آبی پایتون */
+    --primary-dark: #21486b;
+    --accent: #ffd43b;          /* زرد پایتون */
+    --accent-ink: #8a6a00;      /* نسخه خوانای زرد، برای متن روی پس‌زمینه روشن */
+    --accent-soft: #fff6d0;
+    --bg: #f1f4f8;
+    --paper: #ffffff;
+    --text: #26303a;
+    --muted: #6b7684;
+    --border: #dfe5ec;
+    --code-bg: #1e2f43;
+    --out-bg: #15202b;
+    --radius: 10px;
+    --maxw: 880px;
+}
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: Tahoma, sans-serif;
+}
+
+html {
+    scroll-behavior: smooth;
+}
+
+body {
+    background-color: var(--bg);
+    color: var(--text);
+    line-height: 2;
+    font-size: 1rem;
+}
+
+/* ---------- نوار بالای کتاب ---------- */
+.book-bar {
+    background-color: var(--primary);
+    color: #ffffff;
+    padding: 12px 25px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 10px;
+    position: sticky;
+    top: 0;
+    z-index: 50;
+}
+
+.book-bar .name {
+    font-weight: bold;
+}
+
+/* عنوان کتاب لینک است ولی نباید مثل دکمه گرد و رنگی شود */
+.book-bar a.name {
+    background-color: transparent;
+    padding: 0;
+    border-radius: 0;
+    font-size: 1rem;
+    transition: color 0.3s;
+}
+
+.book-bar a.name:hover {
+    background-color: transparent;
+    color: var(--accent);
+}
+
+/* روی زرد، متن باید تیره باشد نه سفید */
+.book-bar a:hover,
+.pager a:hover {
+    color: var(--primary-dark);
+}
+
+.book-bar a {
+    color: #ffffff;
+    text-decoration: none;
+    background-color: rgba(255, 255, 255, 0.14);
+    padding: 5px 14px;
+    border-radius: 20px;
+    font-size: 0.9rem;
+    transition: background-color 0.3s;
+}
+
+.book-bar a:hover {
+    background-color: var(--accent);
+}
+
+/* ---------- صفحه کتاب ---------- */
+.paper {
+    max-width: var(--maxw);
+    margin: 30px auto 60px;
+    background-color: var(--paper);
+    padding: 45px 50px;
+    border-radius: var(--radius);
+    box-shadow: 0 2px 14px rgba(0, 0, 0, 0.07);
+}
+
+/* ---------- سرصفحه فصل ---------- */
+.chapter-head {
+    border-bottom: 2px solid var(--border);
+    padding-bottom: 22px;
+    margin-bottom: 30px;
+}
+
+.chapter-num {
+    display: inline-block;
+    background-color: var(--accent-soft);
+    color: var(--accent-ink);
+    padding: 4px 16px;
+    border-radius: 20px;
+    font-size: 0.9rem;
+    font-weight: bold;
+    margin-bottom: 12px;
+}
+
+.chapter-head h1 {
+    color: var(--primary);
+    font-size: 1.9rem;
+    line-height: 1.6;
+    margin-bottom: 10px;
+}
+
+.lead {
+    color: var(--muted);
+    font-size: 1.05rem;
+}
+
+/* ---------- عنوان‌ها ---------- */
+h2 {
+    color: var(--primary);
+    font-size: 1.35rem;
+    margin-top: 45px;
+    margin-bottom: 14px;
+    padding-bottom: 10px;
+    position: relative;
+}
+
+h2::after {
+    content: "";
+    position: absolute;
+    right: 0;
+    bottom: 0;
+    width: 55px;
+    height: 3px;
+    background-color: var(--accent);
+    border-radius: 2px;
+}
+
+h3 {
+    color: var(--primary-dark);
+    font-size: 1.1rem;
+    margin-top: 28px;
+    margin-bottom: 10px;
+}
+
+p {
+    margin-bottom: 15px;
+    text-align: justify;
+}
+
+ul, ol {
+    margin-bottom: 18px;
+    padding-right: 26px;
+}
+
+li {
+    margin-bottom: 8px;
+}
+
+strong {
+    color: var(--primary-dark);
+}
+
+/* لینک‌های داخل متن. لینک‌های منو و فهرست، استایل خودشان را دارند. */
+.paper p a {
+    color: var(--primary);
+    text-decoration: none;
+    border-bottom: 1px solid var(--accent);
+    transition: color 0.3s;
+}
+
+.paper p a:hover {
+    color: var(--accent-ink);
+}
+
+/* ---------- کد ---------- */
+code {
+    background-color: #eef2f7;
+    color: #b3541e;
+    padding: 2px 6px;
+    border-radius: 4px;
+    font-family: Consolas, monospace;
+    font-size: 0.92em;
+    direction: ltr;
+    display: inline-block;
+}
+
+pre.code {
+    background-color: var(--code-bg);
+    color: #f2f2f2;
+    padding: 18px 20px;
+    border-radius: var(--radius);
+    direction: ltr;
+    text-align: left;
+    font-family: Consolas, monospace;
+    font-size: 0.88rem;
+    line-height: 1.8;
+    overflow-x: auto;
+    margin-bottom: 8px;
+    white-space: pre;
+}
+
+pre.code code {
+    background-color: transparent;
+    color: inherit;
+    padding: 0;
+    font-size: 1em;
+    display: inline;
+}
+
+/* خروجی ترمینال. مثل کد است ولی رنگ تیره‌تر و بدون گوشه رنگی */
+pre.out {
+    background-color: var(--out-bg);
+    color: #d6e4f5;
+    padding: 16px 20px;
+    border-radius: var(--radius);
+    direction: ltr;
+    text-align: left;
+    font-family: Consolas, monospace;
+    font-size: 0.86rem;
+    line-height: 1.8;
+    overflow-x: auto;
+    margin-bottom: 8px;
+    white-space: pre;
+}
+
+/* عنوان زیر بلوک کد. متن فارسی است، پس راست‌چین می‌ماند */
+.code-caption {
+    color: var(--muted);
+    font-size: 0.85rem;
+    margin-bottom: 20px;
+    direction: rtl;
+    text-align: right;
+}
+
+/* ---------- جعبه‌های نکته ---------- */
+.note, .tip, .warn, .try {
+    padding: 15px 18px;
+    border-radius: var(--radius);
+    margin: 22px 0;
+    border-right: 4px solid;
+}
+
+.note {
+    background-color: #eaf1f8;
+    border-right-color: var(--primary);
+}
+
+.tip {
+    background-color: #edf7ee;
+    border-right-color: #4c9a54;
+}
+
+.warn {
+    background-color: #fff6e0;
+    border-right-color: #e0a500;
+}
+
+.try {
+    background-color: var(--accent-soft);
+    border-right-color: var(--accent);
+}
+
+.note p:last-child,
+.tip p:last-child,
+.warn p:last-child,
+.try p:last-child {
+    margin-bottom: 0;
+}
+
+.box-title {
+    display: block;
+    font-weight: bold;
+    color: var(--primary-dark);
+    margin-bottom: 6px;
+}
+
+/* ---------- جدول ---------- */
+table {
+    width: 100%;
+    border-collapse: collapse;
+    margin: 20px 0 25px;
+    font-size: 0.95rem;
+}
+
+th, td {
+    border: 1px solid var(--border);
+    padding: 10px 12px;
+    text-align: right;
+}
+
+th {
+    background-color: var(--primary);
+    color: #ffffff;
+    font-weight: bold;
+}
+
+tbody tr:nth-child(even) {
+    background-color: #f6f8fb;
+}
+
+td code {
+    white-space: nowrap;
+}
+
+/* جدول‌های پهن، مثل جدول عملگرها، در موبایل قابل کشیدن می‌شوند */
+.table-scroll {
+    overflow-x: auto;
+    margin-bottom: 25px;
+}
+
+.table-scroll table {
+    margin-bottom: 0;
+}
+
+/* ---------- نتیجه اجرا ---------- */
+.result {
+    border: 2px dashed var(--border);
+    border-radius: var(--radius);
+    padding: 20px;
+    margin-bottom: 22px;
+    background-color: #fcfcfc;
+}
+
+.result-label {
+    display: block;
+    color: var(--muted);
+    font-size: 0.85rem;
+    margin-bottom: 12px;
+}
+
+/* ---------- فهرست کوچک ابتدای فصل ---------- */
+.mini-toc {
+    background-color: #f6f8fb;
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 18px 22px;
+    margin-bottom: 35px;
+}
+
+.mini-toc .box-title {
+    margin-bottom: 10px;
+}
+
+.mini-toc ol {
+    margin-bottom: 0;
+}
+
+.mini-toc a {
+    color: var(--primary);
+    text-decoration: none;
+}
+
+.mini-toc a:hover {
+    color: var(--accent-ink);
+    text-decoration: underline;
+}
+
+/* ---------- ارجاع به پوشه تمرین ---------- */
+.folder-ref {
+    background-color: var(--primary);
+    color: #ffffff;
+    padding: 14px 18px;
+    border-radius: var(--radius);
+    margin: 25px 0;
+    font-size: 0.95rem;
+}
+
+.folder-ref .box-title {
+    color: #ffffff;
+}
+
+.folder-ref code {
+    background-color: rgba(255, 255, 255, 0.15);
+    color: var(--accent);
+}
+
+/* ---------- تمرین پایان فصل ---------- */
+.exercise {
+    border: 2px solid var(--primary);
+    border-radius: var(--radius);
+    padding: 22px 25px;
+    margin-top: 40px;
+}
+
+.exercise h3 {
+    margin-top: 0;
+    color: var(--primary);
+}
+
+/* ---------- صفحه‌بندی پایین فصل ---------- */
+.pager {
+    display: flex;
+    justify-content: space-between;
+    gap: 12px;
+    margin-top: 50px;
+    padding-top: 25px;
+    border-top: 2px solid var(--border);
+    flex-wrap: wrap;
+}
+
+.pager a {
+    background-color: var(--primary);
+    color: #ffffff;
+    text-decoration: none;
+    padding: 10px 20px;
+    border-radius: var(--radius);
+    transition: background-color 0.3s;
+    font-size: 0.95rem;
+}
+
+.pager a:hover {
+    background-color: var(--accent);
+}
+
+.pager .disabled {
+    background-color: #cccccc;
+    cursor: default;
+    pointer-events: none;
+}
+
+/* ---------- جلد ---------- */
+.cover {
+    background-color: var(--primary);
+    color: #ffffff;
+    text-align: center;
+    padding: 70px 30px;
+    border-radius: var(--radius);
+    margin-bottom: 35px;
+}
+
+.cover h1 {
+    font-size: 2.3rem;
+    line-height: 1.7;
+    margin-bottom: 14px;
+}
+
+.cover .subtitle {
+    font-size: 1.1rem;
+    color: #cfe0f2;
+    margin-bottom: 30px;
+    text-align: center;   /* قانون سراسری p را خنثی می‌کند */
+}
+
+.cover .author {
+    display: inline-block;
+    border-top: 2px solid var(--accent);
+    padding-top: 14px;
+    font-size: 1.05rem;
+}
+
+.cover .author a {
+    color: inherit;
+    text-decoration: none;
+    border-bottom: 1px solid transparent;
+    transition: color 0.3s, border-color 0.3s;
+}
+
+.cover .author a:hover {
+    color: var(--accent);
+    border-bottom-color: var(--accent);
+}
+
+/* ---------- فهرست مطالب ---------- */
+.term-head {
+    background-color: var(--accent-soft);
+    color: var(--primary-dark);
+    border-radius: var(--radius);
+    padding: 12px 18px;
+    margin: 30px 0 16px;
+    font-weight: bold;
+}
+
+.toc-list {
+    list-style: none;
+    padding: 0;
+}
+
+.toc-item {
+    display: flex;
+    gap: 18px;
+    align-items: flex-start;
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 16px 18px;
+    margin-bottom: 12px;
+    text-decoration: none;
+    color: var(--text);
+    transition: border-color 0.3s, transform 0.2s;
+}
+
+.toc-item:hover {
+    border-color: var(--accent);
+    transform: translateX(-4px);
+}
+
+.toc-item .num {
+    flex-shrink: 0;
+    width: 46px;
+    height: 46px;
+    background-color: var(--primary);
+    color: #ffffff;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: bold;
+}
+
+.toc-item .t {
+    font-weight: bold;
+    color: var(--primary);
+    display: block;
+    margin-bottom: 3px;
+}
+
+.toc-item .d {
+    color: var(--muted);
+    font-size: 0.92rem;
+    line-height: 1.7;
+}
+
+/* جلسه‌های ارزشیابی در فهرست، کم‌رنگ‌تر دیده می‌شوند */
+.toc-item.eval .num {
+    background-color: var(--accent);
+    color: var(--primary-dark);
+}
+
+/* ---------- موبایل ---------- */
+@media (max-width: 700px) {
+    body {
+        font-size: 0.95rem;
+    }
+
+    .paper {
+        margin: 15px 10px 40px;
+        padding: 25px 20px;
+    }
+
+    .chapter-head h1 {
+        font-size: 1.5rem;
+    }
+
+    .cover {
+        padding: 45px 20px;
+    }
+
+    .cover h1 {
+        font-size: 1.6rem;
+    }
+
+    .toc-item {
+        gap: 12px;
+        padding: 14px;
+    }
+}
+
+/* ---------- چاپ ---------- */
+@media print {
+    body {
+        background-color: #ffffff;
+    }
+
+    .book-bar, .pager {
+        display: none;
+    }
+
+    .paper {
+        box-shadow: none;
+        margin: 0;
+        max-width: 100%;
+    }
+
+    pre.code, pre.out {
+        background-color: #f0f0f0;
+        color: #000000;
+        border: 1px solid #cccccc;
+    }
+}

@@ -1,0 +1,452 @@
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="فصل چهل: جلسه ارزشیابی پایانی، مرور فصل ۳۰ تا ۳۹، دفاع از پروژه پایانی، نمونه آزمون و نقشه راه ادامه مسیر">
+    <title>فصل ۴۰: ارزشیابی پایانی</title>
+    <link rel="icon" href="logokm.png" type="image/png">
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<header class="book-bar">
+    <a class="name" href="index.html">برنامه‌نویسی پایتون</a>
+    <a href="index.html">فهرست مطالب</a>
+</header>
+
+<main class="paper">
+
+    <div class="chapter-head">
+        <span class="chapter-num">فصل ۴۰</span>
+        <h1 data-t="ch40-001">ارزشیابی پایانی</h1>
+        <p class="lead" data-t="ch40-002">
+            این جلسه، جلسه آزمون است و <strong>مطلب تازه‌ای ندارد</strong>.
+            این فصل برای مرور نوشته شده است: خلاصه فصل ۳۰ تا ۳۹، راهنمای دفاع
+            از پروژه پایانی، یک نمونه آزمون کامل، و در پایان نقشه راهی برای
+            ادامه مسیر بعد از این دوره.
+        </p>
+    </div>
+
+    <div class="mini-toc">
+        <span class="box-title" data-t="ch40-003">در این فصل می‌خوانید</span>
+        <ol>
+            <li data-t="ch40-004"><a href="#s1">چه چیزهایی ارزشیابی می‌شود</a></li>
+            <li data-t="ch40-005"><a href="#s2">مرور پایگاه داده و ORM</a></li>
+            <li data-t="ch40-006"><a href="#s3">مرور رابط گرافیکی</a></li>
+            <li data-t="ch40-007"><a href="#s4">مرور همروندی</a></li>
+            <li data-t="ch40-008"><a href="#s5">مرور وب</a></li>
+            <li data-t="ch40-009"><a href="#s6">دفاع از پروژه پایانی</a></li>
+            <li data-t="ch40-010"><a href="#s7">چک‌لیست آمادگی</a></li>
+            <li data-t="ch40-011"><a href="#s8">اشتباه‌های پرتکرار</a></li>
+            <li data-t="ch40-012"><a href="#s9">نمونه آزمون تشریحی</a></li>
+            <li data-t="ch40-013"><a href="#s10">نمونه آزمون عملی</a></li>
+            <li data-t="ch40-014"><a href="#s11">پاسخ کوتاه سؤال‌های مفهومی</a></li>
+            <li data-t="ch40-015"><a href="#s12">نقشه راه ادامه مسیر</a></li>
+        </ol>
+    </div>
+
+    <h2 id="s1" data-t="ch40-016">۱. چه چیزهایی ارزشیابی می‌شود</h2>
+
+    <div class="table-scroll">
+        <table>
+            <thead>
+                <tr><th data-t="ch40-017">فصل</th><th data-t="ch40-018">موضوع</th><th data-t="ch40-019">وزن تقریبی</th></tr>
+            </thead>
+            <tbody>
+                <tr><td data-t="ch40-020">۳۰</td><td data-t="ch40-021">SQL: جدول، شرط، تجمیع، JOIN</td><td data-t="ch40-022">زیاد</td></tr>
+                <tr><td data-t="ch40-023">۳۱</td><td data-t="ch40-024">sqlite3، پارامتر، تراکنش</td><td data-t="ch40-025">زیاد</td></tr>
+                <tr><td data-t="ch40-026">۳۲</td><td data-t="ch40-027">ORM، SQLAlchemy، رابطه‌ها</td><td data-t="ch40-028">زیاد</td></tr>
+                <tr><td data-t="ch40-029">۳۳</td><td data-t="ch40-030">الگوهای طراحی</td><td data-t="ch40-031">متوسط</td></tr>
+                <tr><td data-t="ch40-032">۳۴ و ۳۵</td><td data-t="ch40-033">tkinter، چیدمان، رویداد، Treeview</td><td data-t="ch40-034">زیاد</td></tr>
+                <tr><td data-t="ch40-035">۳۶</td><td data-t="ch40-036">PySide6، Designer، PyInstaller</td><td data-t="ch40-037">متوسط</td></tr>
+                <tr><td data-t="ch40-038">۳۷</td><td data-t="ch40-039">نخ، قفل، صف، asyncio</td><td data-t="ch40-040">متوسط</td></tr>
+                <tr><td data-t="ch40-041">۳۸</td><td data-t="ch40-042">Flask: مسیر، قالب، فرم، نشست، API</td><td data-t="ch40-043">زیاد</td></tr>
+                <tr><td data-t="ch40-044">۳۹</td><td data-t="ch40-045">معماری پروژه، Git و GitHub</td><td data-t="ch40-046">زیاد</td></tr>
+            </tbody>
+        </table>
+    </div>
+
+    <h2 id="s2" data-t="ch40-047">۲. مرور پایگاه داده و ORM</h2>
+
+    <div class="table-scroll">
+        <table>
+            <thead>
+                <tr><th data-t="ch40-048">سؤال</th><th data-t="ch40-049">پاسخ کوتاه</th></tr>
+            </thead>
+            <tbody>
+                <tr><td data-t="ch40-050">کلید اصلی و کلید خارجی چه فرقی دارند</td><td data-t="ch40-051">اولی هر سطر را یکتا می‌کند، دومی به سطری در جدول دیگر اشاره می‌کند</td></tr>
+                <tr><td data-t="ch40-052"><code>WHERE</code> و <code>HAVING</code></td><td data-t="ch40-053">اولی روی سطرها پیش از گروه‌بندی، دومی روی گروه‌ها بعد از آن</td></tr>
+                <tr><td data-t="ch40-054">سه نوع <code>JOIN</code></td><td data-t="ch40-055"><code>INNER</code> فقط مشترک‌ها، <code>LEFT</code> همه چپ، <code>RIGHT</code> همه راست</td></tr>
+                <tr><td data-t="ch40-056">چرا پارامتر <code>?</code></td><td data-t="ch40-057">تنها دفاع در برابر تزریق SQL؛ مقدار هرگز به کد تبدیل نمی‌شود</td></tr>
+                <tr><td data-t="ch40-058">تراکنش یعنی چه</td><td data-t="ch40-059">چند دستور که یا همه انجام می‌شوند یا هیچ‌کدام</td></tr>
+                <tr><td><code>PRAGMA foreign_keys = ON</code></td><td data-t="ch40-060">در هر اتصال لازم است؛ بدون آن <code>ON DELETE</code> هیچ کاری نمی‌کند</td></tr>
+                <tr><td data-t="ch40-061">ORM چیست</td><td data-t="ch40-062">جدول به کلاس، سطر به شیء، ستون به صفت</td></tr>
+                <tr><td data-t="ch40-063"><code>flush</code> و <code>commit</code></td><td data-t="ch40-064">اولی شناسه می‌سازد، دومی تراکنش را می‌بندد</td></tr>
+                <tr><td data-t="ch40-065">مسئله N+1</td><td data-t="ch40-066">یک پرس‌وجو برای هر سطر؛ درمانش <code>selectinload</code> یا <code>joinedload</code></td></tr>
+            </tbody>
+        </table>
+    </div>
+
+    <h2 id="s3" data-t="ch40-067">۳. مرور رابط گرافیکی</h2>
+
+    <div class="table-scroll">
+        <table>
+            <thead>
+                <tr><th data-t="ch40-068">موضوع</th><th>tkinter</th><th>Qt (PySide6)</th></tr>
+            </thead>
+            <tbody>
+                <tr><td data-t="ch40-069">شروع</td><td data-t="ch40-070"><code>Tk()</code> و <code>mainloop()</code></td><td data-t="ch40-071"><code>QApplication</code> و <code>app.exec()</code></td></tr>
+                <tr><td data-t="ch40-072">پاسخ به کلیک</td><td><code>command=func</code></td><td><code>button.clicked.connect(func)</code></td></tr>
+                <tr><td data-t="ch40-073">چیدمان</td><td data-t="ch40-074"><code>pack</code> و <code>grid</code></td><td data-t="ch40-075"><code>QVBoxLayout</code> و خانواده‌اش</td></tr>
+                <tr><td data-t="ch40-076">جدول</td><td><code>ttk.Treeview</code></td><td><code>QTableWidget</code></td></tr>
+                <tr><td data-t="ch40-077">پنجره دوم</td><td><code>Toplevel</code> + <code>grab_set</code> + <code>wait_window</code></td><td><code>QDialog.exec()</code></td></tr>
+                <tr><td data-t="ch40-078">بستن پنجره</td><td><code>protocol('WM_DELETE_WINDOW', f)</code></td><td><code>closeEvent</code></td></tr>
+                <tr><td data-t="ch40-079">کار زمان‌بندی‌شده</td><td><code>after()</code></td><td><code>QTimer</code></td></tr>
+            </tbody>
+        </table>
+    </div>
+
+    <p data-t="ch40-080">
+        سه قانونی که در هر دو یکسان‌اند: ویجت را با مختصات پیکسلی نچینید؛
+        هرگز از نخ دیگری به ویجت دست نزنید؛ و ویجت را انبار داده خود نکنید.
+    </p>
+
+    <h2 id="s4" data-t="ch40-081">۴. مرور همروندی</h2>
+
+    <div class="table-scroll">
+        <table>
+            <thead>
+                <tr><th data-t="ch40-082">برنامه وقتش را صرف چه می‌کند</th><th data-t="ch40-083">ابزار</th></tr>
+            </thead>
+            <tbody>
+                <tr><td data-t="ch40-084">انتظار، با تعداد کم کار</td><td data-t="ch40-085"><code>threading</code> یا <code>ThreadPoolExecutor</code></td></tr>
+                <tr><td data-t="ch40-086">انتظار، با صدها یا هزاران کار</td><td><code>asyncio</code></td></tr>
+                <tr><td data-t="ch40-087">محاسبه</td><td><code>ProcessPoolExecutor</code></td></tr>
+            </tbody>
+        </table>
+    </div>
+
+    <ul>
+        <li data-t="ch40-088"><strong>شرایط رقابتی</strong>: <code>counter += 1</code> سه قدم است. دو نخ که روی یک متغیر می‌نویسند، به قفل نیاز دارند.</li>
+        <li data-t="ch40-089"><strong>صف</strong> به قفل نیاز ندارد، چون خودش امن است. داده را از راه صف رد و بدل کنید.</li>
+        <li data-t="ch40-090"><strong>GIL</strong>: هر لحظه یک نخ بایت‌کد اجرا می‌کند. برای محاسبه، نخ بی‌فایده است.</li>
+        <li data-t="ch40-091"><strong>asyncio</strong>: هرگز تابع مسدودکننده در کوروتین صدا نزنید. <code>asyncio.sleep</code>، نه <code>time.sleep</code>.</li>
+        <li data-t="ch40-092">استثنای داخل یک <code>Future</code> تا وقتی <code>result()</code> را نخوانید دیده نمی‌شود.</li>
+    </ul>
+
+    <h2 id="s5" data-t="ch40-093">۵. مرور وب</h2>
+
+    <div class="table-scroll">
+        <table>
+            <thead>
+                <tr><th data-t="ch40-094">موضوع</th><th data-t="ch40-095">نکته کلیدی</th></tr>
+            </thead>
+            <tbody>
+                <tr><td><code>@app.route</code></td><td data-t="ch40-096">آدرس به تابع نما وصل می‌شود</td></tr>
+                <tr><td><code>url_for</code></td><td data-t="ch40-097">هرگز لینک را دستی ننویسید</td></tr>
+                <tr><td data-t="ch40-098">۴۰۴ در برابر ۵۰۰</td><td data-t="ch40-099">«وجود ندارد» در برابر «من اشتباه کردم»</td></tr>
+                <tr><td data-t="ch40-100">گریز خودکار Jinja</td><td data-t="ch40-101">محافظ XSS؛ <code>safe</code> روی داده کاربر ممنوع</td></tr>
+                <tr><td>POST / Redirect / GET</td><td data-t="ch40-102">تا F5 فرم را دوباره نفرستد</td></tr>
+                <tr><td data-t="ch40-103">نشست</td><td data-t="ch40-104">کوکی امضاشده ولی <strong>خواندنی</strong></td></tr>
+                <tr><td data-t="ch40-105">رمز عبور</td><td data-t="ch40-106">فقط درهم ذخیره می‌شود، هرگز خام</td></tr>
+                <tr><td data-t="ch40-107">کد وضعیت API</td><td data-t="ch40-108">۲۰۱ برای ساخت، ۴۰۰ برای خطای مشتری، ۲۰۴ برای حذف</td></tr>
+                <tr><td><code>debug=True</code></td><td data-t="ch40-109">هرگز روی سرور واقعی</td></tr>
+            </tbody>
+        </table>
+    </div>
+
+    <h2 id="s6" data-t="ch40-110">۶. دفاع از پروژه پایانی</h2>
+
+    <p data-t="ch40-111">
+        در این جلسه پروژه پایانی‌تان را ارائه و از آن دفاع می‌کنید. سؤال‌هایی
+        که تقریباً حتماً پرسیده می‌شوند:
+    </p>
+
+    <ol>
+        <li data-t="ch40-112">برنامه‌تان را در سه جمله توصیف کنید. چه مسئله‌ای را حل می‌کند؟</li>
+        <li data-t="ch40-113">یک کلیک را از دکمه تا پایگاه داده دنبال کنید و همه توابعی را که اجرا می‌شوند نام ببرید.</li>
+        <li data-t="ch40-114">یک قانون کسب‌وکار پروژه‌تان را نشان دهید و بگویید <strong>دقیقاً کجا</strong> نوشته شده است. اگر در دو جا نوشته شده، چرا؟</li>
+        <li data-t="ch40-115">اگر بخواهیم همین برنامه را فردا به شکل یک سایت دربیاوریم، چه بخشی از کد را باید دوباره بنویسید؟</li>
+        <li data-t="ch40-116">کدام عمل برنامه شما باید حتماً در یک تراکنش باشد و چرا؟</li>
+        <li data-t="ch40-117">یک ورودی اشتباه به من نشان دهید و بگویید برنامه با آن چه می‌کند.</li>
+        <li data-t="ch40-118">در <code>.gitignore</code> چه گذاشته‌اید و هر خطش جلوی چه اشتباهی را می‌گیرد؟</li>
+        <li data-t="ch40-119">تاریخچه کامیت‌هایتان را نشان دهید. پیام‌ها گویا هستند؟</li>
+    </ol>
+
+    <div class="tip">
+        <span class="box-title" data-t="ch40-120">آنچه ارزیاب واقعاً می‌بیند</span>
+        <p data-t="ch40-121">
+            برنامه‌ای که ده امکان دارد و هنگام کلیک اول می‌ترکد، از برنامه‌ای
+            با چهار امکان که همه‌شان بی‌نقص کار می‌کنند ضعیف‌تر است.
+            <strong>اول کار کردن، بعد کامل بودن.</strong> پیش از ارائه، برنامه
+            را روی یک پوشه خالی و تازه یک بار کامل اجرا کنید.
+        </p>
+    </div>
+
+    <h2 id="s7" data-t="ch40-122">۷. چک‌لیست آمادگی</h2>
+
+    <div class="table-scroll">
+        <table>
+            <thead>
+                <tr><th></th><th data-t="ch40-123">باید بتوانم</th></tr>
+            </thead>
+            <tbody>
+                <tr><td data-t="ch40-124">۱</td><td data-t="ch40-125">جدولی با کلید خارجی بسازم و سه نوع JOIN را بنویسم</td></tr>
+                <tr><td data-t="ch40-126">۲</td><td data-t="ch40-127">از پایتون به SQLite وصل شوم و چهار عمل اصلی را با پارامتر بنویسم</td></tr>
+                <tr><td data-t="ch40-128">۳</td><td data-t="ch40-129">یک عمل دومرحله‌ای را در یک تراکنش امن کنم</td></tr>
+                <tr><td data-t="ch40-130">۴</td><td data-t="ch40-131">دو مدل SQLAlchemy با رابطه یک‌به‌چند تعریف کنم</td></tr>
+                <tr><td data-t="ch40-132">۵</td><td data-t="ch40-133">یک زنجیره <code>if/elif</code> را با الگوی استراتژی بازنویسی کنم</td></tr>
+                <tr><td data-t="ch40-134">۶</td><td data-t="ch40-135">فرمی با اعتبارسنجی کامل در tkinter بسازم</td></tr>
+                <tr><td data-t="ch40-136">۷</td><td data-t="ch40-137">یک <code>Treeview</code> را از داده واقعی پر کنم و مرتبش کنم</td></tr>
+                <tr><td data-t="ch40-138">۸</td><td data-t="ch40-139">دیالوگ مودالی بنویسم که مقدار برگرداند</td></tr>
+                <tr><td data-t="ch40-140">۹</td><td data-t="ch40-141">یک پنجره PySide6 با سیگنال و اسلات بسازم</td></tr>
+                <tr><td data-t="ch40-142">۱۰</td><td data-t="ch40-143">برنامه‌ام را به یک فایل اجرایی تبدیل کنم و بدانم فایل داده کجا نوشته می‌شود</td></tr>
+                <tr><td data-t="ch40-144">۱۱</td><td data-t="ch40-145">کار طولانی را به نخ ببرم و از راه صف با پنجره حرف بزنم</td></tr>
+                <tr><td data-t="ch40-146">۱۲</td><td data-t="ch40-147">چند کوروتین را با <code>gather</code> همزمان اجرا کنم</td></tr>
+                <tr><td data-t="ch40-148">۱۳</td><td data-t="ch40-149">سایتی با قالب پایه، فرم و هدایت بعد از POST بنویسم</td></tr>
+                <tr><td data-t="ch40-150">۱۴</td><td data-t="ch40-151">ورود کاربر با رمز درهم‌شده و دکوراتور محافظ بسازم</td></tr>
+                <tr><td data-t="ch40-152">۱۵</td><td data-t="ch40-153">یک REST API با کدهای وضعیت درست بنویسم</td></tr>
+                <tr><td data-t="ch40-154">۱۶</td><td data-t="ch40-155">پروژه‌ای را با <code>core/</code> و <code>gui/</code> لایه‌بندی کنم</td></tr>
+                <tr><td data-t="ch40-156">۱۷</td><td data-t="ch40-157">مخزنی بسازم، شاخه بزنم، تعارض را حل کنم و روی GitHub منتشر کنم</td></tr>
+            </tbody>
+        </table>
+    </div>
+
+    <h2 id="s8" data-t="ch40-158">۸. اشتباه‌های پرتکرار</h2>
+
+    <div class="table-scroll">
+        <table>
+            <thead>
+                <tr><th data-t="ch40-159">اشتباه</th><th data-t="ch40-160">درستش</th></tr>
+            </thead>
+            <tbody>
+                <tr><td data-t="ch40-161">ساختن SQL با f-string</td><td data-t="ch40-162">پارامتر <code>?</code> یا پارامتر ORM</td></tr>
+                <tr><td data-t="ch40-163">فراموش کردن <code>commit</code></td><td data-t="ch40-164">هیچ خطایی نمی‌گیرید، فقط داده غیبش می‌زند</td></tr>
+                <tr><td data-t="ch40-165">خواندن <code>fetchone()</code> بدون بررسی <code>None</code></td><td><code>if row is None: ...</code></td></tr>
+                <tr><td data-t="ch40-166">دو دستور با دو commit جدا</td><td data-t="ch40-167">یک تراکنش</td></tr>
+                <tr><td data-t="ch40-168">خواندن داده از داخل ویجت</td><td data-t="ch40-169">داده واقعی را در پایتون نگه دارید</td></tr>
+                <tr><td data-t="ch40-170"><code>command=func()</code> با پرانتز</td><td><code>command=func</code></td></tr>
+                <tr><td data-t="ch40-171">لامبدا در حلقه بدون <code>x=x</code></td><td data-t="ch40-172">اتصال دیرهنگام؛ مقدار را منجمد کنید</td></tr>
+                <tr><td data-t="ch40-173">قاطی کردن <code>pack</code> و <code>grid</code></td><td data-t="ch40-174">برنامه بی‌صدا قفل می‌شود</td></tr>
+                <tr><td data-t="ch40-175">گم شدن مرجع <code>PhotoImage</code></td><td data-t="ch40-176">روی <code>self</code> نگهش دارید</td></tr>
+                <tr><td data-t="ch40-177"><code>time.sleep</code> در تابع پاسخ یا کوروتین</td><td data-t="ch40-178"><code>after()</code>، نخ، یا <code>asyncio.sleep</code></td></tr>
+                <tr><td data-t="ch40-179">دست زدن به ویجت از نخ کارگر</td><td data-t="ch40-180">از راه صف پیام بفرستید</td></tr>
+                <tr><td data-t="ch40-181">نخواندن <code>future.result()</code></td><td data-t="ch40-182">خطا برای همیشه پنهان می‌ماند</td></tr>
+                <tr><td data-t="ch40-183">قورت دادن <code>CancelledError</code></td><td data-t="ch40-184">بگیرید، تمیزکاری کنید، دوباره پرتابش کنید</td></tr>
+                <tr><td data-t="ch40-185">رندر کردن صفحه بعد از POST موفق</td><td data-t="ch40-186">هدایت کنید</td></tr>
+                <tr><td data-t="ch40-187">صفحه ۵۰۰ برای ورودی غلط کاربر</td><td data-t="ch40-188">۴۰۴ یا ۴۰۰</td></tr>
+                <tr><td data-t="ch40-189">ذخیره رمز عبور خام</td><td data-t="ch40-190">فقط درهم</td></tr>
+                <tr><td data-t="ch40-191">کامیت کردن <code>.venv</code> و <code>.db</code> و توکن</td><td data-t="ch40-192"><code>.gitignore</code> پیش از اولین کامیت</td></tr>
+                <tr><td data-t="ch40-193">نوشتن فایل داده کنار <code>__file__</code> در برنامه منجمد</td><td data-t="ch40-194">کنار <code>sys.executable</code></td></tr>
+            </tbody>
+        </table>
+    </div>
+
+    <h2 id="s9" data-t="ch40-195">۹. نمونه آزمون تشریحی</h2>
+
+    <div class="exercise">
+        <h3 data-t="ch40-196">بخش اول: مفهومی، هر سؤال یک نمره</h3>
+        <ol>
+            <li data-t="ch40-197">تفاوت <code>INNER JOIN</code> و <code>LEFT JOIN</code> را با یک مثال از جدول کتاب و امانت توضیح دهید.</li>
+            <li data-t="ch40-198">چرا <code>WHERE</code> نمی‌تواند روی نتیجه <code>COUNT</code> شرط بگذارد؟ چه چیزی می‌تواند؟</li>
+            <li data-t="ch40-199">یک عملیات در برنامه‌تان نام ببرید که باید داخل یک تراکنش انجام شود و توضیح دهید اگر تراکنش به درستی مدیریت نشود، چه مشکلی ممکن است برای داده‌ها ایجاد شود.</li>
+            <li data-t="ch40-200">سه سود ORM و دو موردی که SQL خام بهتر است را بنویسید.</li>
+            <li data-t="ch40-201">الگوی استراتژی چه مسئله‌ای را حل می‌کند و کی <strong>نباید</strong> به وظیفه آن برد؟</li>
+            <li data-t="ch40-202">چرا در tkinter نباید <code>pack</code> و <code>grid</code> را در یک ظرف قاطی کرد؟ علامت این اشتباه چیست؟</li>
+            <li data-t="ch40-203">«ویجت انبار داده شما نیست» یعنی چه؟ یک باگ واقعی از این جنس شرح دهید.</li>
+            <li data-t="ch40-204">سیگنال و اسلات در Qt با <code>command</code> در tkinter چه فرقی دارد؟ یک مزیت Qt بنویسید.</li>
+            <li data-t="ch40-205">چرا PyInstaller نمی‌تواند روی لینوکس فایل اجرایی ویندوز بسازد؟</li>
+            <li data-t="ch40-206">تفاوت <code>resource_path</code> و <code>data_path</code> را توضیح دهید و بگویید هر کدام کجا به کار می‌آیند.</li>
+            <li data-t="ch40-207">شرایط رقابتی را با مثال <code>counter += 1</code> توضیح دهید. چرا باگی است که ممکن است ماه‌ها پیدا نشود؟</li>
+            <li data-t="ch40-208">چرا <code>queue.Queue</code> به قفل نیاز ندارد ولی یک لیست ساده دارد؟</li>
+            <li data-t="ch40-209">GIL چیست و چه تصمیمی را در طراحی برنامه شما عوض می‌کند؟</li>
+            <li data-t="ch40-210">چرا <code>time.sleep</code> در یک کوروتین یک باگ است و نه فقط یک ناکارآمدی؟</li>
+            <li data-t="ch40-211">قاعده POST / Redirect / GET چیست و جلوی چه اتفاقی را می‌گیرد؟</li>
+            <li data-t="ch40-212">چرا فیلتر <code>safe</code> روی داده کاربر یک حفره امنیتی است؟</li>
+            <li data-t="ch40-213">چرا نباید رمز عبور را ذخیره کرد؟ به جایش چه ذخیره می‌شود و چرا امن‌تر است؟</li>
+            <li data-t="ch40-214">تفاوت ۴۰۰ و ۴۰۴ و ۵۰۰ را با یک مثال از یک API بنویسید.</li>
+            <li data-t="ch40-215">چرا در پروژه پایانی، <code>core/</code> هیچ چیزی از PySide6 وارد نمی‌کند؟</li>
+            <li data-t="ch40-216">رمزی را کامیت و پوش کرده‌اید. چرا پاک کردن آن خط کافی نیست؟</li>
+        </ol>
+
+        <h3 data-t="ch40-217">بخش دوم: خروجی یا اشکال کد را بنویسید</h3>
+
+        <p data-t="ch40-218">۲۱. این کد چه چاپ می‌کند و چرا؟</p>
+
+        <pre class="code"><code>import threading
+
+counter = 0
+
+def work():
+    global counter
+    for _ in range(100_000):
+        counter += 1
+
+threads = [threading.Thread(target=work) for _ in range(5)]
+for t in threads:
+    t.start()
+for t in threads:
+    t.join()
+print(counter)</code></pre>
+
+        <p data-t="ch40-219">۲۲. اشکال این تابع کجاست؟</p>
+
+        <pre class="code"><code>def borrow(conn, book_id, member_id):
+    conn.execute('INSERT INTO borrows (book_id, member_id) VALUES (?, ?)',
+                 (book_id, member_id))
+    conn.commit()
+    conn.execute('UPDATE books SET available = 0 WHERE id = ?', (book_id,))
+    conn.commit()</code></pre>
+
+        <p data-t="ch40-220">۲۳. چرا هر چهار دکمه یک کار می‌کنند؟</p>
+
+        <pre class="code"><code>for name in ('add', 'sub', 'mul', 'div'):
+    button = tk.Button(root, text=name,
+                       command=lambda: run(name))
+    button.pack()</code></pre>
+
+        <p data-t="ch40-221">۲۴. این تابع نما چه کد وضعیتی برمی‌گرداند وقتی مشتری بدنه JSON نفرستد؟ چه باید برگرداند؟</p>
+
+        <pre class="code"><code>@app.route('/api/books', methods=['POST'])
+def create_book():
+    payload = request.get_json()
+    title = payload['title']
+    ...</code></pre>
+
+        <p data-t="ch40-222">۲۵. چرا این کوروتین برنامه را کند می‌کند؟</p>
+
+        <pre class="code"><code>async def fetch_all(urls):
+    results = []
+    for url in urls:
+        results.append(await fetch(url))
+    return results</code></pre>
+    </div>
+
+    <h2 id="s10" data-t="ch40-223">۱۰. نمونه آزمون عملی</h2>
+
+    <div class="exercise">
+        <h3 data-t="ch40-224">سؤال یک: پایگاه داده (۵ نمره)</h3>
+        <p data-t="ch40-225">
+            یک پایگاه داده <code>clinic.db</code> با سه جدول بسازید: بیمار،
+            پزشک و نوبت. کلیدهای خارجی را با <code>ON DELETE</code> درست
+            تعریف کنید. سپس با SQLAlchemy مدل‌هایشان را بنویسید و پرس‌وجویی
+            بسازید که برای هر پزشک، تعداد نوبت‌های امروزش را بدهد.
+        </p>
+
+        <h3 data-t="ch40-226">سؤال دو: تراکنش (۳ نمره)</h3>
+        <p data-t="ch40-227">
+            تابع <code>book_appointment(patient, doctor, when)</code> را
+            بنویسید که نوبت را ثبت کند و فقط در صورتی موفق شود که پزشک در آن
+            ساعت آزاد باشد. بررسی و ثبت باید <strong>اتمی</strong> باشند.
+            توضیح دهید اگر دو کاربر همزمان دکمه را بزنند چه می‌شود.
+        </p>
+
+        <h3 data-t="ch40-228">سؤال سه: رابط گرافیکی (۵ نمره)</h3>
+        <p data-t="ch40-229">
+            پنجره‌ای با دو زبانه بسازید: زبانه بیماران با جدول، جست‌وجوی زنده
+            و سه دکمه افزودن و ویرایش و حذف؛ و زبانه نوبت‌ها که نوبت‌های
+            گذشته را قرمز نشان دهد. فرم افزودن باید یک دیالوگ مودال باشد که
+            داده اعتبارسنجی‌شده برمی‌گرداند. هیچ خط SQL نباید در فایل رابط
+            کاربری باشد.
+        </p>
+
+        <h3 data-t="ch40-230">سؤال چهار: همروندی (۳ نمره)</h3>
+        <p data-t="ch40-231">
+            به همان برنامه، دکمه «پشتیبان‌گیری» اضافه کنید که کار را در یک نخ
+            انجام دهد، پیشرفت را از راه یک صف به پنجره بدهد، و پنجره در تمام
+            مدت پاسخگو بماند. دکمه باید در حین کار غیرفعال شود.
+        </p>
+
+        <h3 data-t="ch40-232">سؤال پنج: وب (۴ نمره)</h3>
+        <p data-t="ch40-233">
+            یک REST API برای همان نوبت‌ها بنویسید با چهار آدرس: فهرست، ساخت،
+            گرفتن یکی و حذف. کدهای وضعیت باید درست باشند و بدنه غیر JSON باید
+            ۴۰۰ بگیرد نه ۵۰۰. بعد یک مشتری <code>requests</code> با
+            <code>timeout</code> برایش بنویسید.
+        </p>
+    </div>
+
+    <h2 id="s11" data-t="ch40-234">۱۱. پاسخ کوتاه سؤال‌های مفهومی</h2>
+
+    <div class="note">
+        <span class="box-title" data-t="ch40-235">اول خودتان جواب دهید</span>
+        <p data-t="ch40-236">
+            این بخش را فقط بعد از اینکه سؤال‌های بالا را جواب دادید بخوانید.
+            خواندن جواب پیش از تلاش، هیچ چیزی یاد نمی‌دهد.
+        </p>
+    </div>
+
+    <div class="table-scroll">
+        <table>
+            <thead>
+                <tr><th data-t="ch40-237">سؤال</th><th data-t="ch40-238">پاسخ کوتاه</th></tr>
+            </thead>
+            <tbody>
+                <tr><td data-t="ch40-239">۲۱</td><td data-t="ch40-240">عددی کمتر از ۵۰۰۰۰۰ و هر بار متفاوت. <code>counter += 1</code> اتمی نیست و افزایش‌ها گم می‌شوند.</td></tr>
+                <tr><td data-t="ch40-241">۲۲</td><td data-t="ch40-242">دو <code>commit</code> جدا. اگر دومی شکست بخورد، کتاب هم امانت داده شده و هم موجود می‌ماند. باید یک تراکنش باشد، و بررسی «هنوز آزاد است؟» جزو خود <code>UPDATE</code>.</td></tr>
+                <tr><td data-t="ch40-243">۲۳</td><td data-t="ch40-244">اتصال دیرهنگام: همه لامبداها به یک متغیر <code>name</code> نگاه می‌کنند و مقدار نهایی <code>div</code> است. درستش <code>lambda n=name: run(n)</code>.</td></tr>
+                <tr><td data-t="ch40-245">۲۴</td><td data-t="ch40-246">الان ۵۰۰ می‌دهد، چون <code>payload</code> برابر <code>None</code> است. باید ۴۰۰ بدهد؛ با <code>get_json(silent=True)</code> و بررسی.</td></tr>
+                <tr><td data-t="ch40-247">۲۵</td><td data-t="ch40-248">حلقه با <code>await</code> ترتیبی است. باید <code>asyncio.gather</code> به کار برود تا همه با هم اجرا شوند.</td></tr>
+                <tr><td data-t="ch40-249">۲</td><td data-t="ch40-250">چون <code>WHERE</code> پیش از گروه‌بندی اجرا می‌شود و هنوز گروهی وجود ندارد. <code>HAVING</code> این کار را می‌کند.</td></tr>
+                <tr><td data-t="ch40-251">۶</td><td data-t="ch40-252">چون مدیر چیدمان دوم با اولی بر سر اندازه ظرف بی‌پایان چانه می‌زند. علامتش این است که پنجره بدون هیچ خطایی قفل می‌شود.</td></tr>
+                <tr><td data-t="ch40-253">۱۲</td><td data-t="ch40-254">چون <code>put</code> و <code>get</code> قفل را خودشان می‌گیرند؛ یک لیست ساده هیچ محافظتی ندارد.</td></tr>
+                <tr><td data-t="ch40-255">۲۰</td><td data-t="ch40-256">چون رمز در تاریخچه مخزن باقی می‌ماند. باید <strong>باطلش</strong> کنید و رمز تازه بگیرید.</td></tr>
+            </tbody>
+        </table>
+    </div>
+
+    <h2 id="s12" data-t="ch40-257">۱۲. نقشه راه ادامه مسیر</h2>
+
+    <p data-t="ch40-258">
+        این دوره تمام شد، ولی یادگیری برنامه‌نویسی با دوره تمام نمی‌شود.
+        چیزهایی که منطقاً بعد از اینجا می‌آیند:
+    </p>
+
+    <div class="table-scroll">
+        <table>
+            <thead>
+                <tr><th data-t="ch40-259">مسیر</th><th data-t="ch40-260">قدم بعدی</th></tr>
+            </thead>
+            <tbody>
+                <tr><td data-t="ch40-261">کیفیت کد</td><td data-t="ch40-262">آزمون خودکار با <code>pytest</code>، که موضوع دوره جداگانه‌ای است</td></tr>
+                <tr><td data-t="ch40-263">وب</td><td data-t="ch40-264">Django یا FastAPI، بعد از Flask این دوره</td></tr>
+                <tr><td data-t="ch40-265">داده</td><td data-t="ch40-266"><code>pandas</code>، <code>numpy</code> و <code>matplotlib</code></td></tr>
+                <tr><td data-t="ch40-267">پایگاه داده</td><td data-t="ch40-268">PostgreSQL، مهاجرت ساختار با Alembic، ایندکس‌گذاری</td></tr>
+                <tr><td data-t="ch40-269">استقرار</td><td data-t="ch40-270">Docker، سرور لینوکسی، انتشار خودکار</td></tr>
+                <tr><td data-t="ch40-271">دسکتاپ</td><td data-t="ch40-272">Qt پیشرفته: مدل و نما، نخ‌های Qt، ترجمه</td></tr>
+                <tr><td data-t="ch40-273">مبانی</td><td data-t="ch40-274">ساختمان داده و الگوریتم، که در هر زبانی به کارتان می‌آید</td></tr>
+            </tbody>
+        </table>
+    </div>
+
+    <div class="tip">
+        <span class="box-title" data-t="ch40-275">مهم‌ترین توصیه</span>
+        <p data-t="ch40-276">
+            بهترین راه ادامه دادن، <strong>ساختن</strong> است. برنامه‌ای
+            بنویسید که خودتان واقعاً به آن نیاز دارید، هر چقدر هم کوچک. یک
+            پروژه تمام‌شده که روزی ازش استفاده می‌کنید، از ده دوره تماشاشده
+            بیشتر یاد می‌دهد. کدتان را روی GitHub بگذارید، کد دیگران را
+            بخوانید، و از نوشتن کد بد در قدم اول نترسید: هر برنامه‌نویسی از
+            همان‌جا شروع کرده است.
+        </p>
+    </div>
+
+    <div class="folder-ref">
+        <span class="box-title" data-t="ch40-277">درباره این جلسه</span>
+        <p data-t="ch40-278">
+            پوشه <code>S40-evaluation</code> فقط یک <code>README.md</code>
+            دارد و هیچ فایل تمرینی ندارد، چون این جلسه، جلسه آزمون است. برای
+            تمرین، به پوشه‌های <code>S30</code> تا <code>S39</code> برگردید.
+        </p>
+    </div>
+
+    <div class="pager">
+        <a href="chapter-39.html">فصل قبل: پروژه پایانی، Git و GitHub</a>
+        <a href="index.html">بازگشت به فهرست</a>
+    </div>
+
+</main>
+
+</body>
+</html>

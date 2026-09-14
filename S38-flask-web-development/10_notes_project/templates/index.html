@@ -1,0 +1,39 @@
+{% extends 'base.html' %}
+
+{% block content %}
+    <h2>All the notes ({{ total }})</h2>
+
+    {# A search is a GET form, so the result can be bookmarked and shared. #}
+    <form class="filters" method="get">
+        <input name="q" value="{{ search }}" placeholder="search...">
+        <select name="category">
+            <option value="">every category</option>
+            {% for category in categories %}
+                <option value="{{ category.id }}"
+                        {% if category_id == category.id | string %}selected{% endif %}>
+                    {{ category.name }}
+                </option>
+            {% endfor %}
+        </select>
+        <button type="submit">Filter</button>
+        <a href="{{ url_for('notes.index') }}">reset</a>
+    </form>
+
+    <ul class="notes">
+        {% for note in notes %}
+            <li>
+                <a href="{{ url_for('notes.detail', note_id=note.id) }}">
+                    {{ note.title }}</a>
+                {% if note.category %}
+                    <span class="tag">{{ note.category.name }}</span>
+                {% endif %}
+                <div class="meta">
+                    {{ note.created_at.strftime('%Y-%m-%d %H:%M') }}
+                </div>
+            </li>
+        {% else %}
+            <li>No note matches. <a href="{{ url_for('notes.create') }}">
+                Write the first one</a>.</li>
+        {% endfor %}
+    </ul>
+{% endblock %}

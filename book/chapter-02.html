@@ -1,0 +1,423 @@
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="فصل دو: عملگرهای ریاضی پایتون، تقسیم صحیح و باقیمانده، توان، اولویت عملگرها و انتساب ترکیبی">
+    <title>فصل ۲: عملگرها</title>
+    <link rel="icon" href="logokm.png" type="image/png">
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<header class="book-bar">
+    <a class="name" href="index.html">برنامه‌نویسی پایتون</a>
+    <a href="index.html">فهرست مطالب</a>
+</header>
+
+<main class="paper">
+
+    <div class="chapter-head">
+        <span class="chapter-num">فصل ۲</span>
+        <h1 data-t="ch02-001">عملگرها</h1>
+        <p class="lead" data-t="ch02-002">در فصل قبل داده را ذخیره کردیم. حالا وقت آن است که با آن کار کنیم. این فصل درباره حساب کردن است، و درباره دو عملگری که تازه‌کارها دست‌کم می‌گیرند ولی در تمام دوره به وظیفه آنان می‌آید.</p>
+    </div>
+
+    <div class="mini-toc">
+        <span class="box-title" data-t="ch02-003">در این فصل می‌خوانید</span>
+        <ol>
+            <li data-t="ch02-004"><a href="#s1">هفت عملگر ریاضی</a></li>
+            <li data-t="ch02-005"><a href="#s2">سه نوع تقسیم</a></li>
+            <li data-t="ch02-006"><a href="#s3">باقیمانده به چه دردی می‌خورد</a></li>
+            <li data-t="ch02-007"><a href="#s4">اولویت عملگرها</a></li>
+            <li data-t="ch02-008"><a href="#s5">به‌روزرسانی یک متغیر با خودش</a></li>
+            <li data-t="ch02-009"><a href="#s6">انتساب ترکیبی</a></li>
+            <li data-t="ch02-010"><a href="#s7">چند برنامه کوچک</a></li>
+            <li data-t="ch02-011"><a href="#s8">ثانیه به ساعت و دقیقه</a></li>
+        </ol>
+    </div>
+
+    <h2 id="s1" data-t="ch02-012">۱. هفت عملگر ریاضی</h2>
+
+    <p data-t="ch02-013"><strong>عملگر</strong> علامتی است که روی یک یا دو مقدار کاری انجام می‌دهد. پایتون هفت عملگر ریاضی دارد. چهار مورد نخست همان‌هایی هستند که در مدرسه دیده‌اید و سه مورد بعدی کمی تازه‌اند.</p>
+
+    <pre class="code"><code># All the arithmetic operators of Python, applied to the same two numbers.
+num1 = 24
+num2 = 6
+
+print('+  :', num1 + num2)    # addition        -&gt; 30
+print('-  :', num1 - num2)    # subtraction     -&gt; 18
+print('*  :', num1 * num2)    # multiplication  -&gt; 144
+print('/  :', num1 / num2)    # true division   -&gt; 4.0  (always a float!)
+print('// :', num1 // num2)   # floor division  -&gt; 4    (whole part only)
+print('%  :', num1 % num2)    # remainder       -&gt; 0
+print('** :', num1 ** num2)   # power           -&gt; 24^6</code></pre>
+    <p class="code-caption" data-t="ch02-014">همه عملگرهای ریاضی: نمونه 01_arithmetic_operators.py</p>
+
+    <pre class="out">+  : 30
+-  : 18
+*  : 144
+/  : 4.0
+// : 4
+%  : 0
+** : 191102976</pre>
+
+    <div class="table-scroll">
+        <table>
+            <thead>
+                <tr><th data-t="ch02-015">عملگر</th><th data-t="ch02-016">نام</th><th data-t="ch02-017">مثال</th><th data-t="ch02-018">نتیجه</th></tr>
+            </thead>
+            <tbody>
+                <tr><td><code>+</code></td><td data-t="ch02-019">جمع</td><td><code>24 + 6</code></td><td><code>30</code></td></tr>
+                <tr><td><code>-</code></td><td data-t="ch02-020">تفریق</td><td><code>24 - 6</code></td><td><code>18</code></td></tr>
+                <tr><td><code>*</code></td><td data-t="ch02-021">ضرب</td><td><code>24 * 6</code></td><td><code>144</code></td></tr>
+                <tr><td><code>/</code></td><td data-t="ch02-022">تقسیم</td><td><code>24 / 6</code></td><td><code>4.0</code></td></tr>
+                <tr><td><code>//</code></td><td data-t="ch02-023">تقسیم صحیح</td><td><code>24 // 6</code></td><td><code>4</code></td></tr>
+                <tr><td><code>%</code></td><td data-t="ch02-024">باقیمانده</td><td><code>24 % 6</code></td><td><code>0</code></td></tr>
+                <tr><td><code>**</code></td><td data-t="ch02-025">توان</td><td><code>2 ** 10</code></td><td><code>1024</code></td></tr>
+            </tbody>
+        </table>
+    </div>
+
+    <div class="note">
+        <span class="box-title" data-t="ch02-026">چرا نتیجه تقسیم ۴.۰ است و نه ۴</span>
+        <p data-t="ch02-027">
+            عملگر <code>/</code> در پایتون <strong>همیشه</strong> نتیجه اعشاری
+            می‌دهد، حتی وقتی تقسیم دقیق است. این تصمیم عمدی است: تقسیم در ریاضی
+            معمولاً عدد اعشاری تولید می‌کند، پس پایتون رفتار یکسانی دارد و
+            غافلگیرتان نمی‌کند.
+        </p>
+    </div>
+
+    <h2 id="s2" data-t="ch02-028">۲. سه نوع تقسیم</h2>
+
+    <p data-t="ch02-029">
+        سه عملگر <code>/</code> و <code>//</code> و <code>%</code> سه سؤال متفاوت
+        را جواب می‌دهند. اگر ۱۰ شکلات داشته باشید و بخواهید بین ۳ نفر تقسیم کنید:
+    </p>
+
+    <ul>
+        <li data-t="ch02-030"><code>10 / 3</code> می‌گوید سهم هر نفر چند شکلات است اگر بشود شکلات را بُرید: ۳٫۳۳</li>
+        <li data-t="ch02-031"><code>10 // 3</code> می‌گوید هر نفر چند شکلات کامل می‌گیرد: ۳</li>
+        <li data-t="ch02-032"><code>10 % 3</code> می‌گوید چند شکلات در جعبه باقی می‌ماند می‌ماند: ۱</li>
+    </ul>
+
+    <pre class="code"><code># '/' always gives a float, even when the division is exact.
+print(10 / 2)     # 5.0
+print(10 / 3)     # 3.3333333333333335
+
+# '//' throws away the decimal part and gives the whole number of times
+# the second value fits into the first.
+print(10 // 3)    # 3
+
+# '%' gives what is left over. It is the tool we use to test even/odd numbers
+# and to know whether one number divides another.
+print(10 % 3)     # 1
+print(10 % 2)     # 0  -&gt; 10 is even
+print(7 % 2)      # 1  -&gt; 7 is odd</code></pre>
+    <p class="code-caption" data-t="ch02-033">سه نوع تقسیم: نمونه 02_division_and_remainder.py</p>
+
+    <pre class="out">5.0
+3.3333333333333335
+3
+1
+0
+1</pre>
+
+    <h3 data-t="ch02-034">شرح مثال</h3>
+
+    <ul>
+        <li data-t="ch02-035">خروجی <code>10 / 3</code> عدد عجیب <code>3.3333333333333335</code> است، با یک ۵ در انتها. این اشتباه پایتون نیست: کامپیوتر اعداد اعشاری را به شکل دودویی و با دقت محدود نگه می‌دارد، پس بعضی کسرها دقیق ذخیره نمی‌شوند. برای کارهای عادی مشکلی ندارد و در فصل شانزدهم با <code>round</code> مرتبش می‌کنیم.</li>
+        <li data-t="ch02-036"><code>//</code> بخش اعشاری نتیجه را حذف می‌کند و آن را به نزدیک‌ترین عدد گرد نمی‌کند. برای مثال، <code>7 // 2</code> برابر ۳ است، نه ۴.</li>
+        <li data-t="ch02-037">وقتی هر دو طرف <code>//</code> عدد صحیح باشند، نتیجه صحیح است. اگر یک طرف اعشاری باشد، نتیجه اعشاری می‌شود: <code>7.0 // 2</code> برابر <code>3.0</code> است.</li>
+    </ul>
+
+    <h2 id="s3" data-t="ch02-038">۳. باقیمانده به چه دردی می‌خورد</h2>
+
+    <p data-t="ch02-039">
+        عملگر <code>%</code> در نگاه اول بی‌مصرف به نظر می‌رسد، ولی یکی از
+        پرکاربردترین عملگرهای برنامه‌نویسی است. سه کاربرد اصلی‌اش:
+    </p>
+
+    <ul>
+        <li data-t="ch02-040">
+            <strong>زوج یا فرد بودن.</strong> اگر <code>n % 2</code> برابر صفر
+            باشد عدد زوج است، وگرنه فرد. در فصل چهارم دقیقاً همین را می‌نویسیم.
+        </li>
+        <li data-t="ch02-041">
+            <strong>بخش‌پذیری.</strong> اگر <code>n % 5</code> صفر باشد یعنی
+            <code>n</code> بر ۵ بخش‌پذیر است. در فصل هشتم با همین ایده عدد اول
+            پیدا می‌کنیم.
+        </li>
+        <li data-t="ch02-042">
+            <strong>جدا کردن ارقام.</strong> <code>n % 10</code> رقم یکان یک عدد
+            را می‌دهد و <code>n // 10</code> بقیه عدد را. با تکرار این دو، هر عدد
+            را می‌شود رقم به رقم باز کرد.
+        </li>
+    </ul>
+
+    <h2 id="s4" data-t="ch02-043">۴. اولویت عملگرها</h2>
+
+    <p data-t="ch02-044">
+        وقتی چند عملگر در یک عبارت باشند، پایتون همان ترتیبی را رعایت می‌کند که
+        در ریاضی یاد گرفته‌اید: اول توان، بعد ضرب و تقسیم، آخر جمع و تفریق.
+        عملگرهای هم‌رتبه از چپ به راست حساب می‌شوند.
+    </p>
+
+    <pre class="code"><code># Python follows the usual mathematical order of operations:
+#   1) **        2) * / // %        3) + -
+# Operators on the same level are evaluated from left to right.
+
+print(2 + 3 * 4)        # 14, not 20: multiplication happens first
+print((2 + 3) * 4)      # 20: parentheses change the order
+print(2 ** 3 ** 2)      # 512: ** is evaluated from RIGHT to left -&gt; 2 ** 9
+print(-3 ** 2)          # -9: the power is applied before the minus sign
+print((-3) ** 2)        # 9
+
+# When in doubt, add parentheses: they cost nothing and make the code readable.</code></pre>
+    <p class="code-caption" data-t="ch02-045">ترتیب محاسبه: نمونه 03_precedence.py</p>
+
+    <pre class="out">14
+20
+512
+-9
+9</pre>
+
+    <h3 data-t="ch02-046">شرح مثال</h3>
+
+    <ul>
+        <li data-t="ch02-047"><code>2 + 3 * 4</code> برابر ۱۴ است، نه ۲۰. ضرب زودتر انجام می‌شود.</li>
+        <li data-t="ch02-048">پرانتز همیشه برنده است. <code>(2 + 3) * 4</code> برابر ۲۰ است.</li>
+        <li data-t="ch02-049">عملگر توان یک استثناست: از <strong>راست به چپ</strong> حساب می‌شود. پس <code>2 ** 3 ** 2</code> یعنی <code>2 ** 9</code> که ۵۱۲ است، نه <code>8 ** 2</code> که ۶۴ می‌شد.</li>
+        <li data-t="ch02-050"><code>-3 ** 2</code> برابر منفی ۹ است، چون اول ۳ به توان ۲ می‌رسد و بعد منفی می‌شود. اگر منفی سه را به توان دو می‌خواهید، باید پرانتز بگذارید.</li>
+    </ul>
+
+    <div class="tip">
+        <span class="box-title" data-t="ch02-051">قانون طلایی</span>
+        <p data-t="ch02-052">ضرورتی ندارد جدول اولویت را حفظ کنید. برنامه‌نویس‌های حرفه‌ای هم حفظ نیستند. هر جا شک کردید، <strong>پرانتز بگذارید</strong>. پرانتز اضافه هیچ هزینه‌ای ندارد و کد را برای کسی که بعداً می‌خواندش روشن‌تر می‌کند.</p>
+    </div>
+
+    <h2 id="s5" data-t="ch02-053">۵. به‌روزرسانی یک متغیر با خودش</h2>
+
+    <p data-t="ch02-054">این خط در نگاه اول ممکن است عجیب به نظر برسد: <code>num1 = num1 + num2</code>. اگر آن را مانند یک معادله ریاضی بخوانید، بی‌معنا به نظر می‌رسد؛ اما اینجا علامت مساوی، عملگر انتساب است. پایتون ابتدا عبارت سمت راست را محاسبه می‌کند و سپس نتیجه را در متغیر سمت چپ قرار می‌دهد.</p>
+
+    <pre class="code"><code># A variable can be updated using its own current value.
+# The right-hand side is calculated first, then stored back into the name.
+num1 = 24
+num2 = 6
+
+num1 = num1 + num2   # 24 + 6 = 30
+print(num1)
+
+num1 = num1 - num2   # 30 - 6 = 24
+print(num1)
+
+number = 3
+result = number + 1
+print(result)        # 4</code></pre>
+    <p class="code-caption" data-t="ch02-055">به‌روزرسانی متغیر: نمونه 04_reassignment.py</p>
+
+    <pre class="out">30
+24
+4</pre>
+
+    <p data-t="ch02-056">این الگو در فصل ششم یکی از مفاهیم اصلی است: متغیری می‌سازیم و در هر دور حلقه مقداری به آن اضافه می‌کنیم. چنین متغیری را <strong>انباره</strong> یا accumulator می‌نامند.</p>
+
+    <h2 id="s6" data-t="ch02-057">۶. انتساب ترکیبی</h2>
+
+    <p data-t="ch02-058">
+        چون نوشتن <code>num1 = num1 + num2</code> آن‌قدر رایج است، پایتون شکل
+        کوتاه‌تری برایش دارد.
+    </p>
+
+    <pre class="code"><code># 'num1 = num1 + num2' is so common that Python offers a shorter form: '+='.
+num1 = 24
+num2 = 6
+
+num1 += num2   # same as num1 = num1 + num2
+print(num1)    # 30
+
+num1 -= num2   # same as num1 = num1 - num2
+print(num1)    # 24
+
+num1 *= num2   # same as num1 = num1 * num2
+print(num1)    # 144
+
+num1 /= num2   # same as num1 = num1 / num2  -&gt; the result becomes a float
+print(num1)    # 24.0
+
+# The same short form exists for // , % and **
+num1 //= 5
+print(num1)    # 4.0</code></pre>
+    <p class="code-caption" data-t="ch02-059">انتساب ترکیبی: نمونه 05_augmented_assignment.py</p>
+
+    <pre class="out">30
+24
+144
+24.0
+4.0</pre>
+
+    <h3 data-t="ch02-060">شرح مثال</h3>
+
+    <ul>
+        <li data-t="ch02-061">هر هفت عملگر ریاضی شکل ترکیبی دارند: <code>+=</code> و <code>-=</code> و <code>*=</code> و <code>/=</code> و <code>//=</code> و <code>%=</code> و <code>**=</code>.</li>
+        <li data-t="ch02-062">به خط چهارم دقت کنید: بعد از <code>/=</code> مقدار <code>24.0</code> شده است، با اعشار. چون عملگر تقسیم همیشه اعشاری برمی‌گرداند، نوع متغیر از این به بعد <code>float</code> است. به همین دلیل خط آخر هم <code>4.0</code> چاپ می‌کند و نه <code>4</code>.</li>
+        <li data-t="ch02-063">ترتیب دو علامت مهم است: <code>+=</code> درست است، <code>=+</code> غلط است. <code>x =+ 5</code> خطا نمی‌دهد ولی معنایش «x را مساوی مثبت ۵ قرار بده» است و یک اشتباه بی‌سروصداست.</li>
+    </ul>
+
+    <h2 id="s7" data-t="ch02-064">۷. چند برنامه کوچک</h2>
+
+    <p data-t="ch02-065">
+        حالا عملگرها را با ورودی کاربر ترکیب کنیم. اولی فقط دو واحد به عدد کاربر
+        اضافه می‌کند:
+    </p>
+
+    <pre class="code"><code># Read a number from the user and increase it by 2.
+user_input = input('Enter a number: ')
+
+number = int(user_input)   # input() gives text, so we must convert it
+number += 2
+
+print('Your number plus 2 is:', number)</code></pre>
+    <p class="code-caption" data-t="ch02-066">افزایش عدد کاربر: نمونه 06_increase_user_number.py</p>
+
+    <p data-t="ch02-067">محیط و مساحت مستطیل:</p>
+
+    <pre class="code"><code># Area and perimeter of a rectangle.
+length_input = input('Length of the rectangle: ')
+width_input = input('Width of the rectangle: ')
+
+length = float(length_input)
+width = float(width_input)
+
+area = length * width
+perimeter = (length + width) * 2
+
+print('Area:     ', area)
+print('Perimeter:', perimeter)</code></pre>
+    <p class="code-caption" data-t="ch02-068">مستطیل: نمونه 08_rectangle.py</p>
+
+    <pre class="out">Length of the rectangle: 5
+Width of the rectangle: 3
+Area:      15.0
+Perimeter: 16.0</pre>
+
+    <p data-t="ch02-069">و میانگین سه عدد، که یک نکته مهم دارد:</p>
+
+    <pre class="code"><code># Average of three numbers. Note the parentheses: without them only the last
+# number would be divided by 3.
+a = float(input('Enter the first number: '))
+b = float(input('Enter the second number: '))
+c = float(input('Enter the third number: '))
+
+average = (a + b + c) / 3
+
+print('Average:', average)</code></pre>
+    <p class="code-caption" data-t="ch02-070">میانگین سه عدد: نمونه 09_average_of_three.py</p>
+
+    <div class="warn">
+        <span class="box-title" data-t="ch02-071">پرانتزی که حذف آن می‌تواند نتیجه را کاملاً تغییر دهد</span>
+        <p data-t="ch02-072">اگر بنویسید <code>a + b + c / 3</code>، به خاطر اولویت عملگرها فقط <code>c</code> بر سه تقسیم می‌شود و جواب کاملاً غلط در می‌آید. بدتر اینکه برنامه هیچ خطایی نمی‌دهد و شما تا وقتی جواب را با ماشین‌حساب چک نکنید، متوجه نمی‌شوید. این موارد را <strong>خطای منطقی</strong> می‌گویند و سخت‌ترین نوع خطا هستند.</p>
+    </div>
+
+    <div class="note">
+        <span class="box-title" data-t="ch02-073">چرا در فایل نمونه نوشته‌اند total و ننوشته‌اند sum</span>
+        <p data-t="ch02-074">
+            در فایل <code>07_sum_two_numbers.py</code> یک توضیح هست که می‌گوید
+            متغیر را <code>sum</code> صدا نزنید. دلیلش این است که
+            <code>sum</code> نام یک تابع آماده پایتون است و اگر نام متغیرتان را
+            آن بگذارید، آن تابع را از دست می‌دهید. در فصل دهم یک مثال کامل از
+            این دام می‌بینید.
+        </p>
+    </div>
+
+    <h2 id="s8" data-t="ch02-075">۸. ثانیه به ساعت و دقیقه</h2>
+
+    <p data-t="ch02-076">
+        این مثال کلاسیک‌ترین کاربرد <code>//</code> و <code>%</code> در کنار هم
+        است و ارزش دارد که خط به خط دنبالش کنید.
+    </p>
+
+    <pre class="code"><code># A classic use of // and % together:
+# convert a number of seconds into hours, minutes and seconds.
+user_input = input('Enter a number of seconds: ')
+total_seconds = int(user_input)
+
+hours = total_seconds // 3600            # how many whole hours
+remaining = total_seconds % 3600         # what is left after removing the hours
+minutes = remaining // 60                # how many whole minutes
+seconds = remaining % 60                 # what is left after removing the minutes
+
+print(hours, 'h', minutes, 'm', seconds, 's')</code></pre>
+    <p class="code-caption" data-t="ch02-077">تبدیل ثانیه به زمان: نمونه 10_seconds_to_time.py</p>
+
+    <pre class="out">Enter a number of seconds: 3725
+1 h 2 m 5 s</pre>
+
+    <h3 data-t="ch02-078">شرح مثال</h3>
+
+    <p data-t="ch02-079">عدد ۳۷۲۵ را دنبال کنیم:</p>
+
+    <ul>
+        <li data-t="ch02-080">هر ساعت ۳۶۰۰ ثانیه است. <code>3725 // 3600</code> برابر ۱ است، پس یک ساعت کامل داریم.</li>
+        <li data-t="ch02-081"><code>3725 % 3600</code> برابر ۱۲۵ است. یعنی بعد از برداشتن آن یک ساعت، ۱۲۵ ثانیه باقی مانده.</li>
+        <li data-t="ch02-082"><code>125 // 60</code> برابر ۲ است، پس دو دقیقه کامل داریم.</li>
+        <li data-t="ch02-083"><code>125 % 60</code> برابر ۵ است، یعنی ۵ ثانیه ته‌مانده.</li>
+    </ul>
+
+    <p data-t="ch02-084">
+        الگویی که اینجا دیدید در همه تبدیل واحدها تکرار می‌شود: با
+        <code>//</code> واحد بزرگ‌تر را بردار، با <code>%</code> باقیمانده را
+        نگه دار، و روی باقیمانده همین کار را با واحد کوچک‌تر تکرار کن.
+    </p>
+
+    <div class="folder-ref">
+        <span class="box-title" data-t="ch02-085">فایل‌های تمرینی این فصل</span>
+        <p data-t="ch02-086">
+            پوشه <code>S02-operators</code> شامل نمونه‌های
+            <code>01_arithmetic_operators.py</code> تا <code>10_seconds_to_time.py</code>.
+        </p>
+    </div>
+
+    <h2 data-t="ch02-087">خلاصه فصل</h2>
+
+    <div class="table-scroll">
+        <table>
+            <thead>
+                <tr><th data-t="ch02-088">ابزار</th><th data-t="ch02-089">وظیفه آن</th></tr>
+            </thead>
+            <tbody>
+                <tr><td><code>+ - * /</code></td><td data-t="ch02-090">چهار عمل اصلی. نتیجه <code>/</code> همیشه اعشاری است</td></tr>
+                <tr><td><code>//</code></td><td data-t="ch02-091">تقسیم صحیح: فقط بخش کامل، اعشار بریده می‌شود</td></tr>
+                <tr><td><code>%</code></td><td data-t="ch02-092">باقیمانده. برای زوج و فرد، بخش‌پذیری و جدا کردن ارقام</td></tr>
+                <tr><td><code>**</code></td><td data-t="ch02-093">توان. از راست به چپ حساب می‌شود</td></tr>
+                <tr><td data-t="ch02-094">اولویت</td><td data-t="ch02-095">اول <code>**</code>، بعد <code>* / // %</code>، آخر <code>+ -</code></td></tr>
+                <tr><td data-t="ch02-096">پرانتز</td><td data-t="ch02-097">همیشه برنده است. هر جا شک دارید بگذاریدش</td></tr>
+                <tr><td><code>x += 1</code></td><td data-t="ch02-098">شکل کوتاه <code>x = x + 1</code>. برای <code>-</code> و <code>*</code> و سایر موارد نیز هست</td></tr>
+            </tbody>
+        </table>
+    </div>
+
+    <div class="exercise">
+        <h3 data-t="ch02-099">تمرین‌های فصل دو</h3>
+        <ol>
+            <li data-t="ch02-100">دو عدد بگیرید و نتیجه هر هفت عملگر ریاضی را روی آنها چاپ کنید.</li>
+            <li data-t="ch02-101">تعدادی دقیقه بگیرید و بگویید چند ساعت و چند دقیقه است.</li>
+            <li data-t="ch02-102">قیمت یک کالا را بگیرید و قیمت با احتساب ۹ درصد مالیات را چاپ کنید.</li>
+            <li data-t="ch02-103">یک عدد سه رقمی بگیرید و رقم صدگان، دهگان و یکانش را جدا چاپ کنید. راهنمایی: با <code>//</code> و <code>%</code>.</li>
+            <li data-t="ch02-104">شعاع دایره را بگیرید و مساحت و محیطش را چاپ کنید. مقدار <code>PI = 3.14159</code> را خودتان بسازید.</li>
+            <li data-t="ch02-105">نمره چهار درس را بگیرید و میانگین را چاپ کنید. مراقب پرانتز باشید.</li>
+            <li data-t="ch02-106">توضیح دهید چرا <code>10 / 5</code> نتیجه <code>2.0</code> می‌دهد ولی <code>10 // 5</code> نتیجه <code>2</code>.</li>
+            <li data-t="ch02-107">یک عدد بگیرید و بگویید باقیمانده‌اش بر ۲ چند است. بعد از فصل چهارم می‌توانید همین را به «زوج است یا فرد» تبدیل کنید.</li>
+        </ol>
+    </div>
+
+    <div class="pager">
+        <a href="chapter-01.html">فصل قبل: اولین قدم‌ها</a>
+        <a href="chapter-03.html">فصل بعد: رشته‌ها</a>
+    </div>
+
+</main>
+
+</body>
+</html>

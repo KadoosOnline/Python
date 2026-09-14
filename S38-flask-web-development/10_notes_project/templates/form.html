@@ -1,0 +1,29 @@
+{% extends 'base.html' %}
+
+{% block title %}{{ 'Edit' if note else 'New note' }}{% endblock %}
+
+{% block content %}
+    <h2>{{ 'Edit the note' if note else 'A new note' }}</h2>
+
+    <form method="post">
+        <label for="title">Title</label>
+        <input id="title" name="title" value="{{ data.title | default('') }}">
+
+        <label for="category_id">Category</label>
+        <select id="category_id" name="category_id">
+            <option value="">(none)</option>
+            {% for category in categories %}
+                <option value="{{ category.id }}"
+                        {% if data.category_id == category.id | string %}selected{% endif %}>
+                    {{ category.name }}
+                </option>
+            {% endfor %}
+        </select>
+
+        <label for="body">Text</label>
+        <textarea id="body" name="body" rows="8">{{ data.body | default('') }}</textarea>
+
+        <button type="submit">Save</button>
+        <a href="{{ url_for('notes.index') }}">cancel</a>
+    </form>
+{% endblock %}

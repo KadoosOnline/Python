@@ -1,0 +1,502 @@
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="فصل دوازده: مقدار پیش‌فرض، آرگومان کلیدواژه‌ای، حوزه محلی و سراسری، ارسال لیست به تابع و الگوی main">
+    <title>فصل ۱۲: آرگومان‌ها و حوزه متغیر</title>
+    <link rel="icon" href="logokm.png" type="image/png">
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<header class="book-bar">
+    <a class="name" href="index.html">برنامه‌نویسی پایتون</a>
+    <a href="index.html">فهرست مطالب</a>
+</header>
+
+<main class="paper">
+
+    <div class="chapter-head">
+        <span class="chapter-num">فصل ۱۲</span>
+        <h1 data-t="ch12-001">آرگومان‌ها و حوزه متغیر</h1>
+        <p class="lead" data-t="ch12-002">
+            در فصل قبل تابع ساختیم. حالا دقیق‌تر می‌بینیم که مقدارها چطور به
+            تابع می‌رسند، متغیرها کجا زندگی می‌کنند، و شکل استاندارد یک برنامه
+            پایتون چیست.
+        </p>
+    </div>
+
+    <div class="mini-toc">
+        <span class="box-title" data-t="ch12-003">در این فصل می‌خوانید</span>
+        <ol>
+            <li data-t="ch12-004"><a href="#s1">مقدار پیش‌فرض</a></li>
+            <li data-t="ch12-005"><a href="#s2">آرگومان کلیدواژه‌ای</a></li>
+            <li data-t="ch12-006"><a href="#s3">ترکیب دو نوع آرگومان</a></li>
+            <li data-t="ch12-007"><a href="#s4">رد کردن یک پارامتر میانی</a></li>
+            <li data-t="ch12-008"><a href="#s5">حوزه محلی</a></li>
+            <li data-t="ch12-009"><a href="#s6">حوزه سراسری و کلمه global</a></li>
+            <li data-t="ch12-010"><a href="#s7">فرستادن لیست به تابع</a></li>
+            <li data-t="ch12-011"><a href="#s8">تابع main</a></li>
+            <li data-t="ch12-012"><a href="#s9">متغیر __name__ چیست</a></li>
+            <li data-t="ch12-013"><a href="#s10">یک برنامه کامل، تکه‌تکه شده</a></li>
+            <li data-t="ch12-014"><a href="#s11">توابعی که با لیست کار می‌کنند</a></li>
+        </ol>
+    </div>
+
+    <h2 id="s1" data-t="ch12-015">۱. مقدار پیش‌فرض</h2>
+
+    <p data-t="ch12-016">
+        پارامتر می‌تواند مقدار پیش‌فرض داشته باشد. آن وقت اگر صداکننده آن
+        آرگومان را ندهد، مقدار پیش‌فرض به کار می‌رود.
+    </p>
+
+    <pre class="code"><code># A parameter can have a default value, used when the caller omits it.
+def welcome(name='Omid', lastname='Shabani'):
+    print('Welcome', name, lastname)
+
+welcome()                       # both defaults
+welcome('Alireza')              # only 'lastname' keeps its default
+welcome('Alireza', 'Ghasemi')   # no default used
+
+# Parameters WITH a default must come after the ones without.
+def calculate_price(price, tax=0.0):
+    return price * (1 + tax)
+
+print(calculate_price(100000))         # 100000.0
+print(calculate_price(100000, 0.2))    # 120000.0</code></pre>
+    <p class="code-caption" data-t="ch12-017">مقدار پیش‌فرض: نمونه 01_default_values.py</p>
+
+    <pre class="out">Welcome Omid Shabani
+Welcome Alireza Shabani
+Welcome Alireza Ghasemi
+100000.0
+120000.0</pre>
+
+    <h3 data-t="ch12-018">شرح مثال</h3>
+
+    <ul>
+        <li data-t="ch12-019">مقدار پیش‌فرض با علامت مساوی در خود <code>def</code> نوشته می‌شود.</li>
+        <li data-t="ch12-020">پارامترهای دارای پیش‌فرض باید <strong>بعد از</strong> پارامترهای بدون پیش‌فرض بیایند. عکسش خطای نگارشی است، چون پایتون نمی‌داند مقدار داده‌شده مال کدام است.</li>
+        <li data-t="ch12-021">پیش‌فرض کار را برای صداکننده راحت می‌کند: حالت معمول را ساده بنویسد و فقط وقتی لازم شد جزئیات بدهد.</li>
+    </ul>
+
+    <h2 id="s2" data-t="ch12-022">۲. آرگومان کلیدواژه‌ای</h2>
+
+    <p data-t="ch12-023">
+        به جای اینکه به ترتیب تکیه کنید، می‌توانید آرگومان‌ها را
+        <strong>با نام</strong> بدهید. آن وقت ترتیب اهمیتی ندارد و مهم‌تر از آن،
+        کد بسیار خواناتر می‌شود.
+    </p>
+
+    <pre class="code"><code># Arguments can be given BY NAME. Then the order does not matter any more,
+# and the call becomes much easier to read.
+def student_info(name, age, city):
+    print(name, age, city)
+
+student_info('Ali', 20, 'Rasht')                       # positional
+student_info(age=20, name='Ali', city='Rasht')         # keyword, any order
+
+# A long call is often written over several lines.
+student_info(
+    name='Ali',
+    age=20,
+    city='Rasht',
+)</code></pre>
+    <p class="code-caption" data-t="ch12-024">آرگومان با نام: نمونه 02_keyword_arguments.py</p>
+
+    <div class="tip">
+        <span class="box-title" data-t="ch12-025">چرا حرفه‌ای‌ها با نام صدا می‌زنند</span>
+        <p data-t="ch12-026">
+            کدام یک را راحت‌تر می‌فهمید؟
+            <code>create_user('ali', True, False, True)</code> یا
+            <code>create_user('ali', active=True, admin=False, verified=True)</code>؟
+            نسخه دوم شش ماه بعد هم قابل فهم است. هر جا آرگومانی از جنس
+            <code>True</code> و <code>False</code> یا عدد بی‌نام دارید، حتماً
+            نامش را بنویسید.
+        </p>
+    </div>
+
+    <h2 id="s3" data-t="ch12-027">۳. ترکیب دو نوع آرگومان</h2>
+
+    <pre class="code"><code>def welcome(name='Omid', lastname='Shabani'):
+    print('Welcome', name, lastname)
+
+welcome(lastname='Ahmadi')                    # skip the first parameter
+welcome(lastname='Raeisi', name='Ebrahim')    # both by name
+
+# Positional arguments must always come BEFORE keyword arguments.
+# This line would be a SyntaxError:
+#   welcome(name='Ali', 'Ahmadi')
+
+def add(num1=0.0, num2=0.0):
+    return num1 + num2
+
+num1 = float(input('Enter a number: '))
+num2 = float(input('Enter a number: '))
+
+print(add(num2=num2, num1=num1))</code></pre>
+    <p class="code-caption" data-t="ch12-028">ترکیب: نمونه 03_mixing_arguments.py</p>
+
+    <p data-t="ch12-029">
+        قانون یک‌خطی: <strong>آرگومان‌های بی‌نام همیشه اول، آرگومان‌های نام‌دار
+        همیشه بعد.</strong> نقض این قانون خطای نگارشی است، نه خطای اجرا، پس
+        بلافاصله متوجه می‌شوید.
+    </p>
+
+    <h2 id="s4" data-t="ch12-030">۴. رد کردن یک پارامتر میانی</h2>
+
+    <pre class="code"><code># When a function has several optional parameters, keyword arguments let us
+# set only the one we care about.
+def register(name, role='student', active=True):
+    print(name, role, active)
+
+register('Ali', active=False)     # 'role' keeps its default
+register('Saeed')                 # everything default
+register('Sara', 'teacher')       # 'role' given positionally
+
+# Division with a safe default divisor.
+def div(num1, num2=1.0):
+    if num2 == 0:
+        print('Cannot divide by zero!')
+        return None
+    return num1 / num2
+
+number = float(input('Enter a number: '))
+print(div(num1=number))           # divided by the default 1.0
+print(div(number, 0))             # the guard protects us</code></pre>
+    <p class="code-caption" data-t="ch12-031">رد کردن پارامتر میانی: نمونه 04_default_and_keyword.py</p>
+
+    <p data-t="ch12-032">
+        این کاربرد اصلی آرگومان نام‌دار است: وقتی تابعی پنج پارامتر اختیاری دارد
+        و شما فقط می‌خواهید چهارمی را عوض کنید، نمی‌شود سه تای اول را
+        «خالی گذاشت». باید نامش را بنویسید.
+    </p>
+
+    <h2 id="s5" data-t="ch12-033">۵. حوزه محلی</h2>
+
+    <p data-t="ch12-034">
+        متغیری که داخل تابع ساخته می‌شود، فقط داخل همان تابع وجود دارد و به محض
+        تمام شدن تابع از بین می‌رود. به این <strong>حوزه محلی</strong> می‌گویند.
+    </p>
+
+    <pre class="code"><code># A variable created inside a function only exists inside that function.
+def calculate():
+    result = 42          # local variable
+    print('inside: ', result)
+
+calculate()
+
+# This line would raise NameError: name 'result' is not defined
+# print('outside:', result)
+
+# Two functions may use the same name without disturbing each other.
+def first():
+    value = 1
+    print('first:', value)
+
+def second():
+    value = 2
+    print('second:', value)
+
+first()
+second()</code></pre>
+    <p class="code-caption" data-t="ch12-035">حوزه محلی: نمونه 05_local_scope.py</p>
+
+    <p data-t="ch12-036">این محدودیت در عمل یک <strong>مزیت</strong> بزرگ است. به لطف آن، وقتی تابعی می‌نویسید ضرورتی ندارد نگران باشید که نام متغیرتان جایی دیگر در برنامه به کار رفته باشد. دو تابع می‌توانند هر دو متغیری به نام <code>i</code> یا <code>result</code> داشته باشند بی‌آنکه به هم کاری داشته باشند.</p>
+
+    <h2 id="s6" data-t="ch12-037">۶. حوزه سراسری و کلمه global</h2>
+
+    <pre class="code"><code># A variable created outside every function is "global": functions can READ it.
+counter = 0
+
+def show():
+    print('counter is', counter)   # reading works without anything special
+
+show()
+
+# But ASSIGNING to it inside a function creates a NEW local variable,
+# unless we declare it as global.
+def increase_wrong():
+    counter = 100                  # this is a local variable!
+    print('local copy:', counter)
+
+increase_wrong()
+print('still:', counter)           # 0
+
+def increase_right():
+    global counter                 # now we really touch the global one
+    counter += 1
+
+increase_right()
+increase_right()
+print('after global:', counter)    # 2
+
+# 'global' makes a program hard to follow. Prefer parameters and return values:
+def increase(value):
+    return value + 1
+
+counter = increase(counter)
+print('better style:', counter)</code></pre>
+    <p class="code-caption" data-t="ch12-038">حوزه سراسری: نمونه 06_global_scope.py</p>
+
+    <h3 data-t="ch12-039">شرح مثال</h3>
+
+    <ul>
+        <li data-t="ch12-040"><strong>خواندن</strong> متغیر سراسری از داخل تابع آزاد است و نیاز به هیچ کاری ندارد.</li>
+        <li data-t="ch12-041"><strong>نوشتن</strong> فرق می‌کند: خط <code>counter = 100</code> داخل تابع، یک متغیر محلی <strong>تازه</strong> با همان نام می‌سازد و متغیر بیرونی دست‌نخورده می‌ماند.</li>
+        <li data-t="ch12-042">کلمه <code>global</code> به پایتون می‌گوید «منظورم همان متغیر بیرونی است».</li>
+        <li data-t="ch12-043">ولی توصیه جدی: از <code>global</code> استفاده نکنید. برنامه‌ای که متغیرهایش از هر جایی قابل تغییرند، عیب‌یابی‌اش کابوس است. راه درست، دادن مقدار به تابع و گرفتن نتیجه از آن است، مثل خط آخر مثال.</li>
+    </ul>
+
+    <h2 id="s7" data-t="ch12-044">۷. فرستادن لیست به تابع</h2>
+
+    <p data-t="ch12-045">
+        اینجا دام فصل نهم دوباره سر بلند می‌کند، این بار در قالب تابع.
+    </p>
+
+    <pre class="code"><code># Numbers and strings are IMMUTABLE: the function works on a copy.
+def try_to_change(number):
+    number += 1
+    print('inside: ', number)
+
+value = 10
+try_to_change(value)
+print('outside:', value)     # 10 -&gt; unchanged
+
+# Lists are MUTABLE: the function receives the SAME list, not a copy.
+def add_item(items):
+    items.append('new')
+
+my_list = ['a', 'b']
+add_item(my_list)
+print(my_list)               # ['a', 'b', 'new'] -&gt; changed!
+
+# When you do not want that, pass a copy.
+def add_item_safely(items):
+    items = items.copy()
+    items.append('new')
+    return items
+
+original = ['a', 'b']
+changed = add_item_safely(original)
+print(original, changed)</code></pre>
+    <p class="code-caption" data-t="ch12-046">لیست به عنوان آرگومان: نمونه 07_pass_a_list.py</p>
+
+    <div class="table-scroll">
+        <table>
+            <thead>
+                <tr><th data-t="ch12-047">نوع آرگومان</th><th data-t="ch12-048">رفتار</th><th data-t="ch12-049">مثال</th></tr>
+            </thead>
+            <tbody>
+                <tr><td data-t="ch12-050">تغییرناپذیر</td><td data-t="ch12-051">تابع روی کپی کار می‌کند، اصل دست‌نخورده</td><td><code>int</code> <code>float</code> <code>str</code> <code>bool</code></td></tr>
+                <tr><td data-t="ch12-052">تغییرپذیر</td><td data-t="ch12-053">تابع همان شیء را می‌گیرد، تغییر بیرون هم دیده می‌شود</td><td><code>list</code> <code>dict</code> <code>set</code></td></tr>
+            </tbody>
+        </table>
+    </div>
+
+    <p data-t="ch12-054">این رفتار همیشه بهتر است. گاهی دقیقاً همان چیزی است که می‌خواهید: تابعی به نام <code>sort_list(items)</code> که لیست را مرتب کند. مهم این است که <strong>بدانید</strong> کدام حالت را دارید. اگر تابع لیست را عوض می‌کند، در نامش یا در مستندش بگویید.</p>
+
+    <h2 id="s8" data-t="ch12-055">۸. تابع main</h2>
+
+    <p data-t="ch12-056">
+        از این فصل به بعد شکل استاندارد برنامه‌های ما این است: همه کد اصلی داخل
+        تابعی به نام <code>main</code> می‌رود و در انتهای فایل یک خط نگهبان
+        صدایش می‌زند.
+    </p>
+
+    <pre class="code"><code># From now on we put the "story" of the program inside a function called main().
+# It keeps every variable local and makes the program easy to read.
+def show(text):
+    print(text)
+
+def main():
+    show('Kadoos')
+    show('Rasht')
+
+if __name__ == '__main__':
+    main()</code></pre>
+    <p class="code-caption" data-t="ch12-057">الگوی main: نمونه 08_main_function.py</p>
+
+    <p data-t="ch12-058">سه فایده دارد:</p>
+
+    <ul>
+        <li data-t="ch12-059">هیچ متغیر سراسری ساخته نمی‌شود، پس دام بخش ششم پیش نمی‌آید.</li>
+        <li data-t="ch12-060">خواننده کد با یک نگاه به <code>main</code> می‌فهمد برنامه چه می‌کند.</li>
+        <li data-t="ch12-061">فایل می‌تواند هم برنامه باشد و هم ماژول قابل import، که موضوع بخش بعد است.</li>
+    </ul>
+
+    <h2 id="s9" data-t="ch12-062">۹. متغیر __name__ چیست</h2>
+
+    <pre class="code"><code># Python gives every file a variable called __name__.
+#  * when the file is RUN directly       -&gt; __name__ == '__main__'
+#  * when the file is IMPORTED elsewhere -&gt; __name__ is the module name
+#
+# So the guard below means: "run this only when I am the program being started".
+# It is what allows a file to be both a program and a reusable module
+# (see session 17).
+print('The value of __name__ here is:', __name__)
+
+def main():
+    print('main() was called')
+
+if __name__ == '__main__':
+    main()</code></pre>
+    <p class="code-caption" data-t="ch12-063">معنی __name__: نمونه 09_name_main.py</p>
+
+    <pre class="out">The value of __name__ here is: __main__
+main() was called</pre>
+
+    <h3 data-t="ch12-064">شرح مثال</h3>
+
+    <ul>
+        <li data-t="ch12-065">پایتون به هر فایل متغیری به نام <code>__name__</code> می‌دهد.</li>
+        <li data-t="ch12-066">اگر فایل را مستقیم اجرا کنید، مقدارش رشته <code>'__main__'</code> است.</li>
+        <li data-t="ch12-067">اگر فایل را از فایل دیگری <code>import</code> کنید، مقدارش نام فایل است.</li>
+        <li data-t="ch12-068">پس آن خط نگهبان یعنی «این کد فقط وقتی اجرا شود که من خودم برنامه اصلی باشم». به لطف آن، می‌توانید توابع یک فایل را در فایل دیگر استفاده کنید بدون اینکه برنامه‌اش اجرا شود. در فصل هفدهم این را کامل می‌بینید.</li>
+        <li data-t="ch12-069">اگر شکل عجیب <code>__name__</code> با دو زیرخط در دو طرف را نمی‌پسندید، در فصل بیست و چهارم می‌بینید که این نام‌گذاری در پایتون قاعده‌ای عمومی برای چیزهای «خاص» است.</li>
+    </ul>
+
+    <h2 id="s10" data-t="ch12-070">۱۰. یک برنامه کامل، تکه‌تکه شده</h2>
+
+    <pre class="code"><code># A complete program cut into small functions:
+# one function reads, one computes, one displays, and main() puts them together.
+
+def read_number(message):
+    'Ask the user for a number until the answer is really a number.'
+    while True:
+        user_input = input(message)
+        try:
+            return float(user_input)
+        except ValueError:
+            print('That is not a number, try again.')
+
+def add(number1, number2):
+    return number1 + number2
+
+def show_result(value):
+    print('Sum:', value)
+
+def main():
+    num1 = read_number('Enter a number: ')
+    num2 = read_number('Enter a number: ')
+    show_result(add(num1, num2))
+
+if __name__ == '__main__':
+    main()</code></pre>
+    <p class="code-caption" data-t="ch12-071">برنامه تکه‌تکه: نمونه 10_program_with_functions.py</p>
+
+    <h3 data-t="ch12-072">شرح مثال</h3>
+
+    <ul>
+        <li data-t="ch12-073">هر تابع <strong>یک</strong> کار می‌کند: یکی می‌خواند، یکی حساب می‌کند، یکی نمایش می‌دهد.</li>
+        <li data-t="ch12-074">تابع <code>main</code> فقط داستان برنامه را می‌گوید و خودش هیچ جزئیاتی ندارد.</li>
+        <li data-t="ch12-075">ساختار <code>try</code> و <code>except</code> اینجا برای اولین بار آمده است: اگر تبدیل به عدد شکست بخورد، به جای خراب شدن برنامه، پیام می‌دهد و دوباره می‌پرسد. فصل نوزدهم کاملاً درباره همین است.</li>
+        <li data-t="ch12-076">تابع <code>read_number</code> نمونه عالی یک تابع قابل استفاده مجدد است: در هر برنامه‌ای که ورودی عددی می‌خواهد، همین را کپی کنید.</li>
+    </ul>
+
+    <h2 id="s11" data-t="ch12-077">۱۱. توابعی که با لیست کار می‌کنند</h2>
+
+    <pre class="code"><code># Functions that take a list as a parameter and return a value.
+
+def total_of(numbers):
+    'Return the sum of a list of numbers.'
+    total = 0
+    for number in numbers:
+        total += number
+    return total
+
+def average_of(numbers):
+    'Return the average, or 0 for an empty list.'
+    if len(numbers) == 0:
+        return 0
+    return total_of(numbers) / len(numbers)
+
+def bigger_list(list1, list2):
+    'Return the list whose items add up to more.'
+    if total_of(list1) &gt; total_of(list2):
+        return list1
+    return list2
+
+def squares_of(numbers):
+    'Return a NEW list with the square of every item.'
+    result = []
+    for number in numbers:
+        result.append(number * number)
+    return result
+
+def main():
+    l1 = [3, 2, 5, 6]
+    l2 = [10, 2]
+
+    print('total  :', total_of(l1))
+    print('average:', average_of(l1))
+    print('bigger :', bigger_list(l1, l2))
+    print('squares:', squares_of(l1))
+    print('empty  :', average_of([]))
+
+if __name__ == '__main__':
+    main()</code></pre>
+    <p class="code-caption" data-t="ch12-078">توابع لیستی: نمونه 11_list_functions.py</p>
+
+    <h3 data-t="ch12-079">شرح مثال</h3>
+
+    <ul>
+        <li data-t="ch12-080"><code>average_of</code> از <code>total_of</code> استفاده می‌کند. توابع روی هم سوار می‌شوند، درست مثل فصل قبل.</li>
+        <li data-t="ch12-081">حالت لیست خالی داخل خود تابع بررسی شده است. این بهتر از این است که هر بار در برنامه اصلی چک کنید.</li>
+        <li data-t="ch12-082"><code>squares_of</code> لیست ورودی را دست نمی‌زند و لیست <strong>تازه</strong> می‌سازد. این سبک امن‌تر است و در فصل بیست و پنجم راه یک‌خطی نوشتنش را می‌بینید.</li>
+        <li data-t="ch12-083">هر تابع یک مستند تک‌خطی دارد که می‌گوید چه چیزی برمی‌گرداند. عادت خوبی است.</li>
+    </ul>
+
+    <div class="folder-ref">
+        <span class="box-title" data-t="ch12-084">فایل‌های تمرینی این فصل</span>
+        <p data-t="ch12-085">
+            پوشه <code>S12-functions-arguments-and-scope</code> شامل نمونه‌های
+            <code>01_default_values.py</code> تا <code>11_list_functions.py</code>.
+        </p>
+    </div>
+
+    <h2 data-t="ch12-086">خلاصه فصل</h2>
+
+    <div class="table-scroll">
+        <table>
+            <thead>
+                <tr><th data-t="ch12-087">ابزار</th><th data-t="ch12-088">وظیفه آن</th></tr>
+            </thead>
+            <tbody>
+                <tr><td><code>def f(x=5)</code></td><td data-t="ch12-089">مقدار پیش‌فرض. بعد از پارامترهای بدون پیش‌فرض</td></tr>
+                <tr><td><code>f(name='Ali')</code></td><td data-t="ch12-090">آرگومان کلیدواژه‌ای. ترتیب آزاد و خواناتر</td></tr>
+                <tr><td data-t="ch12-091">قانون ترتیب</td><td data-t="ch12-092">بی‌نام‌ها اول، نام‌دارها بعد</td></tr>
+                <tr><td data-t="ch12-093">حوزه محلی</td><td data-t="ch12-094">متغیر داخل تابع، بیرون وجود ندارد</td></tr>
+                <tr><td data-t="ch12-095">حوزه سراسری</td><td data-t="ch12-096">خواندنش آزاد است، نوشتنش نیاز به <code>global</code> دارد</td></tr>
+                <tr><td><code>global</code></td><td data-t="ch12-097">کار می‌کند ولی از آن پرهیز کنید</td></tr>
+                <tr><td data-t="ch12-098">آرگومان تغییرپذیر</td><td data-t="ch12-099">لیست و دیکشنری در تابع واقعاً عوض می‌شوند</td></tr>
+                <tr><td><code>main()</code></td><td data-t="ch12-100">محل کد اصلی برنامه</td></tr>
+                <tr><td><code>if __name__ == '__main__':</code></td><td data-t="ch12-101">«فقط وقتی من برنامه اصلی هستم اجرا شو»</td></tr>
+            </tbody>
+        </table>
+    </div>
+
+    <div class="exercise">
+        <h3 data-t="ch12-102">تمرین‌های فصل دوازده</h3>
+        <ol>
+            <li data-t="ch12-103">تابع <code>greet(name, greeting='Hello')</code> را بنویسید و به سه شکل مختلف صدایش بزنید.</li>
+            <li data-t="ch12-104">تابع <code>power(base, exponent=2)</code> را بنویسید و با یک و با دو آرگومان امتحانش کنید.</li>
+            <li data-t="ch12-105">توضیح دهید چرا در کد زیر، خروجی <code>0</code> است: <code>x = 0</code> سپس تابعی که داخلش <code>x = 5</code> است، و بعد از صدا زدنش <code>print(x)</code>.</li>
+            <li data-t="ch12-106">تابع <code>add_score(scores, value)</code> را بنویسید که نمره‌ای به لیست اضافه کند، و نشان دهید لیست اصلی عوض می‌شود.</li>
+            <li data-t="ch12-107">همان تمرین را طوری بازنویسی کنید که لیست اصلی <strong>عوض نشود</strong>.</li>
+            <li data-t="ch12-108">یکی از برنامه‌های فصل دهم را با <code>main()</code> و چند تابع بازنویسی کنید.</li>
+            <li data-t="ch12-109">تابع <code>count_words(sentence, min_length=3)</code> را بنویسید که کلمه‌های حداقل به این طول را بشمارد.</li>
+            <li data-t="ch12-110">یک برنامه منودار بنویسید که هر گزینه منو، تابع خودش را صدا بزند.</li>
+        </ol>
+    </div>
+
+    <div class="pager">
+        <a href="chapter-11.html">فصل قبل: توابع</a>
+        <a href="chapter-13.html">فصل بعد: توابع پیشرفته</a>
+    </div>
+
+</main>
+
+</body>
+</html>

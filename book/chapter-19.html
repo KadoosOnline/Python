@@ -1,0 +1,552 @@
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="فصل نوزده: try و except و else و finally، انواع استثنا، دستور raise، assert و ماژول logging">
+    <title>فصل ۱۹: خطاها و استثناها</title>
+    <link rel="icon" href="logokm.png" type="image/png">
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<header class="book-bar">
+    <a class="name" href="index.html">برنامه‌نویسی پایتون</a>
+    <a href="index.html">فهرست مطالب</a>
+</header>
+
+<main class="paper">
+
+    <div class="chapter-head">
+        <span class="chapter-num">فصل ۱۹</span>
+        <h1 data-t="ch19-001">خطاها و استثناها</h1>
+        <p class="lead" data-t="ch19-002">
+            برنامه خوب آن نیست که خطا ندارد، آن است که وقتی خطا رخ می‌دهد
+            نمی‌ترکد. این فصل درباره این است که چطور به جای خراب شدن، واکنش
+            نشان دهیم.
+        </p>
+    </div>
+
+    <div class="mini-toc">
+        <span class="box-title" data-t="ch19-003">در این فصل می‌خوانید</span>
+        <ol>
+            <li data-t="ch19-004"><a href="#s1">سه نوع مشکل</a></li>
+            <li data-t="ch19-005"><a href="#s2">اولین try و except</a></li>
+            <li data-t="ch19-006"><a href="#s3">گرفتن پیام خطا</a></li>
+            <li data-t="ch19-007"><a href="#s4">استثناهای پرتکرار</a></li>
+            <li data-t="ch19-008"><a href="#s5">چند except برای یک try</a></li>
+            <li data-t="ch19-009"><a href="#s6">else و finally</a></li>
+            <li data-t="ch19-010"><a href="#s7">چرا except خالی بد است</a></li>
+            <li data-t="ch19-011"><a href="#s8">دستور raise</a></li>
+            <li data-t="ch19-012"><a href="#s9">تابع خواندن امن عدد</a></li>
+            <li data-t="ch19-013"><a href="#s10">دستور assert</a></li>
+            <li data-t="ch19-014"><a href="#s11">ماژول logging</a></li>
+        </ol>
+    </div>
+
+    <h2 id="s1" data-t="ch19-015">۱. سه نوع مشکل</h2>
+
+    <div class="table-scroll">
+        <table>
+            <thead>
+                <tr><th data-t="ch19-016">نوع</th><th data-t="ch19-017">کی معلوم می‌شود</th><th data-t="ch19-018">مثال</th></tr>
+            </thead>
+            <tbody>
+                <tr><td data-t="ch19-019">خطای نگارشی</td><td data-t="ch19-020">پیش از اجرا</td><td data-t="ch19-021">فراموش کردن دونقطه یا گیومه</td></tr>
+                <tr><td data-t="ch19-022">استثنا</td><td data-t="ch19-023">هنگام اجرا</td><td data-t="ch19-024">تقسیم بر صفر، فایل ناموجود</td></tr>
+                <tr><td data-t="ch19-025">خطای منطقی</td><td data-t="ch19-026">هرگز خودکار معلوم نمی‌شود</td><td data-t="ch19-027">فرمول غلط، پرانتز جاافتاده</td></tr>
+            </tbody>
+        </table>
+    </div>
+
+    <p data-t="ch19-028">
+        این فصل درباره نوع دوم است: <strong>استثنا</strong>. کدی که از نظر
+        نگارشی درست است ولی هنگام اجرا به مشکل می‌خورد. خطای منطقی هیچ ابزاری
+        ندارد جز فکر کردن و آزمایش کردن.
+    </p>
+
+    <p data-t="ch19-029">
+        وقتی استثنایی رخ دهد و کسی آن را نگیرد، پایتون برنامه را متوقف می‌کند و
+        یک <strong>ردیابی</strong> چاپ می‌کند. آن را از آخر بخوانید: خط آخر
+        می‌گوید چه شد، خط‌های بالاتر می‌گویند از کجا آمده است.
+    </p>
+
+    <h2 id="s2" data-t="ch19-030">۲. اولین try و except</h2>
+
+    <pre class="code"><code># Without a try, this line stops the whole program:
+#     x = 10 / 0
+#     ZeroDivisionError: division by zero
+
+# 'try' contains the risky code, 'except' says what to do when it fails.
+try:
+    x = 10 / 0
+    print(x)
+except ZeroDivisionError:
+    print('Division by zero error')
+
+print('The program continues normally.')</code></pre>
+    <p class="code-caption" data-t="ch19-031">اولین try: نمونه 01_zero_division.py</p>
+
+    <pre class="out">Division by zero error
+The program continues normally.</pre>
+
+    <h3 data-t="ch19-032">شرح مثال</h3>
+
+    <ul>
+        <li data-t="ch19-033">کد پرخطر داخل <code>try</code> می‌رود و واکنش داخل <code>except</code>.</li>
+        <li data-t="ch19-034">به محض رخ دادن خطا، بقیه بلوک <code>try</code> <strong>رها می‌شود</strong> و اجرا به <code>except</code> می‌پرد. به همین دلیل آن <code>print(x)</code> هرگز اجرا نشد.</li>
+        <li data-t="ch19-035">بعد از بلوک، برنامه عادی ادامه پیدا می‌کند. این تفاوت «مدیریت‌شده» و «خراب شدن» است.</li>
+        <li data-t="ch19-036">داخل <code>try</code> فقط کدی بگذارید که واقعاً ممکن است خطا بدهد. بلوک <code>try</code> بزرگ، خطاهای غیرمنتظره را هم می‌بلعد.</li>
+    </ul>
+
+    <h2 id="s3" data-t="ch19-037">۳. گرفتن پیام خطا</h2>
+
+    <pre class="code"><code># int() raises ValueError when the text is not a number.
+text = 'Kadoos'
+
+try:
+    age = int(text)
+    print(age)
+except ValueError as e:
+    # 'as e' gives us the exception object, which contains the message.
+    print("Can't convert this string to an integer!")
+    print('The message of Python was:', e)</code></pre>
+    <p class="code-caption" data-t="ch19-038">گرفتن پیام: نمونه 02_value_error.py</p>
+
+    <pre class="out">Can't convert this string to an integer!
+The message of Python was: invalid literal for int() with base 10: 'Kadoos'</pre>
+
+    <p data-t="ch19-039">
+        با <code>as e</code> خود شیء استثنا را می‌گیرید. چاپ کردنش پیام اصلی
+        پایتون را می‌دهد و <code>type(e).__name__</code> نام نوع خطا را. برای
+        گزارش‌گیری بسیار مفید است.
+    </p>
+
+    <h2 id="s4" data-t="ch19-040">۴. استثناهای پرتکرار</h2>
+
+    <div class="table-scroll">
+        <table>
+            <thead>
+                <tr><th data-t="ch19-041">استثنا</th><th data-t="ch19-042">کی رخ می‌دهد</th></tr>
+            </thead>
+            <tbody>
+                <tr><td><code>ValueError</code></td><td data-t="ch19-043">نوع درست است ولی مقدار بی‌معناست، مثل <code>int('abc')</code></td></tr>
+                <tr><td><code>TypeError</code></td><td data-t="ch19-044">نوع غلط است، مثل <code>'a' + 1</code></td></tr>
+                <tr><td><code>IndexError</code></td><td data-t="ch19-045">اندیس بیرون از لیست</td></tr>
+                <tr><td><code>KeyError</code></td><td data-t="ch19-046">کلید ناموجود در دیکشنری</td></tr>
+                <tr><td><code>FileNotFoundError</code></td><td data-t="ch19-047">فایل وجود ندارد</td></tr>
+                <tr><td><code>PermissionError</code></td><td data-t="ch19-048">اجازه دسترسی به فایل نیست</td></tr>
+                <tr><td><code>ZeroDivisionError</code></td><td data-t="ch19-049">تقسیم بر صفر</td></tr>
+                <tr><td><code>AttributeError</code></td><td data-t="ch19-050">شیء چنین صفت یا متدی ندارد</td></tr>
+                <tr><td><code>ImportError</code></td><td data-t="ch19-051">ماژول پیدا نشد</td></tr>
+            </tbody>
+        </table>
+    </div>
+
+    <pre class="code"><code>items = [10, 20, 30]
+
+try:
+    print(items[5])
+except IndexError:
+    print('This index does not exist!')
+
+# The same protection without an exception:
+index = 5
+if 0 &lt;= index &lt; len(items):
+    print(items[index])
+else:
+    print('index out of range (checked with an if)')</code></pre>
+    <p class="code-caption" data-t="ch19-052">خطای اندیس: نمونه 03_index_error.py</p>
+
+    <pre class="code"><code># Opening a file that does not exist raises FileNotFoundError.
+try:
+    with open('myfile.txt', encoding='utf-8') as f:
+        print(f.read())
+except FileNotFoundError:
+    print('File not found.')
+except PermissionError:
+    print('You are not allowed to read this file.')</code></pre>
+    <p class="code-caption" data-t="ch19-053">فایل ناموجود: نمونه 05_file_not_found.py</p>
+
+    <div class="note">
+        <span class="box-title" data-t="ch19-054">با if جلوگیری کنیم یا با try بگیریم</span>
+        <p data-t="ch19-055">
+            هر دو درست‌اند. وقتی می‌شود راحت جلوگیری کرد، مثل بررسی اندیس یا
+            <code>dict.get</code>، همان بهتر است. ولی برای فایل، بررسی کردن
+            کافی نیست: ممکن است بین لحظه بررسی و لحظه باز کردن، فایل پاک شود.
+            قاعده عملی: برای منطق برنامه <code>if</code>، برای چیزهایی که
+            بیرون از کنترل شما هستند مثل فایل و شبکه، <code>try</code>.
+        </p>
+    </div>
+
+    <h2 id="s5" data-t="ch19-056">۵. چند except برای یک try</h2>
+
+    <pre class="code"><code># One 'try' can have several 'except' blocks: Python runs the first one
+# that matches the exception that happened.
+text = 'AA'          # try also with '10' and with '1'
+numbers = [1, 2, 3]
+
+try:
+    index = int(text)          # may raise ValueError
+    print(numbers[index])      # may raise IndexError
+except ValueError:
+    print('Conversion error!')
+except IndexError:
+    print('Index error!')
+
+# Several exceptions can share the same block.
+try:
+    index = int(text)
+    print(numbers[index])
+except (ValueError, IndexError) as e:
+    print('Something went wrong:', type(e).__name__, '-', e)</code></pre>
+    <p class="code-caption" data-t="ch19-057">چند except: نمونه 06_several_excepts.py</p>
+
+    <p data-t="ch19-058">
+        پایتون از بالا به پایین اولین <code>except</code> مناسب را اجرا می‌کند،
+        درست مثل <code>elif</code>. اگر چند خطا واکنش یکسانی دارند، می‌توانید
+        همه‌شان را در یک تاپل بگذارید.
+    </p>
+
+    <h2 id="s6" data-t="ch19-059">۶. else و finally</h2>
+
+    <pre class="code"><code># The complete shape:
+#   try     -&gt; the risky code
+#   except  -&gt; what to do when it fails
+#   else    -&gt; runs only when NOTHING failed
+#   finally -&gt; runs ALWAYS (success or failure), used to clean up
+user_input = input('Enter a number: ')
+
+try:
+    number = int(user_input)
+    x = 10 / number
+    print(x)
+except ZeroDivisionError:
+    print('Division by zero error')
+except ValueError:
+    print('That was not a number')
+else:
+    print('The division is done!')
+finally:
+    print('Error or no error, this always runs.')</code></pre>
+    <p class="code-caption" data-t="ch19-060">ساختار کامل: نمونه 07_else_finally.py</p>
+
+    <div class="table-scroll">
+        <table>
+            <thead>
+                <tr><th data-t="ch19-061">بخش</th><th data-t="ch19-062">کی اجرا می‌شود</th></tr>
+            </thead>
+            <tbody>
+                <tr><td><code>try</code></td><td data-t="ch19-063">همیشه، تا وقتی خطا رخ دهد</td></tr>
+                <tr><td><code>except</code></td><td data-t="ch19-064">فقط وقتی آن نوع خطا رخ داده باشد</td></tr>
+                <tr><td><code>else</code></td><td data-t="ch19-065">فقط وقتی هیچ خطایی رخ نداده باشد</td></tr>
+                <tr><td><code>finally</code></td><td data-t="ch19-066"><strong>همیشه</strong>، چه خطا باشد چه نباشد</td></tr>
+            </tbody>
+        </table>
+    </div>
+
+    <p data-t="ch19-067"><code>finally</code> برای <strong>پاک‌سازی</strong> است: بستن فایل، قطع اتصال پایگاه داده، آزاد کردن منابع. حتی اگر داخل <code>try</code> دستور <code>return</code> باشد، باز هم <code>finally</code> اجرا می‌شود. البته با وجود <code>with</code>، بیشتر کاربردهای قدیمی‌اش دیگر ضرورتی ندارد.</p>
+
+    <h2 id="s7" data-t="ch19-068">۷. چرا except خالی بد است</h2>
+
+    <pre class="code"><code># A bare 'except:' catches EVERYTHING, even the mistakes in your own code
+# and Ctrl-C. The bug then becomes invisible - never do this.
+try:
+    x = 10 / 0
+except:
+    print('Something is wrong!')      # but WHAT exactly? we have no idea
+
+# Catch the exception you expect ...
+try:
+    x = 10 / 0
+except ZeroDivisionError as e:
+    print('Clear message:', e)
+
+# ... or, if you really must catch everything, at least keep the object.
+try:
+    x = 10 / 0
+except Exception as e:
+    print(f'{type(e).__name__}: {e}')</code></pre>
+    <p class="code-caption" data-t="ch19-069">except خالی: نمونه 08_bare_except.py</p>
+
+    <div class="warn">
+        <span class="box-title" data-t="ch19-070">بدترین عادت برنامه‌نویسی</span>
+        <p data-t="ch19-071">
+            <code>except:</code> خالی همه چیز را می‌گیرد، از جمله غلط تایپی
+            خودتان و حتی <code>Ctrl + C</code> کاربر. نتیجه این است که باگ
+            <strong>نامرئی</strong> می‌شود: برنامه پیام مبهمی می‌دهد و شما
+            هفته‌ها نمی‌فهمید مشکل کجاست. همیشه نوع خطا را بنویسید. اگر واقعاً
+            مجبورید همه چیز را بگیرید، دست‌کم <code>except Exception as e</code>
+            بنویسید و پیام را چاپ کنید.
+        </p>
+    </div>
+
+    <h2 id="s8" data-t="ch19-072">۸. دستور raise</h2>
+
+    <pre class="code"><code># 'raise' creates an exception ourselves. It is how a function says
+# "the value you gave me makes no sense".
+def set_age(age: int) -&gt; int:
+    if age &lt; 0:
+        raise ValueError("Age can't be negative!")
+    if age &gt; 130:
+        raise ValueError('Age is unrealistic!')
+    return age
+
+
+try:
+    set_age(-5)
+except ValueError as e:
+    print('Refused:', e)
+
+# Re-raising after logging is a common pattern: we note the problem,
+# but we let the caller decide what to do.
+def read_config(path: str) -&gt; str:
+    try:
+        with open(path, encoding='utf-8') as f:
+            return f.read()
+    except FileNotFoundError:
+        print(f'[warning] {path} is missing')
+        raise            # send the same exception further up
+
+
+try:
+    read_config('nothing.cfg')
+except FileNotFoundError:
+    print('The caller handled it.')</code></pre>
+    <p class="code-caption" data-t="ch19-073">دستور raise: نمونه 09_raise.py</p>
+
+    <h3 data-t="ch19-074">شرح مثال</h3>
+
+    <ul>
+        <li data-t="ch19-075"><code>raise</code> یعنی «من نمی‌توانم این کار را انجام دهم». تابع به جای برگرداندن مقدار بی‌معنی، خطا می‌اندازد.</li>
+        <li data-t="ch19-076">چرا تابع خودش پیام چاپ نمی‌کند؟ چون تابع نمی‌داند برنامه از کجا صدا زده شده است. شاید برنامه گرافیکی باشد و پیام باید در پنجره نشان داده شود. تصمیم‌گیری وظیفه صداکننده است.</li>
+        <li data-t="ch19-077"><code>raise</code> خالی داخل یک <code>except</code>، همان خطا را دوباره بالا می‌فرستد. الگوی «ثبت کن و پاس بده» است.</li>
+        <li data-t="ch19-078">نوع خطا را مناسب انتخاب کنید: <code>ValueError</code> برای مقدار نامعتبر، <code>TypeError</code> برای نوع نادرست. در فصل بیست و چهارم می‌بینید که می‌شود کلاس خطای اختصاصی هم ساخت.</li>
+    </ul>
+
+    <h2 id="s9" data-t="ch19-079">۹. تابع خواندن امن عدد</h2>
+
+    <p data-t="ch19-080">
+        مفیدترین چیز این فصل. این دو تابع را در هر برنامه‌ای که ورودی می‌گیرد
+        می‌توانید کپی کنید.
+    </p>
+
+    <pre class="code"><code>'''The most useful pattern of this session: reading a valid number.'''
+
+
+def read_number(message: str) -&gt; float:
+    'Ask until the user really types a number.'
+    while True:
+        user_input = input(message)
+        try:
+            return float(user_input)
+        except ValueError:
+            print('That is not a number, try again.')
+
+
+def read_int(message: str, minimum: int, maximum: int) -&gt; int:
+    'Ask until the user types a whole number inside the range.'
+    while True:
+        try:
+            value = int(input(message))
+        except ValueError:
+            print('Please type digits only.')
+            continue
+
+        if value &lt; minimum or value &gt; maximum:
+            print(f'The value must be between {minimum} and {maximum}.')
+            continue
+
+        return value
+
+
+def main() -&gt; None:
+    a = read_number('Enter a number: ')
+    b = read_number('Enter another number: ')
+    print('Sum:', a + b)
+
+    age = read_int('Enter your age (1-120): ', 1, 120)
+    print('Your age is', age)
+
+
+if __name__ == '__main__':
+    main()</code></pre>
+    <p class="code-caption" data-t="ch19-081">خواندن امن: نمونه 10_safe_input.py</p>
+
+    <p data-t="ch19-082">
+        ترکیب سه چیز است: حلقه بی‌پایان فصل هشتم، <code>try</code> این فصل، و
+        <code>return</code> که هم مقدار را می‌دهد و هم حلقه را تمام می‌کند.
+        مقایسه کنید با نسخه فصل هشتم که با <code>isdigit()</code> کار می‌کرد:
+        این نسخه اعشاری و منفی را هم درست مدیریت می‌کند.
+    </p>
+
+    <h2 id="s10" data-t="ch19-083">۱۰. دستور assert</h2>
+
+    <pre class="code"><code># 'assert condition, message' stops the program with an AssertionError when the
+# condition is False. It is a tool for the DEVELOPER, not for the user:
+# it documents an assumption and catches a bug early.
+def average(numbers: list[float]) -&gt; float:
+    assert len(numbers) &gt; 0, 'average() needs at least one number'
+    return sum(numbers) / len(numbers)
+
+
+print(average([10, 20, 30]))
+
+try:
+    average([])
+except AssertionError as e:
+    print('AssertionError:', e)
+
+# Careful: assertions disappear when Python is run with the -O option,
+# so never use assert to validate what a USER typed - use if/raise for that.</code></pre>
+    <p class="code-caption" data-t="ch19-084">دستور assert: نمونه 11_assert.py</p>
+
+    <div class="table-scroll">
+        <table>
+            <thead>
+                <tr><th></th><th><code>assert</code></th><th><code>raise</code></th></tr>
+            </thead>
+            <tbody>
+                <tr><td data-t="ch19-085">برای چه کسی</td><td data-t="ch19-086">برنامه‌نویس</td><td data-t="ch19-087">کاربر و صداکننده تابع</td></tr>
+                <tr><td data-t="ch19-088">چه می‌گوید</td><td data-t="ch19-089">«این نباید هرگز رخ دهد»</td><td data-t="ch19-090">«ورودی نامعتبر است»</td></tr>
+                <tr><td data-t="ch19-091">در حالت بهینه</td><td data-t="ch19-092">حذف می‌شود</td><td data-t="ch19-093">باقی می‌ماند</td></tr>
+                <tr><td data-t="ch19-094">اعتبارسنجی ورودی کاربر</td><td data-t="ch19-095">هرگز</td><td data-t="ch19-096">بله</td></tr>
+            </tbody>
+        </table>
+    </div>
+
+    <p data-t="ch19-097">
+        نکته حیاتی: اگر پایتون با گزینه <code>-O</code> اجرا شود، همه
+        <code>assert</code> ها <strong>حذف</strong> می‌شوند. پس هرگز برای
+        بررسی ورودی کاربر یا برای امنیت به آن تکیه نکنید.
+    </p>
+
+    <h2 id="s11" data-t="ch19-098">۱۱. ماژول logging</h2>
+
+    <pre class="code"><code># print() is fine while learning, but a real program uses 'logging':
+# every message has a level, a time stamp, and can be sent to a file.
+import logging
+
+logging.basicConfig(
+    level=logging.DEBUG,                     # show everything from DEBUG upwards
+    format='%(asctime)s [%(levelname)s] %(message)s',
+    datefmt='%H:%M:%S',
+    # filename='app.log',                    # uncomment to write into a file
+)
+
+logger = logging.getLogger(__name__)
+
+
+def divide(a: float, b: float) -&gt; float | None:
+    logger.debug('divide(%s, %s) was called', a, b)
+    try:
+        result = a / b
+    except ZeroDivisionError:
+        # exception() also prints the traceback - perfect inside an except block
+        logger.exception('division by zero')
+        return None
+    logger.info('the result is %s', result)
+    return result
+
+
+def main() -&gt; None:
+    logger.info('program started')
+    divide(10, 2)
+    divide(10, 0)
+    logger.warning('this is a warning')
+    logger.error('this is an error')
+    logger.info('program finished')
+
+
+if __name__ == '__main__':
+    main()</code></pre>
+    <p class="code-caption" data-t="ch19-099">ماژول logging: نمونه 12_logging.py</p>
+
+    <pre class="out">14:32:10 [INFO] program started
+14:32:10 [DEBUG] divide(10, 2) was called
+14:32:10 [INFO] the result is 5.0
+14:32:10 [DEBUG] divide(10, 0) was called
+14:32:10 [ERROR] division by zero
+Traceback (most recent call last):
+  ...
+ZeroDivisionError: division by zero
+14:32:10 [WARNING] this is a warning</pre>
+
+    <div class="table-scroll">
+        <table>
+            <thead>
+                <tr><th data-t="ch19-100">سطح</th><th data-t="ch19-101">کی به کار می‌رود</th></tr>
+            </thead>
+            <tbody>
+                <tr><td><code>DEBUG</code></td><td data-t="ch19-102">جزئیات فنی، فقط هنگام توسعه</td></tr>
+                <tr><td><code>INFO</code></td><td data-t="ch19-103">گزارش کارهای عادی</td></tr>
+                <tr><td><code>WARNING</code></td><td data-t="ch19-104">چیزی عجیب است ولی برنامه کار می‌کند</td></tr>
+                <tr><td><code>ERROR</code></td><td data-t="ch19-105">کاری انجام نشد</td></tr>
+                <tr><td><code>CRITICAL</code></td><td data-t="ch19-106">برنامه نمی‌تواند ادامه دهد</td></tr>
+            </tbody>
+        </table>
+    </div>
+
+    <h3 data-t="ch19-107">چرا logging بهتر از print است</h3>
+
+    <ul>
+        <li data-t="ch19-108">هر پیام <strong>سطح</strong> دارد، پس می‌توانید با یک تنظیم، پیام‌های جزئی را خاموش کنید بدون اینکه کد را عوض کنید.</li>
+        <li data-t="ch19-109">زمان و نام ماژول خودکار اضافه می‌شود.</li>
+        <li data-t="ch19-110">با یک پارامتر می‌شود همه چیز را به جای صفحه، در فایل نوشت.</li>
+        <li data-t="ch19-111"><code>logger.exception</code> داخل <code>except</code> ردیابی کامل را هم ثبت می‌کند که برای عیب‌یابی طلاست.</li>
+        <li data-t="ch19-112">دقت کنید که پیام با <code>%s</code> و آرگومان جدا نوشته شده، نه با f-string. این‌طور اگر آن سطح خاموش باشد، رشته اصلاً ساخته نمی‌شود.</li>
+    </ul>
+
+    <div class="folder-ref">
+        <span class="box-title" data-t="ch19-113">فایل‌های تمرینی این فصل</span>
+        <p data-t="ch19-114">
+            پوشه <code>S19-errors-and-exceptions</code> شامل نمونه‌های
+            <code>01_zero_division.py</code> تا <code>12_logging.py</code>.
+        </p>
+    </div>
+
+    <h2 data-t="ch19-115">خلاصه فصل</h2>
+
+    <div class="table-scroll">
+        <table>
+            <thead>
+                <tr><th data-t="ch19-116">ابزار</th><th data-t="ch19-117">وظیفه آن</th></tr>
+            </thead>
+            <tbody>
+                <tr><td><code>try / except</code></td><td data-t="ch19-118">گرفتن خطا به جای خراب شدن برنامه</td></tr>
+                <tr><td><code>except X as e</code></td><td data-t="ch19-119">دسترسی به پیام و نوع خطا</td></tr>
+                <tr><td><code>except (A, B)</code></td><td data-t="ch19-120">یک واکنش برای چند خطا</td></tr>
+                <tr><td><code>else</code></td><td data-t="ch19-121">وقتی هیچ خطایی نبود</td></tr>
+                <tr><td><code>finally</code></td><td data-t="ch19-122">همیشه. برای پاک‌سازی</td></tr>
+                <tr><td data-t="ch19-123"><code>except:</code> خالی</td><td data-t="ch19-124">هرگز. باگ را نامرئی می‌کند</td></tr>
+                <tr><td><code>raise ValueError(msg)</code></td><td data-t="ch19-125">اعلام خطا از داخل تابع</td></tr>
+                <tr><td data-t="ch19-126"><code>raise</code> خالی</td><td data-t="ch19-127">فرستادن همان خطا به لایه بالاتر</td></tr>
+                <tr><td><code>assert</code></td><td data-t="ch19-128">بررسی فرض برنامه‌نویس. برای ورودی کاربر نه</td></tr>
+                <tr><td><code>logging</code></td><td data-t="ch19-129">جایگزین حرفه‌ای <code>print</code>، با سطح و زمان و فایل</td></tr>
+            </tbody>
+        </table>
+    </div>
+
+    <div class="exercise">
+        <h3 data-t="ch19-130">تمرین‌های فصل نوزده</h3>
+        <ol>
+            <li data-t="ch19-131">ماشین‌حسابی بنویسید که هر چه کاربر تایپ کند، هرگز خراب نشود.</li>
+            <li data-t="ch19-132">تابع <code>safe_divide(a, b)</code> را بنویسید که به جای خطا، <code>None</code> برگرداند.</li>
+            <li data-t="ch19-133">نام فایلی را از کاربر بگیرید و اگر وجود نداشت، پیام روشنی بدهید.</li>
+            <li data-t="ch19-134">تابع <code>read_age()</code> را بنویسید که تا وقتی جواب عدد صحیح بین ۱ تا ۱۲۰ نشده بپرسد.</li>
+            <li data-t="ch19-135">تابعی بنویسید که اگر لیست خالی بگیرد، <code>ValueError</code> بیندازد.</li>
+            <li data-t="ch19-136">هنگام خواندن دیکشنری <code>KeyError</code> را بگیرید و آن راه حل را با <code>dict.get()</code> مقایسه کنید.</li>
+            <li data-t="ch19-137">به یکی از برنامه‌های قبلی‌تان <code>logging</code> اضافه کنید و گزارش را در فایل بنویسید.</li>
+            <li data-t="ch19-138">فرق <code>assert</code> و <code>raise</code> را با یک مثال از هر کدام توضیح دهید.</li>
+        </ol>
+    </div>
+
+    <div class="pager">
+        <a href="chapter-18.html">فصل قبل: فایل‌ها و سیستم‌عامل</a>
+        <a href="chapter-20.html">فصل بعد: پروژه‌های ترم اول</a>
+    </div>
+
+</main>
+
+</body>
+</html>

@@ -1,0 +1,41 @@
+{% extends 'base.html' %}
+
+{% block content %}
+    <h1>Register for a course</h1>
+
+    {# No `action`: the form posts back to the same address. #}
+    <form method="post">
+        <label for="name">Full name</label>
+        {# value=... gives the visitor back what they typed after an error. #}
+        <input id="name" name="name" value="{{ data.name | default('') }}">
+
+        <label for="email">E-mail</label>
+        <input id="email" name="email" type="email"
+               value="{{ data.email | default('') }}">
+
+        <label for="course">Course</label>
+        <select id="course" name="course">
+            <option value="">-- choose --</option>
+            {% for course in courses %}
+                <option value="{{ course }}"
+                        {% if data.course == course %}selected{% endif %}>
+                    {{ course }}
+                </option>
+            {% endfor %}
+        </select>
+
+        <label for="sessions">How many sessions (1-20)</label>
+        <input id="sessions" name="sessions" type="number" min="1" max="20"
+               value="{{ data.sessions | default('20') }}">
+
+        <label>
+            <input type="checkbox" name="newsletter"
+                   {% if data.newsletter %}checked{% endif %}>
+            Send me news about the courses
+        </label>
+
+        <button type="submit">Register</button>
+    </form>
+
+    <p><a href="{{ url_for('registrations') }}">see the registrations</a></p>
+{% endblock %}

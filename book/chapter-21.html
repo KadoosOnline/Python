@@ -1,0 +1,627 @@
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="فصل بیست و یک: شیءگرایی، کلاس و شیء، متد __init__، پارامتر self، صفت کلاس و صفت نمونه، لیستی از اشیاء">
+    <title>فصل ۲۱: شیءگرایی، کلاس و شیء</title>
+    <link rel="icon" href="logokm.png" type="image/png">
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<header class="book-bar">
+    <a class="name" href="index.html">برنامه‌نویسی پایتون</a>
+    <a href="index.html">فهرست مطالب</a>
+</header>
+
+<main class="paper">
+
+    <div class="chapter-head">
+        <span class="chapter-num">فصل ۲۱</span>
+        <h1 data-t="ch21-001">شیءگرایی: کلاس و شیء</h1>
+        <p class="lead" data-t="ch21-002">
+            شروع ترم دوم. تا اینجا داده و رفتار جدا بودند: لیستی از نمره‌ها و
+            تابعی که میانگین می‌گرفت. شیءگرایی این دو را کنار هم می‌گذارد و
+            برنامه را شبیه دنیای واقعی می‌کند.
+        </p>
+    </div>
+
+    <div class="mini-toc">
+        <span class="box-title" data-t="ch21-003">در این فصل می‌خوانید</span>
+        <ol>
+            <li data-t="ch21-004"><a href="#s1">چرا شیءگرایی</a></li>
+            <li data-t="ch21-005"><a href="#s2">اولین کلاس</a></li>
+            <li data-t="ch21-006"><a href="#s3">صفت کلاس در برابر صفت نمونه</a></li>
+            <li data-t="ch21-007"><a href="#s4">متد و پارامتر self</a></li>
+            <li data-t="ch21-008"><a href="#s5">سازنده __init__</a></li>
+            <li data-t="ch21-009"><a href="#s6">مقدار پیش‌فرض در سازنده</a></li>
+            <li data-t="ch21-010"><a href="#s7">یک کلاس کامل</a></li>
+            <li data-t="ch21-011"><a href="#s8">کلاس با راهنمای نوع</a></li>
+            <li data-t="ch21-012"><a href="#s9">لیستی از اشیاء</a></li>
+            <li data-t="ch21-013"><a href="#s10">شیئی که خودش را ذخیره می‌کند</a></li>
+            <li data-t="ch21-014"><a href="#s11">حساب بانکی</a></li>
+            <li data-t="ch21-015"><a href="#s12">برنامه مدیریت دانشجو</a></li>
+        </ol>
+    </div>
+
+    <h2 id="s1" data-t="ch21-016">۱. چرا شیءگرایی</h2>
+
+    <p data-t="ch21-017">فرض کنید می‌خواهید اطلاعات سی دانشجو را نگه دارید: نام، سن و نمره‌ها. با ابزارهای ترم اول، یا سه لیست موازی می‌سازید (که به هم ریختنشان فقط یک اشتباه فاصله دارد) یا لیستی از دیکشنری. راه دوم بهتر است، ولی توابعی که روی این داده کار می‌کنند جای دیگری هستند و هیچ چیز آنها را به هم وصل نمی‌کند.</p>
+
+    <p data-t="ch21-018">
+        <strong>کلاس</strong> یک <strong>نقشه</strong> است: می‌گوید یک دانشجو
+        چه <strong>داده‌هایی</strong> دارد و چه <strong>کارهایی</strong>
+        می‌تواند بکند. <strong>شیء</strong> یک نمونه واقعی ساخته‌شده از روی آن
+        نقشه است.
+    </p>
+
+    <div class="note">
+        <span class="box-title" data-t="ch21-019">یک مقایسه</span>
+        <p data-t="ch21-020">
+            کلاس مثل نقشه ساختمان است و شیء مثل ساختمان‌های ساخته‌شده از روی
+            آن. یک نقشه، صد ساختمان. هر ساختمان رنگ و ساکنان خودش را دارد ولی
+            همه همان ساختار را دارند.
+        </p>
+    </div>
+
+    <h2 id="s2" data-t="ch21-021">۲. اولین کلاس</h2>
+
+    <pre class="code"><code># A class is a blueprint. Writing it creates NOTHING by itself.
+class MyClass:
+    x = 5
+    y = 'Hello'
+
+
+def main():
+    # Calling the class like a function creates an OBJECT (an instance).
+    p1 = MyClass()
+    print(p1.x)          # 5
+
+    # Every object is independent: changing p2 does not touch p1.
+    p2 = MyClass()
+    p2.x = 12
+    print(p2.x)          # 12
+    print(p1.x)          # 5
+
+    # A class is a type, exactly like int or str.
+    a = 2
+    print(type(a))       # &lt;class 'int'&gt;
+    print(type(p1))      # &lt;class '__main__.MyClass'&gt;
+    print(isinstance(p1, MyClass))   # True
+
+
+if __name__ == '__main__':
+    main()</code></pre>
+    <p class="code-caption" data-t="ch21-022">اولین کلاس: نمونه 01_first_class.py</p>
+
+    <h3 data-t="ch21-023">شرح مثال</h3>
+
+    <ul>
+        <li data-t="ch21-024">کلمه کلیدی <code>class</code>، بعد نام، بعد دونقطه. بدنه تو رفته است.</li>
+        <li data-t="ch21-025">نام کلاس با قرارداد <strong>PascalCase</strong> نوشته می‌شود: هر کلمه با حرف بزرگ شروع می‌شود و زیرخط ندارد. <code>BankAccount</code> نه <code>bank_account</code>.</li>
+        <li data-t="ch21-026">نوشتن کلاس هیچ شیئی نمی‌سازد. برای ساختن شیء، کلاس را مثل تابع صدا می‌زنید: <code>MyClass()</code>.</li>
+        <li data-t="ch21-027">به صفت‌های شیء با نقطه دسترسی دارید، مثل <code>p1.x</code>.</li>
+        <li data-t="ch21-028">کلاس یک <strong>نوع</strong> تازه است، دقیقاً مثل <code>int</code> و <code>str</code>. تابع <code>type</code> همان‌طور که در فصل اول دیدید، اینجا هم کار می‌کند.</li>
+    </ul>
+
+    <h2 id="s3" data-t="ch21-029">۳. صفت کلاس در برابر صفت نمونه</h2>
+
+    <pre class="code"><code># An attribute written in the body of the class belongs to the CLASS:
+# it is shared by every object that does not define its own.
+class Counter:
+    total = 0            # class attribute - ONE copy for everybody
+
+
+def main():
+    a = Counter()
+    b = Counter()
+
+    print(a.total, b.total)        # 0 0
+
+    # Assigning through an object creates an INSTANCE attribute that hides
+    # the class one - only for that object.
+    a.total = 10
+    print(a.total, b.total)        # 10 0
+
+    # Changing it on the class itself changes it for everyone who has no
+    # instance attribute of that name.
+    Counter.total = 99
+    print(a.total, b.total)        # 10 99
+
+    # This is why mutable class attributes are dangerous:
+    class Basket:
+        items = []                 # shared by ALL the baskets!
+
+    b1 = Basket()
+    b2 = Basket()
+    b1.items.append('apple')
+    print(b2.items)                # ['apple'] - surprise!</code></pre>
+    <p class="code-caption" data-t="ch21-030">صفت کلاس و نمونه: نمونه 02_class_vs_instance.py</p>
+
+    <div class="table-scroll">
+        <table>
+            <thead>
+                <tr><th></th><th data-t="ch21-031">صفت کلاس</th><th data-t="ch21-032">صفت نمونه</th></tr>
+            </thead>
+            <tbody>
+                <tr><td data-t="ch21-033">کجا تعریف می‌شود</td><td data-t="ch21-034">بدنه کلاس</td><td data-t="ch21-035">داخل <code>__init__</code>، با <code>self</code></td></tr>
+                <tr><td data-t="ch21-036">چند نسخه</td><td data-t="ch21-037">یکی، مشترک بین همه</td><td data-t="ch21-038">یکی برای هر شیء</td></tr>
+                <tr><td data-t="ch21-039">مناسب برای</td><td data-t="ch21-040">ثابت‌ها، شمارنده کل</td><td data-t="ch21-041">داده مخصوص هر شیء</td></tr>
+            </tbody>
+        </table>
+    </div>
+
+    <div class="warn">
+        <span class="box-title" data-t="ch21-042">دام صفت کلاس تغییرپذیر</span>
+        <p data-t="ch21-043">
+            این همان دام پیش‌فرض تغییرپذیر فصل سیزدهم است، در لباس تازه. لیستی
+            که در بدنه کلاس تعریف شود، <strong>بین همه اشیاء مشترک</strong>
+            است. یک سبد خرید که کالای همه مشتری‌ها را در خودش دارد. راه حل
+            همیشه یکی است: لیست را داخل <code>__init__</code> بسازید.
+        </p>
+    </div>
+
+    <h2 id="s4" data-t="ch21-044">۴. متد و پارامتر self</h2>
+
+    <pre class="code"><code># A method is a function written inside a class.
+# Its first parameter is always 'self': the object the method was called on.
+class MyClass:
+    x = 5
+
+    def hello(self):
+        print(f'Hello {self.x}')
+
+    def bye(self):
+        print(f'Goodbye {self.x}')
+
+
+if __name__ == '__main__':
+    p1 = MyClass()
+    p2 = MyClass()
+
+    p1.x = 15
+    p2.x = -7
+
+    # p1.hello() is really MyClass.hello(p1): that is where 'self' comes from.
+    p1.hello()
+    p2.hello()</code></pre>
+    <p class="code-caption" data-t="ch21-045">متد و self: نمونه 03_methods_and_self.py</p>
+
+    <pre class="out">Hello 15
+Hello -7</pre>
+
+    <h3 data-t="ch21-046">self دقیقاً چیست</h3>
+
+    <ul>
+        <li data-t="ch21-047"><code>self</code> یعنی <strong>همین شیئی که متد رویش صدا زده شده</strong>.</li>
+        <li data-t="ch21-048">وقتی می‌نویسید <code>p1.hello()</code>، پایتون در عمل <code>MyClass.hello(p1)</code> را اجرا می‌کند. پس <code>self</code> همان <code>p1</code> است.</li>
+        <li data-t="ch21-049">برای همین است که <code>self</code> در تعریف نوشته می‌شود ولی موقع صدا زدن نه: پایتون خودش پرش می‌کند.</li>
+        <li data-t="ch21-050">نام <code>self</code> اجباری نیست ولی <strong>قرارداد جهانی</strong> است. هرگز عوضش نکنید.</li>
+        <li data-t="ch21-051">بدون <code>self.</code>، متد به متغیر محلی خودش اشاره می‌کند نه به صفت شیء. فراموش کردن آن، رایج‌ترین خطای این فصل است.</li>
+    </ul>
+
+    <h2 id="s5" data-t="ch21-052">۵. سازنده __init__</h2>
+
+    <pre class="code"><code># __init__ runs automatically right after the object is created.
+# It is where the instance attributes are born.
+class Person:
+
+    def __init__(self, name, age):
+        self.name = name       # instance attribute, one per object
+        self.age = age
+
+
+if __name__ == '__main__':
+    p1 = Person('Ali', 36)
+    p2 = Person(name='Reza', age=22)     # keyword arguments work here too
+
+    print(p1.name, p1.age)
+    print(p2.name, p2.age)
+
+    # Each object keeps its own values.
+    p1.age = 37
+    print(p1.age, p2.age)
+
+    # __dict__ shows the instance attributes of an object.
+    print(p1.__dict__)</code></pre>
+    <p class="code-caption" data-t="ch21-053">سازنده: نمونه 04_init.py</p>
+
+    <pre class="out">Ali 36
+Reza 22
+37 22
+{'name': 'Ali', 'age': 36}</pre>
+
+    <h3 data-t="ch21-054">شرح مثال</h3>
+
+    <ul>
+        <li data-t="ch21-055"><code>__init__</code> بلافاصله پس از ساخته شدن شیء و به طور خودکار اجرا می‌شود. به آن <strong>سازنده</strong> می‌گویند.</li>
+        <li data-t="ch21-056">آرگومان‌هایی که به <code>Person(...)</code> می‌دهید، به پارامترهای <code>__init__</code> می‌رسند. اولی همیشه <code>self</code> است و خودکار پر می‌شود.</li>
+        <li data-t="ch21-057">خط <code>self.name = name</code> صفت نمونه می‌سازد: یک نسخه مخصوص همین شیء.</li>
+        <li data-t="ch21-058">آن دو زیرخط در دو طرف نام، یعنی این متد <strong>خاص</strong> است و پایتون خودش صدایش می‌زند. در فصل بیست و چهارم خواهرها و برادرهایش را می‌بینید.</li>
+        <li data-t="ch21-059"><code>__dict__</code> همه صفت‌های نمونه را به شکل دیکشنری نشان می‌دهد. برای عیب‌یابی مفید است.</li>
+    </ul>
+
+    <h2 id="s6" data-t="ch21-060">۶. مقدار پیش‌فرض در سازنده</h2>
+
+    <pre class="code"><code># The parameters of __init__ can have default values, like any function.
+class Person:
+    def __init__(self, name, age=18):
+        self.name = name
+        self.age = age
+
+
+if __name__ == '__main__':
+    p1 = Person('Ali')             # age takes its default
+    p2 = Person('Reza', 22)
+
+    # Remember the trap of session 13: never use a list as a default value.
+    class Basket:
+        def __init__(self, items=None):
+            # a NEW list for every basket
+            self.items = items if items is not None else []
+
+    b1 = Basket()
+    b2 = Basket()
+    b1.items.append('apple')
+    print(b1.items, b2.items)      # ['apple'] []</code></pre>
+    <p class="code-caption" data-t="ch21-061">پیش‌فرض در سازنده: نمونه 05_init_defaults.py</p>
+
+    <p data-t="ch21-062">
+        همان قواعد فصل دوازدهم و سیزدهم اینجا هم برقرارند: پیش‌فرض بعد از
+        پارامترهای بدون پیش‌فرض، و هرگز لیست به عنوان پیش‌فرض.
+    </p>
+
+    <h2 id="s7" data-t="ch21-063">۷. یک کلاس کامل</h2>
+
+    <pre class="code"><code># A class puts the data (name, age) and the behaviour (greet) together.
+class Person:
+    def __init__(self, name, age):
+        self.name = name
+        self.age = age
+
+    def greet(self):
+        print(f'Hello, my name is {self.name}!')
+
+    def have_birthday(self):
+        'A method may change the state of the object.'
+        self.age += 1
+        print(f'{self.name} is now {self.age}.')
+
+    def is_adult(self):
+        'A method may also just answer a question.'
+        return self.age &gt;= 18
+
+
+if __name__ == '__main__':
+    p1 = Person('Ali', 32)
+    p1.greet()
+    p1.have_birthday()
+    print(p1.is_adult())
+
+    p2 = Person('Reza', 12)
+    p2.greet()
+    print(p2.is_adult())</code></pre>
+    <p class="code-caption" data-t="ch21-064">کلاس کامل: نمونه 06_person.py</p>
+
+    <p data-t="ch21-065">
+        سه نوع متد اینجا می‌بینید: یکی که فقط <strong>نمایش</strong> می‌دهد،
+        یکی که <strong>حالت</strong> شیء را عوض می‌کند، و یکی که به
+        <strong>سؤالی جواب</strong> می‌دهد. بیشتر متدها یکی از این سه‌اند.
+    </p>
+
+    <h2 id="s8" data-t="ch21-066">۸. کلاس با راهنمای نوع</h2>
+
+    <pre class="code"><code>'''The same ideas, written with type hints and a main() function.'''
+
+
+class Car:
+    def __init__(self, brand: str, model: str, year: int) -&gt; None:
+        self.brand: str = brand
+        self.model: str = model
+        self.year: int = year
+
+    def display_info(self) -&gt; None:
+        'Print a readable description of the car.'
+        print(f'{self.year} {self.brand} {self.model}')
+
+    def age(self, current_year: int = 2026) -&gt; int:
+        'Return how old the car is.'
+        return current_year - self.year
+
+
+def main() -&gt; None:
+    car1: Car = Car(brand='Mazda', model='6', year=2018)
+    car1.display_info()
+    print('Age:', car1.age())
+
+
+if __name__ == '__main__':
+    main()</code></pre>
+    <p class="code-caption" data-t="ch21-067">با راهنمای نوع: نمونه 07_car_with_hints.py</p>
+
+    <p data-t="ch21-068">نکته: <code>__init__</code> خروجی <code>-&gt; None</code> دارد، چون سازنده هیچ‌وقت چیزی برنمی‌گرداند. اگر داخلش <code>return</code> با مقدار بنویسید، پایتون خطا ایجاد می‌کند.</p>
+
+    <h2 id="s9" data-t="ch21-069">۹. لیستی از اشیاء</h2>
+
+    <pre class="code"><code># Objects are values like any other: they can live in a list, in a dictionary,
+# be passed to a function and be returned from one.
+class Dog:
+    def __init__(self, name, age):
+        self.name = name
+        self.age = age
+
+    def bark(self):
+        print(f"{self.name} says vagh! And its age is {self.age}.")
+
+
+def oldest(dogs):
+    'Return the oldest dog of a list.'
+    best = dogs[0]
+    for dog in dogs:
+        if dog.age &gt; best.age:
+            best = dog
+    return best
+
+
+if __name__ == '__main__':
+    dogs = [
+        Dog('Jessy', 3),
+        Dog('Blacky', 5),
+        Dog('Rex', 1),
+    ]
+
+    for dog in dogs:
+        dog.bark()
+
+    print('The oldest is', oldest(dogs).name)
+
+    # Sorting a list of objects needs a key that says WHAT to compare.
+    for dog in sorted(dogs, key=lambda d: d.age):
+        print(dog.name, dog.age)</code></pre>
+    <p class="code-caption" data-t="ch21-070">لیستی از اشیاء: نمونه 08_list_of_objects.py</p>
+
+    <h3 data-t="ch21-071">شرح مثال</h3>
+
+    <ul>
+        <li data-t="ch21-072">شیء هم یک مقدار است: در لیست می‌رود، به تابع داده می‌شود و برگردانده می‌شود.</li>
+        <li data-t="ch21-073">الگوی «قهرمان فعلی» فصل دهم اینجا هم کار می‌کند، فقط به جای مقایسه عددها، صفت <code>age</code> اشیاء را مقایسه می‌کنیم.</li>
+        <li data-t="ch21-074">برای مرتب‌سازی اشیاء باید بگویید <strong>بر اساس چه چیزی</strong>. آن <code>lambda</code> در پارامتر <code>key</code> دقیقاً همین را می‌گوید و موضوع فصل بیست و ششم است. در فصل بیست و چهارم راه دیگری می‌بینید که به خود کلاس یاد می‌دهد چطور مقایسه شود.</li>
+    </ul>
+
+    <h2 id="s10" data-t="ch21-075">۱۰. شیئی که خودش را ذخیره می‌کند</h2>
+
+    <pre class="code"><code>'''An object can carry the code that saves and loads it.'''
+
+import os
+
+
+class Dog:
+    def __init__(self, name: str, age: int) -&gt; None:
+        self.name = name
+        self.age = age
+
+    def save(self) -&gt; None:
+        'Write this dog into its own text file.'
+        with open(f'{self.name}.txt', 'w', encoding='utf-8') as file:
+            file.write(f'{self.name}\n{self.age}\n')
+
+    @staticmethod
+    def load(name: str) -&gt; 'Dog | None':
+        'Read a dog back from its file (None when the file is missing).'
+        filename = f'{name}.txt'
+        if not os.path.exists(filename):
+            return None
+
+        with open(filename, encoding='utf-8') as file:
+            saved_name = file.readline().strip()
+            saved_age = int(file.readline().strip())
+
+        return Dog(saved_name, saved_age)
+
+
+if __name__ == '__main__':
+    dogs = [Dog('Jessy', 3), Dog('Blacky', 5)]
+
+    for dog in dogs:
+        dog.save()
+
+    loaded = Dog.load('Jessy')
+    if loaded is not None:
+        print('Loaded from the file:', loaded.name, loaded.age)</code></pre>
+    <p class="code-caption" data-t="ch21-076">ذخیره و بازیابی: نمونه 09_object_saves_itself.py</p>
+
+    <h3 data-t="ch21-077">شرح مثال</h3>
+
+    <ul>
+        <li data-t="ch21-078">متد <code>save</code> روی <strong>یک شیء</strong> کار می‌کند، پس <code>self</code> دارد.</li>
+        <li data-t="ch21-079">متد <code>load</code> فرق دارد: هنوز شیئی وجود ندارد که بخواهد بارگذاری شود. پس <code>self</code> ندارد و با <code>@staticmethod</code> علامت‌گذاری شده است. صدا زدنش هم از راه خود کلاس است: <code>Dog.load('Jessy')</code>.</li>
+        <li data-t="ch21-080">آن دکوراتور و شکل کامل متدهای ایستا و کلاسی، موضوع فصل بعد است.</li>
+        <li data-t="ch21-081">راهنمای نوع <code>'Dog | None'</code> داخل گیومه است، چون در آن لحظه کلاس <code>Dog</code> هنوز کامل تعریف نشده است.</li>
+    </ul>
+
+    <h2 id="s11" data-t="ch21-082">۱۱. حساب بانکی</h2>
+
+    <pre class="code"><code>'''A class whose whole point is to protect a value that changes.'''
+
+
+class BankAccount:
+    def __init__(self, owner: str, balance: float = 0.0) -&gt; None:
+        self.owner = owner
+        self.balance = balance
+        self.history: list[str] = []      # a NEW list for every account
+
+    def deposit(self, amount: float) -&gt; None:
+        'Add money to the account.'
+        if amount &lt;= 0:
+            print('The amount must be positive.')
+            return
+        self.balance += amount
+        self.history.append(f'+{amount}')
+
+    def withdraw(self, amount: float) -&gt; bool:
+        'Take money out. Return False when there is not enough.'
+        if amount &lt;= 0:
+            print('The amount must be positive.')
+            return False
+        if amount &gt; self.balance:
+            print('Not enough money.')
+            return False
+        self.balance -= amount
+        self.history.append(f'-{amount}')
+        return True
+
+    def show(self) -&gt; None:
+        print(f'{self.owner}: {self.balance:,.0f}')
+        print('  history:', ', '.join(self.history) or '(empty)')
+
+
+if __name__ == '__main__':
+    account = BankAccount('Ali', 100_000)
+    account.deposit(50_000)
+    account.withdraw(30_000)
+    account.withdraw(1_000_000)      # refused
+    account.show()</code></pre>
+    <p class="code-caption" data-t="ch21-083">حساب بانکی: نمونه 10_bank_account.py</p>
+
+    <h3 data-t="ch21-084">شرح مثال</h3>
+
+    <ul>
+        <li data-t="ch21-085">این کلاس نمونه خوبی از <strong>چرا شیءگرایی</strong> است: موجودی فقط از راه دو متد قابل تغییر است و هر دو متد قواعد را بررسی می‌کنند.</li>
+        <li data-t="ch21-086"><code>withdraw</code> مقدار بولی برمی‌گرداند تا صداکننده بفهمد موفق شد یا نه. این بهتر از چاپ کردن تنهاست.</li>
+        <li data-t="ch21-087">تاریخچه یک لیست <strong>داخل</strong> <code>__init__</code> است، پس هر حساب تاریخچه خودش را دارد.</li>
+        <li data-t="ch21-088">ولی یک مشکل باقی است: هنوز کسی می‌تواند بنویسد <code>account.balance = 999999</code> و همه قواعد را دور بزند. حل این مشکل، موضوع فصل بعد است.</li>
+    </ul>
+
+    <h2 id="s12" data-t="ch21-089">۱۲. برنامه مدیریت دانشجو</h2>
+
+    <pre class="code"><code>class Student:
+    def __init__(self, name: str, age: int) -&gt; None:
+        self.name = name
+        self.age = age
+        self.scores: list[float] = []
+
+    def add_score(self, score: float) -&gt; None:
+        'Store one score.'
+        self.scores.append(score)
+
+    def average(self) -&gt; float:
+        'Return the average score (0 when there is none).'
+        if len(self.scores) == 0:
+            return 0.0
+        return sum(self.scores) / len(self.scores)
+
+    def describe(self) -&gt; str:
+        'Return a one-line description.'
+        return f'{self.name} ({self.age}) - average {self.average():.2f}'
+
+
+def find(students: list[Student], name: str) -&gt; Student | None:
+    'Return the student with that name, or None.'
+    for student in students:
+        if student.name.lower() == name.lower():
+            return student
+    return None</code></pre>
+    <p class="code-caption" data-t="ch21-090">کلاس دانشجو: نمونه 11_student_manager.py</p>
+
+    <pre class="code"><code>def main() -&gt; None:
+    students: list[Student] = []
+
+    while True:
+        print('\n1) Add a student')
+        print('2) Add a score')
+        print('3) Show all the students')
+        print('0) Exit')
+
+        choice = input('Your choice: ')
+
+        if choice == '1':
+            name = input('Name: ')
+            try:
+                age = int(input('Age: '))
+            except ValueError:
+                print('The age must be a whole number.')
+                continue
+            students.append(Student(name, age))
+            print('Added.')
+
+        elif choice == '2':
+            student = find(students, input('Name: '))
+            if student is None:
+                print('No such student.')
+                continue
+            try:
+                student.add_score(float(input('Score: ')))
+            except ValueError:
+                print('The score must be a number.')
+
+        elif choice == '3':
+            for student in students:
+                print(' -', student.describe())
+
+        elif choice == '0':
+            break</code></pre>
+    <p class="code-caption" data-t="ch21-091">منوی برنامه: نمونه 11_student_manager.py</p>
+
+    <h3 data-t="ch21-092">شرح مثال</h3>
+
+    <ul>
+        <li data-t="ch21-093">مقایسه کنید با نسخه‌ای که با دیکشنری می‌نوشتید: اینجا <code>average</code> و <code>describe</code> <strong>داخل</strong> خود دانشجو هستند، نه در جای دیگری از برنامه.</li>
+        <li data-t="ch21-094">تابع <code>find</code> بیرون کلاس است، چون روی <strong>مجموعه</strong> دانشجوها کار می‌کند نه روی یک دانشجو. این تصمیم درستی است.</li>
+        <li data-t="ch21-095">خروجی <code>Student | None</code> به صداکننده هشدار می‌دهد که ممکن است چیزی پیدا نشود، پس باید بررسی کند.</li>
+        <li data-t="ch21-096">ورودی‌ها با <code>try</code> محافظت شده‌اند، درس فصل نوزدهم.</li>
+    </ul>
+
+    <div class="folder-ref">
+        <span class="box-title" data-t="ch21-097">فایل‌های تمرینی این فصل</span>
+        <p data-t="ch21-098">
+            پوشه <code>S21-oop-classes-and-objects</code> شامل نمونه‌های
+            <code>01_first_class.py</code> تا <code>11_student_manager.py</code>.
+        </p>
+    </div>
+
+    <h2 data-t="ch21-099">خلاصه فصل</h2>
+
+    <div class="table-scroll">
+        <table>
+            <thead>
+                <tr><th data-t="ch21-100">مفهوم</th><th data-t="ch21-101">توضیح</th></tr>
+            </thead>
+            <tbody>
+                <tr><td data-t="ch21-102">کلاس</td><td data-t="ch21-103">نقشه. با <code>class Name:</code> و نام PascalCase</td></tr>
+                <tr><td data-t="ch21-104">شیء</td><td data-t="ch21-105">نمونه ساخته‌شده. با <code>Name()</code></td></tr>
+                <tr><td data-t="ch21-106">صفت</td><td data-t="ch21-107">داده شیء. دسترسی با نقطه</td></tr>
+                <tr><td data-t="ch21-108">متد</td><td data-t="ch21-109">تابع داخل کلاس. اولین پارامترش <code>self</code></td></tr>
+                <tr><td><code>self</code></td><td data-t="ch21-110">خود شیئی که متد رویش صدا زده شده</td></tr>
+                <tr><td><code>__init__</code></td><td data-t="ch21-111">سازنده. خودکار اجرا می‌شود، صفت‌های نمونه را می‌سازد</td></tr>
+                <tr><td data-t="ch21-112">صفت کلاس</td><td data-t="ch21-113">در بدنه کلاس. مشترک بین همه اشیاء</td></tr>
+                <tr><td data-t="ch21-114">صفت نمونه</td><td data-t="ch21-115">با <code>self.</code> در سازنده. مخصوص هر شیء</td></tr>
+                <tr><td data-t="ch21-116">لیست تغییرپذیر در بدنه کلاس</td><td data-t="ch21-117">دام. همیشه داخل <code>__init__</code> بسازیدش</td></tr>
+                <tr><td><code>obj.__dict__</code></td><td data-t="ch21-118">دیدن همه صفت‌های نمونه</td></tr>
+            </tbody>
+        </table>
+    </div>
+
+    <div class="exercise">
+        <h3 data-t="ch21-119">تمرین‌های فصل بیست و یک</h3>
+        <ol>
+            <li data-t="ch21-120">کلاس <code>Book</code> را با صفت‌های <code>title</code> و <code>author</code> و <code>year</code> و متد <code>describe()</code> بنویسید.</li>
+            <li data-t="ch21-121">کلاس <code>Rectangle</code> را با <code>width</code> و <code>height</code> و متدهای <code>area()</code> و <code>perimeter()</code> بنویسید.</li>
+            <li data-t="ch21-122">کلاس <code>Circle</code> را بنویسید و مساحتش را با <code>math.pi</code> حساب کنید.</li>
+            <li data-t="ch21-123">کلاس <code>Timer</code> را با متدهای <code>start()</code> و <code>stop()</code> و <code>elapsed()</code> بنویسید.</li>
+            <li data-t="ch21-124">لیستی از پنج شیء <code>Book</code> بسازید و قدیمی‌ترینشان را چاپ کنید.</li>
+            <li data-t="ch21-125">متد <code>save()</code> به <code>Book</code> اضافه کنید که آن را در فایل متنی بنویسد.</li>
+            <li data-t="ch21-126">با مثال خودتان فرق صفت کلاس و صفت نمونه را توضیح دهید.</li>
+            <li data-t="ch21-127">کلاس <code>Playlist</code> را بنویسید که لیستی از آهنگ‌ها دارد، با متدهای <code>add</code> و <code>remove</code> و <code>show</code>.</li>
+        </ol>
+    </div>
+
+    <div class="pager">
+        <a href="chapter-20.html">فصل قبل: پروژه‌های ترم اول</a>
+        <a href="chapter-22.html">فصل بعد: کپسوله‌سازی و dataclass</a>
+    </div>
+
+</main>
+
+</body>
+</html>

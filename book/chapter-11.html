@@ -1,0 +1,459 @@
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="فصل یازده: تعریف تابع با def، پارامتر و آرگومان، دستور return، مقدار None و تابعی که تابع دیگر را صدا می‌زند">
+    <title>فصل ۱۱: توابع</title>
+    <link rel="icon" href="logokm.png" type="image/png">
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<header class="book-bar">
+    <a class="name" href="index.html">برنامه‌نویسی پایتون</a>
+    <a href="index.html">فهرست مطالب</a>
+</header>
+
+<main class="paper">
+
+    <div class="chapter-head">
+        <span class="chapter-num">فصل ۱۱</span>
+        <h1 data-t="ch11-001">توابع</h1>
+        <p class="lead" data-t="ch11-002">
+            تا اینجا برنامه‌های ما یک تکه بلند بودند. تابع به شما اجازه می‌دهد
+            کد را به قطعه‌های کوچک نام‌دار بشکنید و هر قطعه را هر جا لازم شد
+            دوباره به کار ببرید. این نقطه‌ای است که برنامه‌نویسی حرفه‌ای شروع
+            می‌شود.
+        </p>
+    </div>
+
+    <div class="mini-toc">
+        <span class="box-title" data-t="ch11-003">در این فصل می‌خوانید</span>
+        <ol>
+            <li data-t="ch11-004"><a href="#s1">چرا تابع</a></li>
+            <li data-t="ch11-005"><a href="#s2">اولین تابع</a></li>
+            <li data-t="ch11-006"><a href="#s3">پارامتر و آرگومان</a></li>
+            <li data-t="ch11-007"><a href="#s4">دستور return</a></li>
+            <li data-t="ch11-008"><a href="#s5">تابع بدون return و مقدار None</a></li>
+            <li data-t="ch11-009"><a href="#s6">تابعی که تصمیم می‌گیرد</a></li>
+            <li data-t="ch11-010"><a href="#s7">برگرداندن مقدار بولی</a></li>
+            <li data-t="ch11-011"><a href="#s8">تابع تشخیص عدد اول</a></li>
+            <li data-t="ch11-012"><a href="#s9">استفاده از تابع در حلقه</a></li>
+            <li data-t="ch11-013"><a href="#s10">تابعی که تابع دیگر را صدا می‌زند</a></li>
+            <li data-t="ch11-014"><a href="#s11">کجا تابع را تعریف کنیم</a></li>
+        </ol>
+    </div>
+
+    <h2 id="s1" data-t="ch11-015">۱. چرا تابع</h2>
+
+    <p data-t="ch11-016">
+        فرض کنید در سه جای برنامه‌تان باید تشخیص دهید عددی اول است یا نه. بدون
+        تابع، همان ده خط را سه بار کپی می‌کنید. حالا اگر باگی در آن ده خط پیدا
+        شود، باید سه جا را اصلاح کنید و حتماً یکی را فراموش می‌کنید.
+    </p>
+
+    <p data-t="ch11-017">تابع سه چیز به شما می‌دهد:</p>
+
+    <ul>
+        <li data-t="ch11-018"><strong>عدم تکرار.</strong> کد یک بار نوشته می‌شود و هر جا لازم شد صدا زده می‌شود.</li>
+        <li data-t="ch11-019"><strong>نام‌گذاری.</strong> <code>is_prime(n)</code> در یک نگاه فهمیده می‌شود، ده خط حلقه و شرط نه.</li>
+        <li data-t="ch11-020"><strong>تقسیم مسئله.</strong> مسئله بزرگ به چند مسئله کوچک تبدیل می‌شود که هر کدام جدا قابل حل و قابل آزمایش‌اند.</li>
+    </ul>
+
+    <h2 id="s2" data-t="ch11-021">۲. اولین تابع</h2>
+
+    <pre class="code"><code># 'def' defines a function. The body is indented, exactly like a loop body.
+# Defining a function does NOT run it.
+def hello():
+    print('Hello World!')
+
+# The function only runs when we CALL it, with parentheses.
+hello()
+hello()
+hello()</code></pre>
+    <p class="code-caption" data-t="ch11-022">اولین تابع: نمونه 01_first_function.py</p>
+
+    <pre class="out">Hello World!
+Hello World!
+Hello World!</pre>
+
+    <h3 data-t="ch11-023">شرح مثال</h3>
+
+    <ul>
+        <li data-t="ch11-024">کلمه کلیدی <code>def</code>، بعد نام تابع، بعد پرانتز، بعد دونقطه. بدنه تو رفته است، مثل بدنه <code>if</code> و <code>for</code>.</li>
+        <li data-t="ch11-025"><strong>تعریف</strong> تابع آن را اجرا نمی‌کند. فقط به پایتون می‌گوید «این دستور را با این نام یاد بگیر».</li>
+        <li data-t="ch11-026">برای اجرا باید <strong>صدایش بزنید</strong>: نام تابع با پرانتز. بدون پرانتز، فقط به خود تابع اشاره می‌کنید و هیچ اتفاقی نمی‌افتد.</li>
+        <li data-t="ch11-027">نام تابع همان قواعد نام متغیر را دارد: حروف کوچک، کلمات با زیرخط، و معنادار. معمولاً فعل است، چون تابع کاری انجام می‌دهد.</li>
+    </ul>
+
+    <h2 id="s3" data-t="ch11-028">۳. پارامتر و آرگومان</h2>
+
+    <p data-t="ch11-029">
+        تابعی که همیشه یک کار ثابت انجام دهد محدود است. با
+        <strong>پارامتر</strong> می‌شود به تابع اطلاعات داد.
+    </p>
+
+    <pre class="code"><code># A parameter is a variable that receives a value when the function is called.
+def hello(name):
+    print('Hello', name)
+
+# 'Matin', 'Maryam' and 'Raha' are the arguments.
+hello('Matin')
+hello('Maryam')
+hello('Raha')
+
+# A function may have several parameters; their ORDER matters.
+def introduce(name, city):
+    print(f'{name} lives in {city}.')
+
+introduce('Ali', 'Rasht')</code></pre>
+    <p class="code-caption" data-t="ch11-030">پارامترها: نمونه 02_parameters.py</p>
+
+    <div class="table-scroll">
+        <table>
+            <thead>
+                <tr><th data-t="ch11-031">اصطلاح</th><th data-t="ch11-032">یعنی</th><th data-t="ch11-033">در مثال</th></tr>
+            </thead>
+            <tbody>
+                <tr><td data-t="ch11-034">پارامتر</td><td data-t="ch11-035">نام متغیر در <strong>تعریف</strong> تابع</td><td><code>name</code></td></tr>
+                <tr><td data-t="ch11-036">آرگومان</td><td data-t="ch11-037">مقدار واقعی موقع <strong>صدا زدن</strong></td><td><code>'Matin'</code></td></tr>
+            </tbody>
+        </table>
+    </div>
+
+    <p data-t="ch11-038">
+        ترتیب آرگومان‌ها مهم است. اگر بنویسید
+        <code>introduce('Rasht', 'Ali')</code>، تابع می‌گوید «Rasht در Ali
+        زندگی می‌کند». پایتون نمی‌فهمد اشتباه کرده‌اید. در فصل بعد راهی
+        می‌بینید که این خطا را از بین می‌برد.
+    </p>
+
+    <h2 id="s4" data-t="ch11-039">۴. دستور return</h2>
+
+    <p data-t="ch11-040">
+        تا اینجا توابع ما فقط چاپ می‌کردند. <code>return</code> نتیجه را به جایی
+        که تابع صدا زده شده <strong>برمی‌گرداند</strong>، تا بشود با آن کار کرد.
+    </p>
+
+    <pre class="code"><code># 'return' sends a value back to the place where the function was called.
+def add(number1, number2):
+    total = number1 + number2
+    return total
+
+# The returned value can be stored ...
+c = add(3, 2)
+print(c)
+
+d = add(7, 4)
+print(d)
+
+# ... or used directly.
+print(add(3, 2))
+print(add(1, 2) + add(3, 4))
+
+# 'return' also ENDS the function immediately.
+def first_positive(a, b):
+    if a &gt; 0:
+        return a
+    return b            # only reached when a is not positive
+
+print(first_positive(-5, 8))</code></pre>
+    <p class="code-caption" data-t="ch11-041">برگرداندن مقدار: نمونه 03_return.py</p>
+
+    <pre class="out">5
+11
+5
+10
+8</pre>
+
+    <h3 data-t="ch11-042">شرح مثال</h3>
+
+    <ul>
+        <li data-t="ch11-043">مقدار برگشتی را می‌شود در متغیر ذخیره کرد، مستقیم چاپ کرد، یا در یک محاسبه بزرگ‌تر به کار برد.</li>
+        <li data-t="ch11-044"><code>return</code> تابع را <strong>فوراً تمام می‌کند</strong>. هیچ خطی بعد از آن اجرا نمی‌شود.</li>
+        <li data-t="ch11-045">به همین دلیل در <code>first_positive</code> نیازی به <code>else</code> نیست: اگر شرط برقرار باشد، اجرا با <code>return a</code> تمام شده است.</li>
+        <li data-t="ch11-046">یک تابع می‌تواند چند <code>return</code> داشته باشد، ولی فقط یکی از آنها اجرا می‌شود.</li>
+    </ul>
+
+    <h2 id="s5" data-t="ch11-047">۵. تابع بدون return و مقدار None</h2>
+
+    <pre class="code"><code># A function that only prints does NOT give a value back:
+# its result is the special value None.
+def show_sum(a, b):
+    print(a + b)
+
+result = show_sum(2, 3)
+print(result)            # None
+
+# A function that returns can be reused in other calculations.
+def get_sum(a, b):
+    return a + b
+
+result = get_sum(2, 3)
+print(result * 10)       # 50
+
+# Rule of thumb: compute with 'return', display with 'print' - not both.</code></pre>
+    <p class="code-caption" data-t="ch11-048">print در برابر return: نمونه 04_return_none.py</p>
+
+    <pre class="out">5
+None
+50</pre>
+
+    <div class="warn">
+        <span class="box-title" data-t="ch11-049">مهم‌ترین سوءتفاهم این فصل</span>
+        <p data-t="ch11-050">
+            <code>print</code> و <code>return</code> دو چیز کاملاً متفاوتند.
+            <code>print</code> چیزی را <strong>به کاربر نشان می‌دهد</strong> و
+            <code>return</code> چیزی را <strong>به برنامه پس می‌دهد</strong>.
+            تابعی که فقط چاپ می‌کند، نتیجه‌اش <code>None</code> است و نمی‌شود
+            با آن حساب کرد. قانون: محاسبه با <code>return</code>، نمایش با
+            <code>print</code>، و ترجیحاً نه هر دو در یک تابع.
+        </p>
+    </div>
+
+    <p data-t="ch11-051"><code>None</code> نوع خاصی در پایتون است که یعنی «هیچ مقداری». هر تابعی که <code>return</code> نداشته باشد، به طور خودکار <code>None</code> برمی‌گرداند. به خاطر دارید که <code>list.sort()</code> هم همین کار را می‌کرد.</p>
+
+    <h2 id="s6" data-t="ch11-052">۶. تابعی که تصمیم می‌گیرد</h2>
+
+    <pre class="code"><code># A function that compares two numbers and returns the bigger one.
+# (Python already has max(); we write it here to practise.)
+def bigger(num1, num2):
+    if num1 &gt; num2:
+        return num1
+    return num2
+
+user_input = input('Enter the first number: ')
+a = float(user_input)
+
+user_input = input('Enter the second number: ')
+b = float(user_input)
+
+print('Max:', bigger(a, b))</code></pre>
+    <p class="code-caption" data-t="ch11-053">بزرگ‌تر از دو عدد: نمونه 05_max_of_two.py</p>
+
+    <p data-t="ch11-054">
+        دقت کنید که تابع هیچ ارتباطی با <code>input</code> ندارد. تابع فقط دو
+        عدد می‌گیرد و یکی برمی‌گرداند. گرفتن ورودی کار برنامه اصلی است. این
+        <strong>جدایی</strong> بسیار مهم است: تابعی که ورودی نمی‌گیرد و چاپ
+        نمی‌کند، در هر برنامه دیگری هم قابل استفاده است.
+    </p>
+
+    <h2 id="s7" data-t="ch11-055">۷. برگرداندن مقدار بولی</h2>
+
+    <pre class="code"><code># Three ways of writing the same function, from the longest to the shortest.
+
+def is_even_v1(number):
+    if number % 2 == 0:
+        return True
+    else:
+        return False
+
+def is_even_v2(number):
+    if number % 2 == 0:
+        return True
+    return False            # the else is not needed: return already exits
+
+def is_even_v3(number):
+    return number % 2 == 0  # the comparison IS already True or False
+
+number = 4
+
+# A function that returns a bool can be used directly inside an if.
+if is_even_v3(number):
+    print('Even')
+else:
+    print('Odd')
+
+print(is_even_v1(7), is_even_v2(7), is_even_v3(7))</code></pre>
+    <p class="code-caption" data-t="ch11-056">سه سبک نوشتن یک تابع: نمونه 06_is_even.py</p>
+
+    <h3 data-t="ch11-057">شرح مثال</h3>
+
+    <ul>
+        <li data-t="ch11-058">هر سه نسخه دقیقاً یک کار می‌کنند. نسخه سوم پایتونی‌ترین است: خود مقایسه یک مقدار بولی است، پس مستقیم برگردانیدش.</li>
+        <li data-t="ch11-059">نوشتن <code>if x == True: return True else: return False</code> نشانه تازه‌کار بودن است. آن را کوتاه کنید.</li>
+        <li data-t="ch11-060">نام توابعی که بولی برمی‌گردانند معمولاً با <code>is_</code> یا <code>has_</code> شروع می‌شود. این قرارداد به خواننده می‌گوید انتظار جواب بله یا خیر داشته باشد.</li>
+        <li data-t="ch11-061">چنین تابعی مستقیم داخل <code>if</code> می‌نشیند و کد را بسیار خوانا می‌کند.</li>
+    </ul>
+
+    <h2 id="s8" data-t="ch11-062">۸. تابع تشخیص عدد اول</h2>
+
+    <pre class="code"><code># The prime test of session 08, turned into a reusable function.
+def is_prime(number):
+    # 0, 1 and the negative numbers are not prime.
+    if number &lt; 2:
+        return False
+
+    for i in range(2, number):
+        if number % i == 0:
+            return False     # a divisor was found -&gt; stop immediately
+
+    return True              # no divisor was found
+
+user_input = input('Enter a number: ')
+n = int(user_input)
+
+if is_prime(n):
+    print('Prime!')
+else:
+    print('Not prime.')
+
+# The same function on a whole list of numbers.
+numbers = [13, 11, 6, 8, 2, 7, 21, 1, 0, -3]
+for num in numbers:
+    print(num, is_prime(num))</code></pre>
+    <p class="code-caption" data-t="ch11-063">تابع عدد اول: نمونه 07_is_prime.py</p>
+
+    <p data-t="ch11-064">
+        این همان الگوریتم فصل هشتم است، ولی حالا داخل تابع. مقایسه کنید:
+        نسخه فصل هشتم به متغیر پرچم و <code>break</code> نیاز داشت. اینجا
+        <code>return</code> جای هر دو را می‌گیرد و کد کوتاه‌تر و روشن‌تر است.
+        این یکی از مزیت‌های پنهان تابع است.
+    </p>
+
+    <h2 id="s9" data-t="ch11-065">۹. استفاده از تابع در حلقه</h2>
+
+    <pre class="code"><code># Once the function exists, answering a bigger question is easy.
+def is_prime(number):
+    if number &lt; 2:
+        return False
+    # Testing up to the square root is enough: a divisor bigger than the root
+    # always has a partner smaller than the root.
+    i = 2
+    while i * i &lt;= number:
+        if number % i == 0:
+            return False
+        i += 1
+    return True
+
+count = 0
+
+for number in range(50000, 100000):
+    if is_prime(number):
+        count += 1
+
+print('Number of primes between 50000 and 100000:', count)</code></pre>
+    <p class="code-caption" data-t="ch11-066">شمردن اعداد اول: نمونه 08_count_primes.py</p>
+
+    <h3 data-t="ch11-067">شرح مثال</h3>
+
+    <ul>
+        <li data-t="ch11-068">وقتی تابع آماده باشد، پاسخ به سؤال بزرگ‌تر فقط چهار خط است. این قدرت واقعی تابع است.</li>
+        <li data-t="ch11-069">یک بهینه‌سازی مهم اینجا اضافه شده: به جای امتحان کردن همه اعداد تا <code>number</code>، فقط تا جذر آن می‌رویم. شرط <code>i * i &lt;= number</code> همین را می‌گوید.</li>
+        <li data-t="ch11-070">چرا جذر کافی است؟ چون اگر عددی مقسوم‌علیهی بزرگ‌تر از جذرش داشته باشد، حتماً یک مقسوم‌علیه کوچک‌تر از جذر هم دارد که قبلاً پیدایش کرده‌ایم.</li>
+        <li data-t="ch11-071">این بهینه‌سازی برای عددهای بزرگ تفاوت بین چند ثانیه و چند دقیقه است. هر دو نسخه را اجرا کنید و زمانش را ببینید.</li>
+    </ul>
+
+    <h2 id="s10" data-t="ch11-072">۱۰. تابعی که تابع دیگر را صدا می‌زند</h2>
+
+    <pre class="code"><code># A function may call another function. Here pow() is built on top of mul().
+def mul(num1, num2):
+    'Multiply two whole numbers using repeated addition.'
+    result = 0
+    for i in range(num2):
+        result += num1
+    return result
+
+def power(num1, num2):
+    'Raise num1 to the power num2 using repeated multiplication.'
+    result = 1
+    for i in range(num2):
+        result = mul(result, num1)
+    return result
+
+a = int(input('Enter the base: '))
+b = int(input('Enter the exponent: '))
+
+print(power(a, b))</code></pre>
+    <p class="code-caption" data-t="ch11-073">تابع روی تابع: نمونه 09_function_calls_function.py</p>
+
+    <h3 data-t="ch11-074">شرح مثال</h3>
+
+    <ul>
+        <li data-t="ch11-075">ضرب را با جمع مکرر می‌سازیم، بعد توان را با ضرب مکرر. هر لایه روی لایه قبلی سوار می‌شود.</li>
+        <li data-t="ch11-076">این همان شکلی است که همه نرم‌افزارهای بزرگ ساخته می‌شوند: توابع ساده در پایین، توابع پیچیده‌تر روی آنها.</li>
+        <li data-t="ch11-077">آن رشته زیر خط <code>def</code> یک <strong>مستند</strong> است و توضیح می‌دهد تابع چه کار می‌کند. در فصل سیزدهم شکل استاندارد و سه‌گیومه‌ای‌اش را می‌بینید.</li>
+        <li data-t="ch11-078">توجه: انباره <code>mul</code> از صفر شروع می‌شود چون جمع است، و انباره <code>power</code> از یک، چون ضرب است. همان قاعده فصل ششم.</li>
+    </ul>
+
+    <h2 id="s11" data-t="ch11-079">۱۱. کجا تابع را تعریف کنیم</h2>
+
+    <p data-t="ch11-080">
+        پایتون فایل را از بالا به پایین می‌خواند. پس تابع باید
+        <strong>پیش از</strong> اولین جایی که صدا زده می‌شود تعریف شده باشد.
+        در عمل، همه توابع را بالای فایل می‌نویسند و کد اصلی را پایین.
+    </p>
+
+    <pre class="code"><code># Right: define first, call later.
+def greet(name):
+    return f'Hello {name}'
+
+print(greet('Ali'))
+
+
+# Wrong: this would raise NameError, because greet2 does not exist yet.
+# print(greet2('Ali'))
+# def greet2(name):
+#     return f'Hello {name}'</code></pre>
+    <p class="code-caption" data-t="ch11-081">ترتیب تعریف و صدا زدن</p>
+
+    <p data-t="ch11-082">
+        استثنا: یک تابع می‌تواند تابعی را صدا بزند که پایین‌تر تعریف شده است،
+        به شرطی که <strong>موقع اجرا</strong> هر دو تعریف شده باشند. چون بدنه
+        تابع فقط هنگام صدا زدن اجرا می‌شود، نه هنگام تعریف. در فصل بعد با
+        الگوی <code>main()</code> این را مرتب می‌کنیم.
+    </p>
+
+    <div class="folder-ref">
+        <span class="box-title" data-t="ch11-083">فایل‌های تمرینی این فصل</span>
+        <p data-t="ch11-084">
+            پوشه <code>S11-functions-basics</code> شامل نمونه‌های
+            <code>01_first_function.py</code> تا <code>10_multiplication.py</code>.
+        </p>
+    </div>
+
+    <h2 data-t="ch11-085">خلاصه فصل</h2>
+
+    <div class="table-scroll">
+        <table>
+            <thead>
+                <tr><th data-t="ch11-086">ابزار</th><th data-t="ch11-087">وظیفه آن</th></tr>
+            </thead>
+            <tbody>
+                <tr><td><code>def name():</code></td><td data-t="ch11-088">تعریف تابع. اجرا نمی‌شود تا صدا زده شود</td></tr>
+                <tr><td><code>name()</code></td><td data-t="ch11-089">صدا زدن تابع</td></tr>
+                <tr><td data-t="ch11-090">پارامتر</td><td data-t="ch11-091">متغیر داخل تعریف تابع</td></tr>
+                <tr><td data-t="ch11-092">آرگومان</td><td data-t="ch11-093">مقدار واقعی موقع صدا زدن</td></tr>
+                <tr><td><code>return x</code></td><td data-t="ch11-094">پس دادن نتیجه و تمام کردن فوری تابع</td></tr>
+                <tr><td><code>None</code></td><td data-t="ch11-095">نتیجه تابعی که <code>return</code> ندارد</td></tr>
+                <tr><td><code>return a == b</code></td><td data-t="ch11-096">راه پایتونی برگرداندن بولی</td></tr>
+                <tr><td data-t="ch11-097"><code>is_</code> در نام</td><td data-t="ch11-098">قرارداد نام‌گذاری توابعی که بولی برمی‌گردانند</td></tr>
+                <tr><td data-t="ch11-099">ترتیب تعریف</td><td data-t="ch11-100">تابع باید پیش از صدا زده شدن تعریف شده باشد</td></tr>
+            </tbody>
+        </table>
+    </div>
+
+    <div class="exercise">
+        <h3 data-t="ch11-101">تمرین‌های فصل یازده</h3>
+        <ol>
+            <li data-t="ch11-102">تابع <code>square(n)</code> را بنویسید که مربع یک عدد را برگرداند.</li>
+            <li data-t="ch11-103">تابع <code>celsius_to_fahrenheit(c)</code> را بنویسید و با سه مقدار امتحانش کنید.</li>
+            <li data-t="ch11-104">تابع <code>is_leap(year)</code> را بنویسید که برای سال کبیسه <code>True</code> برگرداند.</li>
+            <li data-t="ch11-105">تابع <code>count_vowels(text)</code> را بنویسید که تعداد حروف صدادار یک جمله را برگرداند.</li>
+            <li data-t="ch11-106">تابع <code>average(a, b, c)</code> را بنویسید که میانگین سه عدد را برگرداند.</li>
+            <li data-t="ch11-107">تابع <code>factorial(n)</code> را بنویسید و با آن ترکیب <code>C(n, k) = n! / (k! * (n-k)!)</code> را حساب کنید.</li>
+            <li data-t="ch11-108">تابع <code>reverse_text(text)</code> را <strong>بدون</strong> استفاده از برش بنویسید.</li>
+            <li data-t="ch11-109">تابع <code>is_palindrome(text)</code> را با کمک تابع تمرین قبل بنویسید.</li>
+        </ol>
+    </div>
+
+    <div class="pager">
+        <a href="chapter-10.html">فصل قبل: الگوریتم‌های لیست</a>
+        <a href="chapter-12.html">فصل بعد: آرگومان‌ها و حوزه متغیر</a>
+    </div>
+
+</main>
+
+</body>
+</html>

@@ -1,0 +1,22 @@
+The exceptions you meet most often
+==================================
+
+ValueError          the type is right but the value is not (int('abc'))
+TypeError           the type itself is wrong ('a' + 1)
+IndexError          a list index that does not exist
+KeyError            a dictionary key that does not exist
+AttributeError      the object has no such attribute or method
+FileNotFoundError   open() on a file that is not there
+PermissionError     no right to read/write the file
+ZeroDivisionError   division by zero
+ImportError         the module could not be imported
+ModuleNotFoundError the module does not exist at all
+RuntimeError        a general run-time problem
+StopIteration       an iterator has no more items
+RecursionError      too many nested calls
+AssertionError      an assert failed
+KeyboardInterrupt   the user pressed Ctrl-C
+
+All of them inherit from Exception, which inherits from BaseException.
+'except Exception' therefore catches all the normal errors,
+but not KeyboardInterrupt or SystemExit.

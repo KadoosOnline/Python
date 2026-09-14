@@ -1,0 +1,21 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Home</title>
+</head>
+<body>
+    {# Double braces print a value that came from render_template().
+       Note: this is a JINJA comment. An ordinary HTML comment would still be
+       read by Jinja, so a stray brace inside one breaks the page. #}
+    <h1>Hello {{ name }}!</h1>
+
+    <p>We have {{ student_count }} student{{ 's' if student_count != 1 }}.</p>
+
+    <ul>
+        <li><a href="/students">the list of students</a></li>
+        <li><a href="/empty">the same page with nobody in it</a></li>
+        <li><a href="/escaping">auto-escaping</a></li>
+    </ul>
+</body>
+</html>

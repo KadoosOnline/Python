@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
+ <class>LendDialog</class>
+ <widget class="QDialog" name="LendDialog">
+  <property name="geometry">
+   <rect><x>0</x><y>0</y><width>460</width><height>200</height></rect>
+  </property>
+  <property name="windowTitle"><string>Lend a book</string></property>
+  <layout class="QVBoxLayout" name="mainLayout">
+   <item>
+    <layout class="QFormLayout" name="formLayout">
+     <item row="0" column="0">
+      <widget class="QLabel" name="labelMember">
+       <property name="text"><string>Member</string></property>
+      </widget>
+     </item>
+     <item row="0" column="1">
+      <widget class="QComboBox" name="comboMember"/>
+     </item>
+     <item row="1" column="0">
+      <widget class="QLabel" name="labelBook">
+       <property name="text"><string>Book</string></property>
+      </widget>
+     </item>
+     <item row="1" column="1">
+      <widget class="QComboBox" name="comboBook"/>
+     </item>
+     <item row="2" column="0">
+      <widget class="QLabel" name="labelDays">
+       <property name="text"><string>For how many days</string></property>
+      </widget>
+     </item>
+     <item row="2" column="1">
+      <widget class="QSpinBox" name="spinDays">
+       <property name="minimum"><number>1</number></property>
+       <property name="maximum"><number>90</number></property>
+       <property name="value"><number>14</number></property>
+      </widget>
+     </item>
+    </layout>
+   </item>
+   <item>
+    <widget class="QLabel" name="labelHint">
+     <property name="text"><string>Only books that are on the shelf are listed.</string></property>
+    </widget>
+   </item>
+   <item>
+    <widget class="QDialogButtonBox" name="buttonBox">
+     <property name="orientation"><enum>Qt::Horizontal</enum></property>
+     <property name="standardButtons"><set>QDialogButtonBox::Cancel|QDialogButtonBox::Ok</set></property>
+    </widget>
+   </item>
+  </layout>
+ </widget>
+ <resources/>
+ <connections/>
+</ui>

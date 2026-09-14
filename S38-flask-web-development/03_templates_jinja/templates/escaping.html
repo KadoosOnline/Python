@@ -1,0 +1,24 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Auto-escaping</title>
+</head>
+<body>
+    <h1>Auto-escaping</h1>
+
+    <p>The variable contains this text:</p>
+    <pre>{{ text }}</pre>
+
+    <p>Printed normally — Jinja turns the tags into harmless characters,
+       so you SEE the script instead of running it:</p>
+    <div>{{ text }}</div>
+
+    <p>With <code>| safe</code> the browser would really run it. That line is
+       commented out on purpose — never write it for data that came from a
+       visitor:</p>
+    {# <div>{{ text | safe }}</div> #}
+
+    <p><a href="/">back home</a></p>
+</body>
+</html>

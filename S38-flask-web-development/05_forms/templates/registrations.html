@@ -1,0 +1,31 @@
+{% extends 'base.html' %}
+
+{% block title %}Registrations{% endblock %}
+
+{% block content %}
+    <h1>Registrations ({{ total }})</h1>
+
+    {# A search is a GET form: the query ends up in the address bar. #}
+    <form method="get">
+        <input name="q" value="{{ query }}" placeholder="search by name">
+        <button type="submit">Search</button>
+    </form>
+
+    <table>
+        <tr><th>Name</th><th>E-mail</th><th>Course</th>
+            <th>Sessions</th><th>News</th></tr>
+        {% for row in rows %}
+            <tr>
+                <td>{{ row.name }}</td>
+                <td>{{ row.email }}</td>
+                <td>{{ row.course }}</td>
+                <td>{{ row.sessions }}</td>
+                <td>{{ 'yes' if row.newsletter else 'no' }}</td>
+            </tr>
+        {% else %}
+            <tr><td colspan="5">Nothing to show.</td></tr>
+        {% endfor %}
+    </table>
+
+    <p><a href="{{ url_for('register') }}">register somebody else</a></p>
+{% endblock %}

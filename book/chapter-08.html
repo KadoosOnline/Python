@@ -1,0 +1,488 @@
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="فصل هشت: حلقه while، حلقه بی‌پایان، break و continue، حلقه نگهبان، اعتبارسنجی ورودی و بلوک else حلقه">
+    <title>فصل ۸: حلقه while</title>
+    <link rel="icon" href="logokm.png" type="image/png">
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<header class="book-bar">
+    <a class="name" href="index.html">برنامه‌نویسی پایتون</a>
+    <a href="index.html">فهرست مطالب</a>
+</header>
+
+<main class="paper">
+
+    <div class="chapter-head">
+        <span class="chapter-num">فصل ۸</span>
+        <h1 data-t="ch08-001">حلقه while</h1>
+        <p class="lead" data-t="ch08-002">
+            حلقه <code>for</code> وقتی خوب است که از قبل بدانید چند بار باید
+            تکرار کنید. ولی خیلی وقت‌ها نمی‌دانید: تا وقتی کاربر خسته شود، تا
+            وقتی جواب درست پیدا شود، تا وقتی فایل تمام شود. اینجا جای
+            <code>while</code> است.
+        </p>
+    </div>
+
+    <div class="mini-toc">
+        <span class="box-title" data-t="ch08-003">در این فصل می‌خوانید</span>
+        <ol>
+            <li data-t="ch08-004"><a href="#s1">اولین while</a></li>
+            <li data-t="ch08-005"><a href="#s2">حلقه بی‌پایان</a></li>
+            <li data-t="ch08-006"><a href="#s3">for یا while، کدام</a></li>
+            <li data-t="ch08-007"><a href="#s4">while True و break</a></li>
+            <li data-t="ch08-008"><a href="#s5">دستور continue</a></li>
+            <li data-t="ch08-009"><a href="#s6">میانگین در حال اجرا</a></li>
+            <li data-t="ch08-010"><a href="#s7">اعتبارسنجی ورودی</a></li>
+            <li data-t="ch08-011"><a href="#s8">بازی حدس عدد</a></li>
+            <li data-t="ch08-012"><a href="#s9">تشخیص عدد اول</a></li>
+            <li data-t="ch08-013"><a href="#s10">بلوک else حلقه</a></li>
+            <li data-t="ch08-014"><a href="#s11">باز کردن یک عدد رقم به رقم</a></li>
+        </ol>
+    </div>
+
+    <h2 id="s1" data-t="ch08-015">۱. اولین while</h2>
+
+    <p data-t="ch08-016">
+        <code>while</code> یعنی «تا وقتی که». شرطی می‌گیرد و تا وقتی آن شرط درست
+        است، بدنه‌اش را تکرار می‌کند.
+    </p>
+
+    <pre class="code"><code># A 'while' repeats as long as its condition is True.
+# Something inside the loop MUST eventually make the condition False,
+# otherwise the program never stops (an "infinite loop").
+x = 0
+
+while x &lt; 10:
+    x += 1          # without this line the loop would never end
+    print(x)</code></pre>
+    <p class="code-caption" data-t="ch08-017">شمارش با while: نمونه 01_first_while.py</p>
+
+    <h3 data-t="ch08-018">شرح مثال</h3>
+
+    <ul>
+        <li data-t="ch08-019">سه چیز همیشه لازم است: <strong>مقدار اولیه</strong> پیش از حلقه، <strong>شرط</strong> در خط <code>while</code>، و <strong>تغییر</strong> داخل بدنه.</li>
+        <li data-t="ch08-020">اگر خط <code>x += 1</code> نبود، شرط همیشه درست می‌ماند و برنامه هرگز تمام نمی‌شد.</li>
+        <li data-t="ch08-021">شرط پیش از هر دور بررسی می‌شود. اگر از همان اول نادرست باشد، بدنه حتی یک بار هم اجرا نمی‌شود.</li>
+    </ul>
+
+    <h2 id="s2" data-t="ch08-022">۲. حلقه بی‌پایان</h2>
+
+    <div class="warn">
+        <span class="box-title" data-t="ch08-023">اگر برنامه گیر کرد</span>
+        <p data-t="ch08-024">حلقه بی‌پایان یعنی حلقه‌ای که شرطش هرگز نادرست نمی‌شود. برنامه ظاهراً هنگ می‌کند یا بی‌نهایت خط چاپ می‌کند. برای متوقف کردنش در ترمینال کلیدهای <code>Ctrl + C</code> را بزنید. این کلید را در همین مرحله یاد بگیرید، چون در هفته اول کار با <code>while</code> چند بار لازمتان می‌شود.</p>
+    </div>
+
+    <p data-t="ch08-025">سه علت رایج حلقه بی‌پایان:</p>
+
+    <ul>
+        <li data-t="ch08-026">یادتان رفته متغیر شرط را داخل حلقه تغییر دهید.</li>
+        <li data-t="ch08-027">خط تغییردهنده را اشتباهاً بیرون حلقه گذاشته‌اید، یعنی تورفتگی‌اش غلط است.</li>
+        <li data-t="ch08-028">شرط را برعکس نوشته‌اید، مثلاً <code>x &gt; 0</code> در حالی که <code>x</code> دارد بزرگ‌تر می‌شود.</li>
+    </ul>
+
+    <h2 id="s3" data-t="ch08-029">۳. for یا while، کدام</h2>
+
+    <pre class="code"><code># Use 'for' when you know in advance how many turns you need.
+for i in range(1, 6):
+    print(i, end=' ')
+print()
+
+# Use 'while' when the number of turns depends on something that happens
+# during the loop.
+i = 1
+while i &lt;= 5:
+    print(i, end=' ')
+    i += 1
+print()</code></pre>
+    <p class="code-caption" data-t="ch08-030">یک کار، دو روش: نمونه 02_while_vs_for.py</p>
+
+    <div class="table-scroll">
+        <table>
+            <thead>
+                <tr><th data-t="ch08-031">وقتی که</th><th data-t="ch08-032">حلقه مناسب</th><th data-t="ch08-033">مثال</th></tr>
+            </thead>
+            <tbody>
+                <tr><td data-t="ch08-034">تعداد تکرار از قبل معلوم است</td><td><code>for</code></td><td data-t="ch08-035">چاپ ۱ تا ۱۰۰، پیمایش یک لیست</td></tr>
+                <tr><td data-t="ch08-036">تعداد تکرار معلوم نیست</td><td><code>while</code></td><td data-t="ch08-037">تا وقتی کاربر exit بزند، تا وقتی رمز درست شود</td></tr>
+            </tbody>
+        </table>
+    </div>
+
+    <p data-t="ch08-038">
+        در مثال بالا هر دو یک خروجی دارند، ولی <code>for</code> کوتاه‌تر و
+        کم‌خطرتر است، چون شمارنده را خودش مدیریت می‌کند و امکان حلقه بی‌پایان
+        ندارد. قانون ساده: <strong>اگر می‌شود با <code>for</code> نوشت، با
+        <code>for</code> بنویسید.</strong>
+    </p>
+
+    <h2 id="s4" data-t="ch08-039">۴. while True و break</h2>
+
+    <p data-t="ch08-040">
+        الگویی که در برنامه‌های واقعی بیش از همه دیده می‌شود این است: حلقه را
+        عمداً بی‌پایان می‌سازیم و با <code>break</code> از وسطش بیرون می‌پریم.
+        مقداری که باعث خروج می‌شود را <strong>نگهبان</strong> می‌نامند.
+    </p>
+
+    <pre class="code"><code># A "sentinel" is a special value that means "stop".
+# Here the sentinel is the word 'exit'.
+total = 0
+
+while True:                              # loop for ever ...
+    user_input = input('Enter a number (or "exit"): ')
+
+    if user_input == 'exit':
+        break                            # ... until break jumps out of it
+
+    number = float(user_input)
+    total += number
+    print('Sum is:', total)
+
+print('Final sum:', total)</code></pre>
+    <p class="code-caption" data-t="ch08-041">جمع تا رسیدن نگهبان: نمونه 03_sentinel_sum.py</p>
+
+    <pre class="out">Enter a number (or "exit"): 5
+Sum is: 5.0
+Enter a number (or "exit"): 3
+Sum is: 8.0
+Enter a number (or "exit"): exit
+Final sum: 8.0</pre>
+
+    <h3 data-t="ch08-042">شرح مثال</h3>
+
+    <ul>
+        <li data-t="ch08-043"><code>while True</code> یعنی شرط همیشه درست است، پس حلقه به خودی خود تمام نمی‌شود.</li>
+        <li data-t="ch08-044"><code>break</code> بلافاصله از حلقه بیرون می‌پرد و اجرا از اولین خط بعد از حلقه ادامه می‌یابد.</li>
+        <li data-t="ch08-045">بررسی نگهبان باید <strong>پیش از</strong> تبدیل نوع باشد. اگر اول <code>float(user_input)</code> را بنویسید، کلمه exit برنامه را خراب می‌کند.</li>
+        <li data-t="ch08-046">چرا این الگو بهتر از گذاشتن شرط در خود <code>while</code> است؟ چون باید ورودی را بگیریم تا بتوانیم بررسی‌اش کنیم، و گرفتن ورودی وسط حلقه اتفاق می‌افتد، نه پیش از آن.</li>
+    </ul>
+
+    <h2 id="s5" data-t="ch08-047">۵. دستور continue</h2>
+
+    <p data-t="ch08-048"><code>break</code> از حلقه بیرون می‌پرد، ولی <code>continue</code> فقط <strong>سایر موارد نیزین دور</strong> را رد می‌کند و به بالای حلقه برمی‌گردد.</p>
+
+    <pre class="code"><code># 'continue' skips the REST of the current turn and goes back to the top.
+# Here the odd numbers are simply ignored.
+total = 0
+
+while True:
+    user_input = input('Enter a number (or "exit"): ')
+
+    if user_input == 'exit':
+        break
+
+    number = int(user_input)
+
+    if number % 2 != 0:
+        print('Odd number ignored.')
+        continue                 # go back to the input() line
+
+    total += number
+    print('Sum is:', total)</code></pre>
+    <p class="code-caption" data-t="ch08-049">رد کردن اعداد فرد: نمونه 04_continue.py</p>
+
+    <div class="table-scroll">
+        <table>
+            <thead>
+                <tr><th data-t="ch08-050">دستور</th><th data-t="ch08-051">اثرش</th></tr>
+            </thead>
+            <tbody>
+                <tr><td><code>break</code></td><td data-t="ch08-052">خروج کامل از حلقه</td></tr>
+                <tr><td><code>continue</code></td><td data-t="ch08-053">رد کردن بقیه این دور و رفتن به دور بعد</td></tr>
+            </tbody>
+        </table>
+    </div>
+
+    <p data-t="ch08-054"><code>continue</code> بیشتر برای «فیلتر کردن» به کار می‌رود: چیزهایی که برای مسئله ما کاربردی ندارند را زود رد می‌کنیم تا کد اصلی داخل تودرتویی عمیق نیفتد. مقایسه کنید با نوشتن یک <code>else</code> بزرگ که همه کد اصلی را داخلش می‌برد.</p>
+
+    <h2 id="s6" data-t="ch08-055">۶. میانگین در حال اجرا</h2>
+
+    <pre class="code"><code># Two accumulators: the total and how many numbers were entered.
+total = 0
+counter = 0
+
+while True:
+    user_input = input('Enter a number (or "exit"): ')
+
+    if user_input == 'exit':
+        break
+
+    number = float(user_input)
+
+    total += number
+    counter += 1
+
+    print('Average is:', total / counter)
+
+# After the loop, counter may still be 0 - never divide by it blindly.
+if counter == 0:
+    print('No number was entered.')
+else:
+    print('Final average:', total / counter)</code></pre>
+    <p class="code-caption" data-t="ch08-056">میانگین در حال اجرا: نمونه 05_running_average.py</p>
+
+    <p data-t="ch08-057">
+        داخل حلقه، تقسیم بر <code>counter</code> بی‌خطر است چون همان بالا یکی
+        اضافه شده و حتماً بزرگ‌تر از صفر است. ولی بعد از حلقه چنین تضمینی نداریم:
+        اگر کاربر همان اول exit بزند، شمارنده صفر می‌ماند. برای همین شرط پایانی
+        لازم است.
+    </p>
+
+    <h2 id="s7" data-t="ch08-058">۷. اعتبارسنجی ورودی</h2>
+
+    <p data-t="ch08-059">
+        این کاربردی‌ترین الگوی این فصل است. تا وقتی کاربر جواب معتبر ندهد، سؤال
+        را تکرار می‌کنیم.
+    </p>
+
+    <pre class="code"><code># A very common use of 'while': keep asking until the answer makes sense.
+while True:
+    user_input = input('Enter your age (1-120): ')
+
+    if not user_input.isdigit():
+        print('Please type digits only.')
+        continue
+
+    age = int(user_input)
+
+    if age &lt; 1 or age &gt; 120:
+        print('The age must be between 1 and 120.')
+        continue
+
+    break        # the value is valid, leave the loop
+
+print('Your age is', age)</code></pre>
+    <p class="code-caption" data-t="ch08-060">اعتبارسنجی: نمونه 06_input_validation.py</p>
+
+    <pre class="out">Enter your age (1-120): abc
+Please type digits only.
+Enter your age (1-120): 500
+The age must be between 1 and 120.
+Enter your age (1-120): 25
+Your age is 25</pre>
+
+    <h3 data-t="ch08-061">شرح مثال</h3>
+
+    <ul>
+        <li data-t="ch08-062">ساختار: هر بررسی که رد شود، پیام می‌دهد و <code>continue</code> می‌کند. اگر همه بررسی‌ها رد شدند، به <code>break</code> می‌رسیم.</li>
+        <li data-t="ch08-063"><code>isdigit()</code> از فصل سوم اینجا حیاتی است: پیش از <code>int()</code> مطمئن می‌شویم ورودی واقعاً رقم است. بدون آن، تایپ یک حرف برنامه را خراب می‌کند.</li>
+        <li data-t="ch08-064">ترتیب مهم است: اول بررسی نوع، بعد تبدیل، بعد بررسی بازه.</li>
+        <li data-t="ch08-065">در فصل نوزدهم راه دیگری برای همین کار می‌بینید که <code>try</code> نام دارد و برای حالت‌های پیچیده‌تر مناسب‌تر است.</li>
+    </ul>
+
+    <h2 id="s8" data-t="ch08-066">۸. بازی حدس عدد</h2>
+
+    <pre class="code"><code># A tiny game: the program knows a number, the player has to find it.
+SECRET = 16
+
+tries = 0
+
+while True:
+    user_input = input('Enter a number: ')
+    guess = int(user_input)
+    tries += 1
+
+    if guess &lt; SECRET:
+        print('The number is greater!')
+    elif guess &gt; SECRET:
+        print('The number is smaller!')
+    else:
+        print(f'You win! You needed {tries} tries.')
+        break</code></pre>
+    <p class="code-caption" data-t="ch08-067">حدس عدد: نمونه 07_guess_the_number.py</p>
+
+    <pre class="out">Enter a number: 10
+The number is greater!
+Enter a number: 20
+The number is smaller!
+Enter a number: 16
+You win! You needed 3 tries.</pre>
+
+    <p data-t="ch08-068">
+        این اولین <strong>بازی</strong> شماست. هنوز کامل نیست: عدد ثابت است و
+        بعد از یک بار بازی، دیگر جالب نیست. در فصل شانزدهم با
+        <code>random</code> عدد را تصادفی می‌کنیم و در فصل بیستم نسخه کاملش را
+        با محدودیت تعداد حدس می‌سازیم.
+    </p>
+
+    <h2 id="s9" data-t="ch08-069">۹. تشخیص عدد اول</h2>
+
+    <pre class="code"><code># A prime number is only divisible by 1 and by itself.
+# As soon as we find one divisor we can stop looking -&gt; 'break'.
+user_input = input('Enter your number: ')
+number = int(user_input)
+
+# 0, 1 and the negative numbers are NOT prime, so we handle them separately.
+if number &lt; 2:
+    is_prime = False
+else:
+    is_prime = True
+    for i in range(2, number):
+        if number % i == 0:
+            is_prime = False
+            break            # no need to test the remaining divisors
+
+if is_prime:
+    print("It's prime!")
+else:
+    print("It's not prime.")</code></pre>
+    <p class="code-caption" data-t="ch08-070">عدد اول: نمونه 08_is_prime.py</p>
+
+    <h3 data-t="ch08-071">شرح مثال</h3>
+
+    <ul>
+        <li data-t="ch08-072">الگوی مهمی اینجا هست: یک متغیر <strong>پرچم</strong> به نام <code>is_prime</code> که با <code>True</code> شروع می‌شود و به محض پیدا شدن مقسوم‌علیه، <code>False</code> می‌شود.</li>
+        <li data-t="ch08-073"><code>break</code> بعد از پیدا شدن اولین مقسوم‌علیه، بقیه حلقه را بی‌فایده می‌داند و بیرون می‌پرد. برای عدد یک میلیون این یعنی صرفه‌جویی عظیم.</li>
+        <li data-t="ch08-074"><code>break</code> در حلقه <code>for</code> هم درست مثل <code>while</code> کار می‌کند.</li>
+    </ul>
+
+    <div class="warn">
+        <span class="box-title" data-t="ch08-075">باگی که در نسخه اصلی بود</span>
+        <p data-t="ch08-076">
+            نسخه اصلی این برنامه شرط <code>number &lt; 2</code> را نداشت. نتیجه
+            این بود که عدد ۱ و عدد صفر و حتی اعداد منفی «اول» اعلام می‌شدند،
+            چون حلقه <code>range(2, 1)</code> اصلاً اجرا نمی‌شد و پرچم
+            <code>True</code> باقی می‌ماند. درس: همیشه حالت‌های مرزی را جدا
+            بررسی کنید. حلقه‌ای که هیچ دوری نمی‌زند، خطر پنهان دارد.
+        </p>
+    </div>
+
+    <h2 id="s10" data-t="ch08-077">۱۰. بلوک else حلقه</h2>
+
+    <p data-t="ch08-078">
+        این یکی از ویژگی‌های عجیب و کم‌شناخته پایتون است: حلقه می‌تواند
+        <code>else</code> داشته باشد. آن بلوک وقتی اجرا می‌شود که حلقه
+        <strong>به طور طبیعی</strong> تمام شود، یعنی با <code>break</code>
+        قطع نشده باشد.
+    </p>
+
+    <pre class="code"><code># A loop may have an 'else' block. It runs only when the loop finished
+# normally, that is when it was NOT stopped by a 'break'.
+number = int(input('Enter a number: '))
+
+for i in range(2, number):
+    if number % i == 0:
+        print(f'{number} is divisible by {i}')
+        break
+else:
+    # reached only when no divisor was found
+    print(f'{number} is prime!')</code></pre>
+    <p class="code-caption" data-t="ch08-079">else حلقه: نمونه 09_while_else.py</p>
+
+    <p data-t="ch08-080">مقایسه کنید با نسخه قبلی: اینجا دیگر متغیر پرچم ضرورتی ندارد. اگر حلقه مقسوم‌علیهی پیدا کند، <code>break</code> می‌زند و <code>else</code> اجرا نمی‌شود. اگر تا آخر برود و چیزی پیدا نکند، <code>else</code> اجرا می‌شود.</p>
+
+    <div class="note">
+        <span class="box-title" data-t="ch08-081">اسمش گمراه‌کننده است</span>
+        <p data-t="ch08-082">
+            بهتر بود اسمش <code>nobreak</code> بود، نه <code>else</code>. چون
+            معنایش «اگر حلقه شکسته نشد» است، نه «در غیر این صورت». طراح پایتون
+            هم بعدها گفته که این نام‌گذاری اشتباه بوده است. با این حال، الگوی
+            «جست‌وجو کن و اگر پیدا نشد کاری بکن» را واقعاً تمیز می‌نویسد.
+        </p>
+    </div>
+
+    <h2 id="s11" data-t="ch08-083">۱۱. باز کردن یک عدد رقم به رقم</h2>
+
+    <pre class="code"><code># Taking a number apart digit by digit is a classic 'while' exercise.
+user_input = input('Enter a positive number: ')
+number = int(user_input)
+
+digit_count = 0
+digit_sum = 0
+
+while number &gt; 0:
+    digit = number % 10       # the last digit
+    digit_sum += digit
+    digit_count += 1
+    number = number // 10     # remove the last digit
+
+print('Number of digits:', digit_count)
+print('Sum of the digits:', digit_sum)</code></pre>
+    <p class="code-caption" data-t="ch08-084">ارقام یک عدد: نمونه 10_digits_of_number.py</p>
+
+    <pre class="out">Enter a positive number: 4728
+Number of digits: 4
+Sum of the digits: 21</pre>
+
+    <h3 data-t="ch08-085">شرح مثال</h3>
+
+    <p data-t="ch08-086">عدد ۴۷۲۸ را دنبال کنیم:</p>
+
+    <div class="table-scroll">
+        <table>
+            <thead>
+                <tr><th data-t="ch08-087">دور</th><th><code>number</code></th><th><code>number % 10</code></th><th><code>number // 10</code></th></tr>
+            </thead>
+            <tbody>
+                <tr><td data-t="ch08-088">۱</td><td data-t="ch08-089">۴۷۲۸</td><td data-t="ch08-090">۸</td><td data-t="ch08-091">۴۷۲</td></tr>
+                <tr><td data-t="ch08-092">۲</td><td data-t="ch08-093">۴۷۲</td><td data-t="ch08-094">۲</td><td data-t="ch08-095">۴۷</td></tr>
+                <tr><td data-t="ch08-096">۳</td><td data-t="ch08-097">۴۷</td><td data-t="ch08-098">۷</td><td data-t="ch08-099">۴</td></tr>
+                <tr><td data-t="ch08-100">۴</td><td data-t="ch08-101">۴</td><td data-t="ch08-102">۴</td><td data-t="ch08-103">۰</td></tr>
+            </tbody>
+        </table>
+    </div>
+
+    <p data-t="ch08-104">
+        وقتی <code>number</code> به صفر رسید، شرط حلقه نادرست می‌شود و کار تمام
+        است. این همان ترکیب <code>%</code> و <code>//</code> فصل دوم است که حالا
+        داخل یک حلقه قدرت واقعی‌اش را نشان می‌دهد. با همین الگو می‌شود عدد را
+        برعکس کرد، که یکی از تمرین‌های این فصل است.
+    </p>
+
+    <div class="folder-ref">
+        <span class="box-title" data-t="ch08-105">فایل‌های تمرینی این فصل</span>
+        <p data-t="ch08-106">
+            پوشه <code>S08-while-loops</code> شامل نمونه‌های
+            <code>01_first_while.py</code> تا <code>10_digits_of_number.py</code>.
+        </p>
+    </div>
+
+    <h2 data-t="ch08-107">خلاصه فصل</h2>
+
+    <div class="table-scroll">
+        <table>
+            <thead>
+                <tr><th data-t="ch08-108">ابزار</th><th data-t="ch08-109">وظیفه آن</th></tr>
+            </thead>
+            <tbody>
+                <tr><td data-t="ch08-110"><code>while شرط:</code></td><td data-t="ch08-111">تکرار تا وقتی شرط درست است</td></tr>
+                <tr><td data-t="ch08-112">سه جزء لازم</td><td data-t="ch08-113">مقدار اولیه، شرط، تغییر داخل بدنه</td></tr>
+                <tr><td data-t="ch08-114">حلقه بی‌پایان</td><td data-t="ch08-115">شرطی که هرگز نادرست نمی‌شود. توقف با <code>Ctrl + C</code></td></tr>
+                <tr><td data-t="ch08-116"><code>while True:</code> با <code>break</code></td><td data-t="ch08-117">پرکاربردترین الگو در برنامه‌های تعاملی</td></tr>
+                <tr><td><code>break</code></td><td data-t="ch08-118">خروج فوری از حلقه</td></tr>
+                <tr><td><code>continue</code></td><td data-t="ch08-119">رد کردن بقیه دور جاری</td></tr>
+                <tr><td data-t="ch08-120">نگهبان</td><td data-t="ch08-121">مقدار خاصی مثل exit که یعنی «تمام»</td></tr>
+                <tr><td data-t="ch08-122">حلقه اعتبارسنجی</td><td data-t="ch08-123">تا وقتی ورودی معتبر نشده، دوباره بپرس</td></tr>
+                <tr><td data-t="ch08-124">متغیر پرچم</td><td data-t="ch08-125">متغیر بولی که نتیجه جست‌وجو را نگه می‌دارد</td></tr>
+                <tr><td data-t="ch08-126"><code>else</code> حلقه</td><td data-t="ch08-127">فقط وقتی حلقه بدون <code>break</code> تمام شود</td></tr>
+            </tbody>
+        </table>
+    </div>
+
+    <div class="exercise">
+        <h3 data-t="ch08-128">تمرین‌های فصل هشت</h3>
+        <ol>
+            <li data-t="ch08-129">تا وقتی کاربر <code>exit</code> نزده عدد بگیرید و در پایان بزرگ‌ترین را چاپ کنید.</li>
+            <li data-t="ch08-130">یک پرسش رمز بنویسید که به کاربر سه فرصت بدهد.</li>
+            <li data-t="ch08-131">عدد بگیرید تا <code>exit</code>، و بگویید چند تا مثبت و چند تا منفی بودند.</li>
+            <li data-t="ch08-132">یک عدد بگیرید و برعکسش کنید، مثلاً <code>123</code> به <code>321</code>، فقط با <code>//</code> و <code>%</code>.</li>
+            <li data-t="ch08-133">بازی حدس عدد را طوری بنویسید که کامپیوتر عدد را تصادفی انتخاب کند. کافی است <code>import random</code> کنید؛ در فصل شانزدهم کاملش را می‌بینید.</li>
+            <li data-t="ch08-134">یک عدد بگیرید و همه مقسوم‌علیه‌هایش را چاپ کنید.</li>
+            <li data-t="ch08-135">دو عدد بگیرید و بزرگ‌ترین مقسوم‌علیه مشترکشان را با یک حلقه <code>while</code> پیدا کنید.</li>
+            <li data-t="ch08-136">منوی فصل پنجم را داخل یک حلقه بگذارید تا تا وقتی کاربر گزینه صفر را نزده تکرار شود.</li>
+        </ol>
+    </div>
+
+    <div class="pager">
+        <a href="chapter-07.html">فصل قبل: حلقه‌های تودرتو</a>
+        <a href="chapter-09.html">فصل بعد: لیست‌ها</a>
+    </div>
+
+</main>
+
+</body>
+</html>

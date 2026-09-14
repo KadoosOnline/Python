@@ -1,0 +1,795 @@
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="فصل سی و هشت: برنامه‌نویسی وب با Flask، مسیرها، قالب Jinja2، فرم‌ها، نشست و ورود کاربر، وب‌سرویس JSON و Flask-SQLAlchemy">
+    <title>فصل ۳۸: وب با Flask</title>
+    <link rel="icon" href="logokm.png" type="image/png">
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<header class="book-bar">
+    <a class="name" href="index.html">برنامه‌نویسی پایتون</a>
+    <a href="index.html">فهرست مطالب</a>
+</header>
+
+<main class="paper">
+
+    <div class="chapter-head">
+        <span class="chapter-num">فصل ۳۸</span>
+        <h1 data-t="ch38-001">وب با Flask</h1>
+        <p class="lead" data-t="ch38-002">یک وب‌سایت می‌نویسیم: آدرس‌ها، قالب‌های HTML، فرم‌ها، ورود کاربر، یک وب‌سرویس JSON، و یک پایگاه داده پشت همه این موارد. هر چه در این دوره خوانده‌اید اینجا یکجا برمی‌گردد: تابع، دیکشنری، کلاس، دکوراتور، SQLAlchemy و JSON.</p>
+    </div>
+
+    <div class="mini-toc">
+        <span class="box-title" data-t="ch38-003">در این فصل می‌خوانید</span>
+        <ol>
+            <li data-t="ch38-004"><a href="#s1">وب چطور کار می‌کند</a></li>
+            <li data-t="ch38-005"><a href="#s2">اولین سایت</a></li>
+            <li data-t="ch38-006"><a href="#s3">آدرس متغیر، url_for و ۴۰۴</a></li>
+            <li data-t="ch38-007"><a href="#s4">قالب‌های Jinja2</a></li>
+            <li data-t="ch38-008"><a href="#s5">ارث‌بری قالب و فایل ایستا</a></li>
+            <li data-t="ch38-009"><a href="#s6">فرم‌ها و قاعده PRG</a></li>
+            <li data-t="ch38-010"><a href="#s7">نشست و کوکی</a></li>
+            <li data-t="ch38-011"><a href="#s8">رمز عبور و login_required</a></li>
+            <li data-t="ch38-012"><a href="#s9">وب‌سرویس JSON</a></li>
+            <li data-t="ch38-013"><a href="#s10">مصرف‌کننده API</a></li>
+            <li><a href="#s11">Flask-SQLAlchemy</a></li>
+            <li data-t="ch38-014"><a href="#s12">پروژه: دفترچه یادداشت</a></li>
+        </ol>
+    </div>
+
+    <h2 id="s1" data-t="ch38-015">۱. وب چطور کار می‌کند</h2>
+
+    <ol>
+        <li data-t="ch38-016">مرورگر یک <strong>درخواست</strong> می‌فرستد: یک روش (<code>GET</code>، <code>POST</code> و مانند آن) و یک آدرس.</li>
+        <li data-t="ch38-017">برنامه شما <strong>تابع نمایی</strong> را انتخاب می‌کند که مسیرش با آن آدرس جور است.</li>
+        <li data-t="ch38-018">تابع یک <strong>پاسخ</strong> برمی‌گرداند: مقداری HTML یا JSON، به‌علاوه یک <strong>کد وضعیت</strong> مثل ۲۰۰ یا ۴۰۴ یا ۵۰۰.</li>
+        <li data-t="ch38-019">مرورگر آن را می‌کشد.</li>
+        <li data-t="ch38-020">و بعد همه چیز را فراموش می‌کند. HTTP حافظه ندارد، و نشست و کوکی دقیقاً برای همین وجود دارند.</li>
+    </ol>
+
+    <pre class="out">python -m venv .venv
+.venv\Scripts\activate            # Windows
+pip install -r requirements.txt</pre>
+
+    <h2 id="s2" data-t="ch38-021">۲. اولین سایت</h2>
+
+    <pre class="code"><code>from flask import Flask
+
+
+# `__name__` tells Flask where this file is, so it can find `templates/`
+# and `static/` next to it.
+app = Flask(__name__)
+
+
+@app.route('/')
+def home() -&gt; str:
+    '''The home page. The name of the function is up to you.'''
+    return '&lt;h1&gt;Hello!&lt;/h1&gt;&lt;p&gt;This is my first Flask program.&lt;/p&gt;'
+
+
+@app.route('/about')
+def about() -&gt; str:
+    return ('&lt;h1&gt;Kadoos Institute&lt;/h1&gt;'
+            '&lt;p&gt;Python course, Rasht.&lt;/p&gt;')
+
+
+# One function can answer several addresses.
+@app.route('/contact')
+@app.route('/contact-us')
+def contact() -&gt; str:
+    return '&lt;h1&gt;Contact&lt;/h1&gt;&lt;p&gt;Come and see us in Rasht.&lt;/p&gt;'
+
+
+if __name__ == '__main__':
+    # host='127.0.0.1' = only this computer can open it.
+    # host='0.0.0.0' would let the whole classroom network in.
+    app.run(debug=True)</code></pre>
+    <p class="code-caption" data-t="ch38-022">کوچک‌ترین سایت دنیا: نمونه 01_hello_flask/app.py</p>
+
+    <pre class="out">python app.py
+# then open http://127.0.0.1:5000</pre>
+
+    <h3 data-t="ch38-023">شرح مثال</h3>
+
+    <ul>
+        <li data-t="ch38-024">دکوراتور <code>@app.route('/about')</code> آدرس را به تابع وصل می‌کند. این همان دکوراتور فصل بیست و ششم است که حالا کاربرد واقعی گرفته.</li>
+        <li data-t="ch38-025">نام تابع با خودتان است، ولی مهم است: <code>url_for</code> بعداً با همین نام کار می‌کند.</li>
+        <li data-t="ch38-026">یک تابع می‌تواند به چند آدرس جواب بدهد؛ کافی است دو دکوراتور روی هم بگذارید.</li>
+    </ul>
+
+    <div class="warn">
+        <span class="box-title" data-t="ch38-027">debug=True هرگز روی سرور واقعی</span>
+        <p data-t="ch38-028">
+            حالت اشکال‌زدایی دو چیز عالی به شما می‌دهد: سرور با هر بار ذخیره
+            فایل خودش را دوباره راه می‌اندازد، و خطا به جای پیام خشک
+            <span dir="ltr">Internal Server Error</span> با ردیابی کامل نشان
+            داده می‌شود. ولی همان صفحه، به هر بازدیدکننده‌ای یک
+            <strong>کنسول پایتون داخل برنامه شما</strong> می‌دهد. روی سرور
+            واقعی، هرگز.
+        </p>
+    </div>
+
+    <h2 id="s3" data-t="ch38-029">۳. آدرس متغیر، url_for و ۴۰۴</h2>
+
+    <pre class="code"><code>@app.route('/user/&lt;username&gt;')
+def profile(username: str) -&gt; str:
+    '''A missing user is a 404, not a crash.'''
+    if username not in USERS:
+        abort(404)
+    return f'&lt;h1&gt;{USERS[username]}&lt;/h1&gt;&lt;p&gt;username: {username}&lt;/p&gt;'
+
+
+@app.route('/post/&lt;int:post_id&gt;')
+def post(post_id: int) -&gt; str:
+    '''`&lt;int:...&gt;`: post_id really is an int here.'''
+    title = POSTS.get(post_id)
+    if title is None:
+        abort(404)
+    # post_id is a real int, so arithmetic works without any conversion.
+    return (f'&lt;h1&gt;{title}&lt;/h1&gt;'
+            f'&lt;p&gt;post {post_id}; the next one would be {post_id + 1}&lt;/p&gt;')
+
+
+@app.route('/old-home')
+def old_home():
+    '''A page that moved: send the browser to the new address.'''
+    return redirect(url_for('home'))
+
+
+@app.errorhandler(404)
+def not_found(error):
+    '''Our own 404 page. The second value is the HTTP STATUS CODE.'''
+    return ('&lt;h1&gt;404 - not found&lt;/h1&gt;'
+            f'&lt;p&gt;&lt;a href="{url_for("home")}"&gt;back home&lt;/a&gt;&lt;/p&gt;'), 404</code></pre>
+    <p class="code-caption" data-t="ch38-030">مسیرهای متغیر: نمونه 02_routes_and_variables/app.py</p>
+
+    <div class="table-scroll">
+        <table>
+            <thead>
+                <tr><th data-t="ch38-031">مبدل</th><th data-t="ch38-032">می‌پذیرد</th></tr>
+            </thead>
+            <tbody>
+                <tr><td data-t="ch38-033"><code>string</code> (پیش‌فرض)</td><td data-t="ch38-034">هر متنی بدون اسلش</td></tr>
+                <tr><td><code>int</code></td><td data-t="ch38-035">عدد صحیح، و واقعاً <code>int</code> تحویل می‌دهد</td></tr>
+                <tr><td><code>float</code></td><td data-t="ch38-036">عدد اعشاری</td></tr>
+                <tr><td><code>path</code></td><td data-t="ch38-037">متن همراه با اسلش</td></tr>
+                <tr><td><code>uuid</code></td><td data-t="ch38-038">شناسه یکتای جهانی</td></tr>
+            </tbody>
+        </table>
+    </div>
+
+    <h3 data-t="ch38-039">شرح مثال</h3>
+
+    <ul>
+        <li data-t="ch38-040"><code>&lt;int:post_id&gt;</code> ارزش زیادی دارد: آدرس <code>/post/abc</code> یک ۴۰۴ تمیز می‌گیرد و اصلاً به کد شما نمی‌رسد.</li>
+        <li data-t="ch38-041"><code>url_for('نام تابع', آرگومان‌ها)</code> آدرس را <strong>از روی نام تابع</strong> می‌سازد. هرگز لینک را دستی ننویسید: مسیر را یک بار عوض کنید و همه لینک‌ها دنبالش می‌آیند.</li>
+        <li data-t="ch38-042">نسخه اصلی این درس مستقیم <code>usernames[username]</code> می‌نوشت. کاربر ناشناس یعنی <code>KeyError</code> و بازدیدکننده یک <strong>۵۰۰</strong> می‌گرفت، که یعنی «برنامه‌نویس اشتباه کرده». کاربری که وجود ندارد اشتباه نیست؛ پاسخ صادقانه‌اش <strong>۴۰۴</strong> است. کار <code>abort(404)</code> همین است.</li>
+        <li data-t="ch38-043"><code>@app.errorhandler(404)</code> صفحه خطای خودتان را جایگزین می‌کند. عدد دوم در <code>return</code> همان کد وضعیت است.</li>
+    </ul>
+
+    <h2 id="s4" data-t="ch38-044">۴. قالب‌های Jinja2</h2>
+
+    <p data-t="ch38-045">
+        برگرداندن HTML از داخل رشته پایتون، بعد از سه خط از دست می‌رود. Flask
+        از <strong>Jinja2</strong> استفاده می‌کند: یک فایل HTML که در آن
+        سوراخ‌هایی هست. قالب‌ها در پوشه‌ای به نام <code>templates/</code>
+        کنار <code>app.py</code> می‌نشینند و این نام ثابت است.
+    </p>
+
+    <pre class="code"><code>@app.route('/students')
+def students():
+    return render_template('students.html', students=STUDENTS,
+                           passing_mark=10)
+
+
+@app.route('/empty')
+def empty():
+    '''The same template with an empty list: see the {% else %} of the loop.'''
+    return render_template('students.html', students=[], passing_mark=10)</code></pre>
+    <p class="code-caption" data-t="ch38-046">تابع نما: نمونه 03_templates_jinja/app.py</p>
+
+    <pre class="code"><code>&lt;table border="1" cellpadding="6"&gt;
+    &lt;tr&gt;&lt;th&gt;#&lt;/th&gt;&lt;th&gt;Name&lt;/th&gt;&lt;th&gt;City&lt;/th&gt;&lt;th&gt;Score&lt;/th&gt;&lt;th&gt;&lt;/th&gt;&lt;/tr&gt;
+
+    {# `loop.index` counts from 1; `students` is the list we passed in #}
+    {% for student in students %}
+        &lt;tr&gt;
+            &lt;td&gt;{{ loop.index }}&lt;/td&gt;
+            &lt;td&gt;{{ student.name | title }}&lt;/td&gt;
+            &lt;td&gt;{{ student.city }}&lt;/td&gt;
+            &lt;td&gt;{{ student.score }}&lt;/td&gt;
+            &lt;td&gt;
+                {% if student.score &gt;= passing_mark %}
+                    passed
+                {% else %}
+                    failed
+                {% endif %}
+            &lt;/td&gt;
+        &lt;/tr&gt;
+    {% else %}
+        {# runs when the list is EMPTY -- no `if` needed around the loop #}
+        &lt;tr&gt;&lt;td colspan="5"&gt;Nobody has registered yet.&lt;/td&gt;&lt;/tr&gt;
+    {% endfor %}
+&lt;/table&gt;</code></pre>
+    <p class="code-caption" data-t="ch38-047">قالب: templates/students.html</p>
+
+    <div class="table-scroll">
+        <table>
+            <thead>
+                <tr><th data-t="ch38-048">نحو Jinja</th><th data-t="ch38-049">وظیفه آن</th></tr>
+            </thead>
+            <tbody>
+                <tr><td dir="ltr"><code>{{ value }}</code></td><td data-t="ch38-050">چاپ یک مقدار</td></tr>
+                <tr><td dir="ltr"><code>{% if %} ... {% endif %}</code></td><td data-t="ch38-051">شرط</td></tr>
+                <tr><td dir="ltr"><code>{% for x in items %}</code></td><td data-t="ch38-052">حلقه، با <code>{% else %}</code> برای حالت خالی</td></tr>
+                <tr><td dir="ltr"><code>{{ value | upper }}</code></td><td data-t="ch38-053">فیلتر</td></tr>
+                <tr><td dir="ltr"><code>{# ... #}</code></td><td data-t="ch38-054">توضیح Jinja، که به HTML نمی‌رسد</td></tr>
+                <tr><td><code>loop.index</code></td><td data-t="ch38-055">شماره تکرار، از یک</td></tr>
+            </tbody>
+        </table>
+    </div>
+
+    <p data-t="ch38-056">
+        فیلترهایی که زود به کارتان می‌آیند: <code>length</code>،
+        <code>upper</code>، <code>title</code>، <code>round</code>،
+        <code>default('-')</code>، <code>join(', ')</code> و
+        <code>tojson</code>.
+    </p>
+
+    <div class="warn">
+        <span class="box-title" data-t="ch38-057">گریز خودکار، و حفره XSS</span>
+        <p data-t="ch38-058">Jinja به طور خودکار محتوای متغیرها را بی‌خطر می‌کند: یک <code>script</code> که کاربر تایپ کرده، به متن ساده تبدیل می‌شود و اجرا نمی‌شود. اگر این محافظ را با فیلتر <code>safe</code> روی داده‌ای که کاربر فرستاده خاموش کنید، در همین مرحله یک حفره <strong>XSS</strong> ساخته‌اید. قاعده ساده است: هرگز <code>safe</code> را روی داده‌ای که از کاربر آمده نگذارید.</p>
+    </div>
+
+    <h2 id="s5" data-t="ch38-059">۵. ارث‌بری قالب و فایل ایستا</h2>
+
+    <p data-t="ch38-060">
+        نوشتن سرصفحه و منو و پاصفحه در ده فایل یعنی ده جا برای تغییر دادن. راه
+        درست، یک قالب <strong>پایه</strong> است که بقیه از آن ارث می‌برند.
+    </p>
+
+    <pre class="code"><code>&lt;head&gt;
+    &lt;meta charset="UTF-8"&gt;
+    {# A block with a DEFAULT value: a child page may override the title. #}
+    &lt;title&gt;{% block title %}{{ site_name }}{% endblock %}&lt;/title&gt;
+
+    {# url_for('static', ...) -- never write the path by hand. #}
+    &lt;link rel="stylesheet"
+          href="{{ url_for('static', filename='style.css') }}"&gt;
+&lt;/head&gt;
+&lt;body&gt;
+    &lt;header&gt;
+        &lt;h1&gt;{{ site_name }}&lt;/h1&gt;
+        &lt;nav&gt;
+            &lt;a href="{{ url_for('home') }}"&gt;Home&lt;/a&gt;
+            &lt;a href="{{ url_for('courses') }}"&gt;Courses&lt;/a&gt;
+        &lt;/nav&gt;
+    &lt;/header&gt;
+
+    &lt;main&gt;
+        {# The hole every child page fills. #}
+        {% block content %}{% endblock %}
+    &lt;/main&gt;
+&lt;/body&gt;</code></pre>
+    <p class="code-caption" data-t="ch38-061">قالب پایه: نمونه 04_inheritance_and_static/templates/base.html</p>
+
+    <h3 data-t="ch38-062">شرح مثال</h3>
+
+    <ul>
+        <li data-t="ch38-063">هر صفحه فرزند با <code>{% extends 'base.html' %}</code> شروع می‌شود و فقط بلوک‌ها را پر می‌کند.</li>
+        <li data-t="ch38-064"><code>{% include %}</code> یک تکه قالب را در جای دیگر می‌گذارد؛ برای کارت‌ها و اجزای تکراری.</li>
+        <li data-t="ch38-065">فایل‌های ایستا (CSS، تصویر، جاوااسکریپت) در پوشه <code>static/</code> می‌روند و همیشه با <code>url_for('static', filename=...)</code> صدا زده می‌شوند.</li>
+        <li data-t="ch38-066"><code>@app.context_processor</code> متغیری مثل <code>site_name</code> را در <strong>همه</strong> قالب‌ها در دسترس می‌گذارد، بدون اینکه در هر <code>render_template</code> پاسش بدهید.</li>
+    </ul>
+
+    <h2 id="s6" data-t="ch38-067">۶. فرم‌ها و قاعده PRG</h2>
+
+    <pre class="code"><code>def validate(form) -&gt; tuple[dict, list[str]]:
+    '''Clean the fields and collect every problem, not just the first one.'''
+    data = {
+        'name': form.get('name', '').strip(),
+        'email': form.get('email', '').strip(),
+        'course': form.get('course', ''),
+        'sessions': form.get('sessions', '').strip(),
+        'newsletter': 'newsletter' in form,      # a checkbox is present or not
+    }
+    errors = []
+
+    if len(data['name']) &lt; 3:
+        errors.append('The name must be at least 3 characters long.')
+    if not EMAIL_PATTERN.match(data['email']):
+        errors.append('That does not look like an e-mail address.')
+    # Never trust a &lt;select&gt;: the browser is not the only thing that can POST.
+    if data['course'] not in COURSES:
+        errors.append('Please choose a course from the list.')
+    if not data['sessions'].isdigit() or not 1 &lt;= int(data['sessions']) &lt;= 20:
+        errors.append('The number of sessions must be between 1 and 20.')
+
+    return data, errors
+
+
+@app.route('/', methods=['GET', 'POST'])
+def register():
+    '''One address, two methods: show the form, then receive it.'''
+    if request.method == 'POST':
+        data, errors = validate(request.form)
+
+        if errors:
+            for message in errors:
+                flash(message, 'error')
+            # Give the form back WITH what the visitor already typed.
+            return render_template('register.html', courses=COURSES,
+                                   data=data)
+
+        data['sessions'] = int(data['sessions'])
+        REGISTRATIONS.append(data)
+        flash(f'Thank you {data["name"]}, you are registered.', 'success')
+        # POST / Redirect / GET: F5 now reloads a harmless page.
+        return redirect(url_for('registrations'))
+
+    # GET: an empty form.
+    return render_template('register.html', courses=COURSES, data={})</code></pre>
+    <p class="code-caption" data-t="ch38-068">فرم: نمونه 05_forms/app.py</p>
+
+    <div class="table-scroll">
+        <table>
+            <thead>
+                <tr><th data-t="ch38-069">روش</th><th data-t="ch38-070">معنایش</th><th data-t="ch38-071">کجا</th></tr>
+            </thead>
+            <tbody>
+                <tr><td><code>GET</code></td><td data-t="ch38-072">چیزی به من بده</td><td data-t="ch38-073">جست‌وجو و نمایش. مقدارها در آدرس‌اند</td></tr>
+                <tr><td><code>POST</code></td><td data-t="ch38-074">این را بگیر و نگه دار</td><td data-t="ch38-075">هر چیزی که داده را <strong>تغییر</strong> می‌دهد</td></tr>
+            </tbody>
+        </table>
+    </div>
+
+    <h3 data-t="ch38-076">شرح مثال</h3>
+
+    <ul>
+        <li data-t="ch38-077"><code>request.form.get('x', '')</code> امن‌تر از <code>request.form['x']</code> است: به جای خطا، مقدار پیش‌فرض می‌دهد.</li>
+        <li data-t="ch38-078">همه خطاها با هم جمع می‌شوند، نه فقط اولی. کاربری که فرم را چهار بار پشت سر هم پر می‌کند، خیلی زود سایت شما را می‌بندد.</li>
+        <li data-t="ch38-079">به <code>select</code> اعتماد نکنید. مرورگر تنها چیزی نیست که می‌تواند <code>POST</code> بفرستد.</li>
+        <li data-t="ch38-080">وقتی خطا هست، فرم را با <strong>همان چیزی که کاربر تایپ کرده</strong> برگردانید. پاک کردن فرم، بی‌احترامی به وقت اوست.</li>
+    </ul>
+
+    <div class="tip">
+        <span class="box-title" data-t="ch38-081">قاعده POST / Redirect / GET</span>
+        <p data-t="ch38-082">
+            بعد از یک <code>POST</code> موفق، هرگز صفحه را رندر نکنید؛
+            <strong>هدایت</strong> کنید. وگرنه مرورگر هنوز همان POST را در دست
+            دارد و زدن F5 فرم را <strong>دوباره</strong> می‌فرستد: ثبت‌نام
+            دوم، پرداخت دوم. هدایت کردن، آخرین کار را به یک GET بی‌خطر تبدیل
+            می‌کند. پیام <code>flash()</code> هم برای همین است: پیام را
+            نگه می‌دارد تا صفحه بعدی نشانش دهد.
+        </p>
+    </div>
+
+    <h2 id="s7" data-t="ch38-083">۷. نشست و کوکی</h2>
+
+    <p data-t="ch38-084">
+        HTTP حافظه ندارد. هر درخواست تنها می‌آید و سرور نمی‌داند کسی که
+        <code>/profile</code> را می‌خواهد همان کسی است که یک ثانیه پیش فرم
+        ورود را پر کرد. پاسخ، <strong>کوکی</strong> است.
+    </p>
+
+    <pre class="code"><code>session['username'] = 'sara'      # write
+session.get('username')           # read
+session.pop('username', None)     # forget
+session.clear()                   # forget everything</code></pre>
+    <p class="code-caption" data-t="ch38-085">نشست، یک دیکشنری درون کوکی</p>
+
+    <h3 data-t="ch38-086">آنچه باید درباره نشست بدانید</h3>
+
+    <ul>
+        <li data-t="ch38-087">کوکی با <code>app.secret_key</code> <strong>امضا</strong> می‌شود، پس کسی نمی‌تواند بدون لو رفتن تغییرش دهد. ولی فقط base64 است، پس <strong>هر کسی می‌تواند بخواندش</strong>. هرگز رمز عبور یا شماره کارت یا هر چیز خصوصی در نشست نگذارید.</li>
+        <li data-t="ch38-088">اگر کلید مخفی عوض شود، همه نشست‌ها همان لحظه باطل می‌شوند.</li>
+        <li data-t="ch38-089">همه‌اش در مرورگر بازدیدکننده زندگی می‌کند، پس کوچک نگهش دارید.</li>
+        <li data-t="ch38-090">کلید مخفی، مثل توکن ربات فصل سی و هفتم، نباید در کد یک سایت واقعی نوشته شود. از متغیر محیطی بخوانیدش.</li>
+    </ul>
+
+    <h2 id="s8" data-t="ch38-091">۸. رمز عبور و login_required</h2>
+
+    <pre class="code"><code>def login_required(view):
+    '''A decorator that sends anonymous visitors to the login page.'''
+    @functools.wraps(view)          # keep the name of the wrapped function
+    def wrapper(*args, **kwargs):
+        if 'username' not in session:
+            flash('Please log in first.', 'error')
+            # `next=` remembers where the visitor wanted to go.
+            return redirect(url_for('login', next=request.path))
+        return view(*args, **kwargs)
+    return wrapper
+
+
+@app.route('/login', methods=['GET', 'POST'])
+def login():
+    if request.method == 'POST':
+        username = request.form.get('username', '').strip().lower()
+        password = request.form.get('password', '')
+
+        user = USERS.get(username)
+        # ONE message for both cases: saying "no such user" would tell an
+        # attacker which names exist.
+        if user is None or not check_password_hash(user['password_hash'],
+                                                   password):
+            flash('Wrong user name or password.', 'error')
+            return render_template('login.html', username=username)
+
+        # A new session id at login: it closes the "session fixation" hole.
+        session.clear()
+        session['username'] = username
+
+        # Never redirect to any address the visitor sends us: an absolute URL
+        # here would be an "open redirect" straight to a phishing page.
+        target = request.args.get('next', '')
+        if not target.startswith('/') or target.startswith('//'):
+            target = url_for('profile')
+        return redirect(target)
+
+    return render_template('login.html', username='')
+
+
+@app.route('/profile')
+@login_required
+def profile():
+    ...</code></pre>
+    <p class="code-caption" data-t="ch38-092">ورود کاربر: نمونه 06_sessions_and_login/app.py</p>
+
+    <div class="warn">
+        <span class="box-title" data-t="ch38-093">هرگز رمز عبور را ذخیره نکنید</span>
+        <p data-t="ch38-094"><strong>درهم</strong> رمز را ذخیره کنید: <code>generate_password_hash('1234')</code> چیزی مثل <code dir="ltr">scrypt:32768:8:1$xYz...</code> می‌سازد، و <code>check_password_hash(hash, typed)</code> درست یا نادرست می‌دهد. درهم را نمی‌شود به رمز برگرداند، پس پایگاه داده دزدیده‌شده، رمز همه کاربران را به مهاجم نمی‌دهد. کتابخانه <code>werkzeug</code> همراه Flask می‌آید، پس در همین مرحله داریدش.</p>
+    </div>
+
+    <h3 data-t="ch38-095">سه نکته امنیتی در همین چند خط</h3>
+
+    <ul>
+        <li data-t="ch38-096">برای «کاربر وجود ندارد» و «رمز غلط است» <strong>یک</strong> پیام بدهید. پیام جداگانه به مهاجم می‌گوید کدام نام کاربری واقعی است.</li>
+        <li data-t="ch38-097"><code>session.clear()</code> هنگام ورود، حفره <strong>تثبیت نشست</strong> را می‌بندد.</li>
+        <li data-t="ch38-098">هرگز به هر آدرسی که بازدیدکننده می‌فرستد هدایت نکنید. یک آدرس مطلق در <code>next</code> یعنی <strong>هدایت باز</strong> مستقیم به یک صفحه فیشینگ.</li>
+        <li data-t="ch38-099"><code>@functools.wraps</code> در دکوراتور فراموش نشود: Flask توابع نما را با نامشان می‌شناسد و بدون آن، دو نما هر دو <code>wrapper</code> نام می‌گیرند و برنامه بالا نمی‌آید.</li>
+    </ul>
+
+    <h2 id="s9" data-t="ch38-100">۹. وب‌سرویس JSON</h2>
+
+    <p data-t="ch38-101">
+        در فصل بیست و هشتم یک REST API را <strong>صدا زدیم</strong>. حالا
+        خودمان یکی می‌نویسیم. تفاوتش با صفحه‌های بالا این است که به جای HTML،
+        JSON برمی‌گردانیم و <strong>کد وضعیت</strong> معنا را حمل می‌کند.
+    </p>
+
+    <div class="table-scroll">
+        <table>
+            <thead>
+                <tr><th data-t="ch38-102">کد</th><th data-t="ch38-103">معنایش</th></tr>
+            </thead>
+            <tbody>
+                <tr><td data-t="ch38-104">۲۰۰</td><td data-t="ch38-105">بفرمایید، این هم جوابتان</td></tr>
+                <tr><td data-t="ch38-106">۲۰۱</td><td data-t="ch38-107">چیزی که فرستادی را ساختم</td></tr>
+                <tr><td data-t="ch38-108">۲۰۴</td><td data-t="ch38-109">انجام شد و چیزی برای گفتن نیست</td></tr>
+                <tr><td data-t="ch38-110">۴۰۰</td><td data-t="ch38-111">پیام <strong>تو</strong> غلط بود</td></tr>
+                <tr><td data-t="ch38-112">۴۰۱ و ۴۰۳</td><td data-t="ch38-113">وارد نشده‌ای / اجازه نداری</td></tr>
+                <tr><td data-t="ch38-114">۴۰۴</td><td data-t="ch38-115">چنین چیزی وجود ندارد</td></tr>
+                <tr><td data-t="ch38-116">۴۰۵</td><td data-t="ch38-117">روش اشتباه برای این آدرس</td></tr>
+                <tr><td data-t="ch38-118">۵۰۰</td><td data-t="ch38-119"><strong>من</strong> اشتباه کردم</td></tr>
+            </tbody>
+        </table>
+    </div>
+
+    <pre class="code"><code>def read_payload() -&gt; tuple[dict | None, tuple | None]:
+    '''Return (data, error_response). Exactly one of the two is None.'''
+    # silent=True -&gt; None instead of an exception when the body is not JSON.
+    payload = request.get_json(silent=True)
+    if not isinstance(payload, dict):
+        return None, (jsonify(error='the body must be a JSON object'), 400)
+    return payload, None
+
+
+@app.route('/api/books/&lt;int:book_id&gt;', methods=['GET'])
+def get_book(book_id: int):
+    if book_id not in BOOKS:
+        return jsonify(error=f'no book with id {book_id}'), 404
+    return jsonify(with_id(book_id))
+
+
+@app.route('/api/books', methods=['POST'])
+def create_book():
+    global next_id
+
+    payload, error = read_payload()
+    if error:
+        return error
+
+    title = str(payload.get('title', '')).strip()
+    if not title:
+        return jsonify(error='"title" is required'), 400
+
+    book_id = next_id
+    next_id += 1
+    BOOKS[book_id] = {'title': title, ...}
+    # 201 Created, and the address of the new thing in the Location header.
+    return jsonify(with_id(book_id)), 201, {
+        'Location': f'/api/books/{book_id}'}
+
+
+@app.errorhandler(404)
+def api_not_found(error):
+    '''An API must answer JSON even when it fails -- never an HTML page.'''
+    return jsonify(error='not found'), 404</code></pre>
+    <p class="code-caption" data-t="ch38-120">وب‌سرویس: نمونه 07_json_api/app.py</p>
+
+    <div class="table-scroll">
+        <table>
+            <thead>
+                <tr><th data-t="ch38-121">آدرس</th><th data-t="ch38-122">روش</th><th data-t="ch38-123">وظیفه آن</th></tr>
+            </thead>
+            <tbody>
+                <tr><td dir="ltr"><code>/api/books</code></td><td>GET</td><td data-t="ch38-124">فهرست</td></tr>
+                <tr><td dir="ltr"><code>/api/books</code></td><td>POST</td><td data-t="ch38-125">ساختن یکی</td></tr>
+                <tr><td dir="ltr"><code>/api/books/3</code></td><td>GET</td><td data-t="ch38-126">گرفتن یکی</td></tr>
+                <tr><td dir="ltr"><code>/api/books/3</code></td><td>PUT</td><td data-t="ch38-127">جایگزینی کامل</td></tr>
+                <tr><td dir="ltr"><code>/api/books/3</code></td><td>PATCH</td><td data-t="ch38-128">تغییر بخشی از آن</td></tr>
+                <tr><td dir="ltr"><code>/api/books/3</code></td><td>DELETE</td><td data-t="ch38-129">حذف</td></tr>
+            </tbody>
+        </table>
+    </div>
+
+    <h3 data-t="ch38-130">شرح مثال</h3>
+
+    <ul>
+        <li data-t="ch38-131">برگرداندن ۲۰۰ با یک <code>error</code> داخل بدنه (کاری که تازه‌کارها می‌کنند) هر مشتری را مجبور می‌کند بدنه را بخواند تا بفهمد کار انجام شده یا نه. از کدها استفاده کنید.</li>
+        <li data-t="ch38-132">نسخه اصلی این درس مستقیم <code>payload['title']</code> می‌نوشت. اگر مشتری فیلدی را جا بیندازد یا اصلاً JSON نفرستد، نتیجه‌اش <code>KeyError</code> است و یک صفحه ۵۰۰. ولی فیلد جاافتاده اشتباه <strong>مشتری</strong> است: ۴۰۰.</li>
+        <li data-t="ch38-133"><code>get_json(silent=True)</code> به جای استثنا، <code>None</code> می‌دهد؛ دقیقاً همان چیزی که برای بررسی لازم داریم.</li>
+        <li data-t="ch38-134">بسته‌بندی فهرست در یک شیء (<code>count</code> و <code>books</code>) جا برای اضافه کردن «صفحه بعدی» باقی می‌گذارد، بدون شکستن همه مشتری‌ها.</li>
+        <li data-t="ch38-135">یک API حتی هنگام شکست هم باید JSON بدهد، نه صفحه HTML. برای همین <code>errorhandler</code> هم <code>jsonify</code> برمی‌گرداند.</li>
+    </ul>
+
+    <h2 id="s10" data-t="ch38-136">۱۰. مصرف‌کننده API</h2>
+
+    <pre class="code"><code>BASE_URL = 'http://127.0.0.1:5000'
+TIMEOUT = 5
+
+
+def main() -&gt; None:
+    session = requests.Session()        # reuses the connection
+
+    try:
+        show('GET the list', session.get(f'{BASE_URL}/api/books',
+                                         timeout=TIMEOUT))
+
+        response = session.post(f'{BASE_URL}/api/books',
+                                json={'title': 'Automate the Boring Stuff',
+                                      'author': 'Al Sweigart',
+                                      'year': 2019},
+                                timeout=TIMEOUT)
+        show('POST a new book', response)
+        book_id = response.json()['id']
+        print('    Location header:', response.headers.get('Location'))</code></pre>
+    <p class="code-caption" data-t="ch38-137">مشتری: نمونه 08_api_client/client.py</p>
+
+    <p data-t="ch38-138">
+        سه کاری که این مشتری می‌کند و نسخه اصلی نمی‌کرد: روی
+        <strong>هر</strong> درخواست <code>timeout</code> می‌گذارد (بدون آن یک
+        درخواست می‌تواند تا ابد معلق بماند)؛ کورکورانه
+        <code>raise_for_status()</code> صدا نمی‌زند بلکه به کد نگاه می‌کند تا
+        بتواند «کتاب وجود ندارد» را از «سرور خراب است» تشخیص دهد؛ و وقتی سرور
+        اصلاً بالا نیست، صریح به کاربر می‌گوید.
+    </p>
+
+    <h2 id="s11" data-t="ch38-139">۱۱. Flask-SQLAlchemy</h2>
+
+    <p data-t="ch38-140">
+        همان SQLAlchemy فصل سی و دوم، این بار داخل یک سایت.
+        Flask-SQLAlchemy لایه نازکی روی آن است که
+        <code>db.session</code> و <code>db.Model</code> را از قبل به برنامه
+        گره می‌زند.
+    </p>
+
+    <pre class="code"><code>class Base(DeclarativeBase):
+    '''The base class every model inherits from (SQLAlchemy 2 style).'''
+
+
+db = SQLAlchemy(model_class=Base)
+
+app = Flask(__name__)
+app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///library.db'
+db.init_app(app)
+
+
+class Author(db.Model):
+    __tablename__ = 'author'
+
+    id: Mapped[int] = mapped_column(primary_key=True)
+    name: Mapped[str] = mapped_column(String(100), nullable=False)
+
+    # One author has many books. `back_populates` connects the two sides;
+    # `cascade` deletes the books of an author we delete.
+    books: Mapped[list['Book']] = relationship(
+        back_populates='author', cascade='all, delete-orphan')
+
+
+# -- commands, not routes --------------------------------------------------
+@app.cli.command('init-db')
+def init_db_command() -&gt; None:
+    '''Create the tables and a little sample data.
+
+    Run it with:  flask --app app init-db
+    '''
+    db.create_all()</code></pre>
+    <p class="code-caption" data-t="ch38-141">مدل‌ها و فرمان: نمونه 09_flask_sqlalchemy/app.py</p>
+
+    <div class="table-scroll">
+        <table>
+            <thead>
+                <tr><th data-t="ch38-142">دستور</th><th data-t="ch38-143">وظیفه آن</th></tr>
+            </thead>
+            <tbody>
+                <tr><td dir="ltr"><code>db.session.scalars(db.select(Book)).all()</code></td><td data-t="ch38-144">همه سطرها</td></tr>
+                <tr><td dir="ltr"><code>db.select(Book).where(...)</code></td><td data-t="ch38-145">با شرط</td></tr>
+                <tr><td dir="ltr"><code>db.session.get(Book, 3)</code></td><td data-t="ch38-146">با کلید اصلی</td></tr>
+                <tr><td dir="ltr"><code>db.get_or_404(Book, 3)</code></td><td data-t="ch38-147">یا شیء، یا یک ۴۰۴ تمیز</td></tr>
+                <tr><td dir="ltr"><code>db.session.add(x); db.session.commit()</code></td><td data-t="ch38-148">ذخیره</td></tr>
+                <tr><td dir="ltr"><code>db.session.delete(x)</code></td><td data-t="ch38-149">حذف</td></tr>
+            </tbody>
+        </table>
+    </div>
+
+    <div class="warn">
+        <span class="box-title" data-t="ch38-150">ساخت جدول‌ها با فرمان، نه با مسیر</span>
+        <p data-t="ch38-151">
+            نسخه اصلی این درس یک مسیر <code dir="ltr">GET /api/init-db</code>
+            داشت که جدول‌ها را می‌ساخت. یعنی هر کسی که آن آدرس را پیدا کند
+            می‌تواند به پایگاه داده شما دست بزند؛ و اصولاً یک <code>GET</code>
+            نباید <strong>هیچ چیزی</strong> را عوض کند. راه درست یک فرمان است:
+            <code dir="ltr">flask --app app init-db</code>.
+        </p>
+    </div>
+
+    <h2 id="s12" data-t="ch38-152">۱۲. پروژه: دفترچه یادداشت</h2>
+
+    <p data-t="ch38-153">
+        پروژه پایانی این فصل، یک برنامه یادداشت با دسته‌بندی، جست‌وجو، چهار
+        عمل اصلی و یک API است. مهم‌ترین درسش دو الگوست که هر پروژه Flask
+        بعد از سی مسیر به آنها نیاز پیدا می‌کند:
+        <strong>کارخانه برنامه</strong> و <strong>بلوپرینت</strong>.
+    </p>
+
+    <pre class="code"><code>def create_app(database_uri: str | None = None) -&gt; Flask:
+    '''Build and return a ready application.'''
+    app = Flask(__name__)
+
+    app.config['SECRET_KEY'] = os.environ.get('SECRET_KEY',
+                                              'dev-key-not-for-production')
+    app.config['SQLALCHEMY_DATABASE_URI'] = (database_uri
+                                             or 'sqlite:///notes.db')
+
+    db.init_app(app)
+    app.register_blueprint(notes_bp)
+
+    register_error_handlers(app)
+    register_commands(app)
+
+    return app</code></pre>
+    <p class="code-caption" data-t="ch38-154">کارخانه برنامه: نمونه 10_notes_project/app.py</p>
+
+    <h3 data-t="ch38-155">چرا این تابع اضافه ارزشش را دارد</h3>
+
+    <ul>
+        <li data-t="ch38-156">پیکربندی یک <strong>آرگومان</strong> می‌شود، پس همان کد می‌تواند با پایگاه داده دیگری اجرا شود: یک پایگاه داده واقعی، یک موقتی، یکی برای هر برنامه‌نویس.</li>
+        <li data-t="ch38-157">صرفاً به خاطر <code>import</code> شدن ماژول، هیچ اتفاقی نمی‌افتد.</li>
+        <li data-t="ch38-158">گره وارد کردن دایره‌ای باز می‌شود: <code>models</code> و <code>routes</code> هرگز <code>app</code> را وارد نمی‌کنند.</li>
+    </ul>
+
+    <p data-t="ch38-159">
+        ساختار پروژه سه فایل پایتون دارد که هر کدام یک کار می‌کنند:
+        <code>models.py</code> فقط جدول‌ها، <code>routes.py</code> فقط مسیرها
+        در قالب یک بلوپرینت، و <code>app.py</code> که همه را به هم وصل
+        می‌کند. همان لایه‌بندی فصل سی و پنجم، این بار در وب.
+    </p>
+
+    <pre class="code"><code>class Note(db.Model):
+    __tablename__ = 'note'
+
+    id: Mapped[int] = mapped_column(primary_key=True)
+    title: Mapped[str] = mapped_column(String(120), nullable=False)
+    body: Mapped[str] = mapped_column(Text, nullable=False, default='')
+
+    # A note without a category is allowed, so the column may be NULL.
+    category_id: Mapped[int | None] = mapped_column(
+        ForeignKey('category.id'), nullable=True)
+    category: Mapped[Category | None] = relationship(back_populates='notes')
+
+    # server_default=func.now(): the DATABASE fills it in, so the value is
+    # right even for a row inserted by hand in another program.
+    created_at: Mapped[datetime] = mapped_column(
+        DateTime, server_default=func.now())
+    updated_at: Mapped[datetime] = mapped_column(
+        DateTime, server_default=func.now(), onupdate=func.now())
+
+    def to_dict(self) -&gt; dict:
+        '''The shape the JSON API sends out.'''
+        return {'id': self.id,
+                'title': self.title,
+                'body': self.body,
+                'category': self.category.name if self.category else None,
+                'created_at': self.created_at.isoformat()}</code></pre>
+    <p class="code-caption" data-t="ch38-160">مدل یادداشت: نمونه 10_notes_project/models.py</p>
+
+    <div class="folder-ref">
+        <span class="box-title" data-t="ch38-161">فایل‌های تمرینی این فصل</span>
+        <p data-t="ch38-162">
+            پوشه <code>S38-flask-web-development</code> شامل ده پوشه است. در
+            هر پوشه <code>python app.py</code> بزنید و
+            <code dir="ltr">http://127.0.0.1:5000</code> را باز کنید؛ با
+            Ctrl-C متوقفش کنید. برای نمونه هشتم، اول سرور نمونه هفتم را در
+            <strong>ترمینال دوم</strong> راه بیندازید. برای نمونه‌های نهم و
+            دهم، اول <code dir="ltr">flask --app app init-db</code> بزنید.
+        </p>
+    </div>
+
+    <h2 data-t="ch38-163">خلاصه فصل</h2>
+
+    <div class="table-scroll">
+        <table>
+            <thead>
+                <tr><th data-t="ch38-164">ابزار</th><th data-t="ch38-165">وظیفه آن</th></tr>
+            </thead>
+            <tbody>
+                <tr><td><code>Flask(__name__)</code></td><td data-t="ch38-166">ساختن برنامه</td></tr>
+                <tr><td><code>@app.route('/x')</code></td><td data-t="ch38-167">وصل کردن آدرس به تابع</td></tr>
+                <tr><td><code>&lt;int:post_id&gt;</code></td><td data-t="ch38-168">بخش متغیر آدرس، با تبدیل خودکار</td></tr>
+                <tr><td><code>url_for('name', ...)</code></td><td data-t="ch38-169">ساخت لینک. هرگز دستی ننویسید</td></tr>
+                <tr><td><code>abort(404)</code></td><td data-t="ch38-170">پاسخ صادقانه به چیزی که وجود ندارد</td></tr>
+                <tr><td><code>@app.errorhandler(404)</code></td><td data-t="ch38-171">صفحه خطای خودتان</td></tr>
+                <tr><td><code>redirect(...)</code></td><td data-t="ch38-172">فرستادن مرورگر به آدرس دیگر</td></tr>
+                <tr><td><code>render_template(...)</code></td><td data-t="ch38-173">رندر یک قالب Jinja2</td></tr>
+                <tr><td data-t="ch38-174">گریز خودکار</td><td data-t="ch38-175">محافظ XSS. <code>safe</code> روی داده کاربر ممنوع</td></tr>
+                <tr><td data-t="ch38-176"><code>extends</code> و <code>block</code></td><td data-t="ch38-177">ارث‌بری قالب</td></tr>
+                <tr><td><code>url_for('static', filename=...)</code></td><td data-t="ch38-178">فایل‌های ایستا</td></tr>
+                <tr><td data-t="ch38-179"><code>request.form</code> و <code>request.args</code></td><td data-t="ch38-180">داده فرم و داده آدرس</td></tr>
+                <tr><td>POST / Redirect / GET</td><td data-t="ch38-181">تا F5 فرم را دوباره نفرستد</td></tr>
+                <tr><td><code>flash()</code></td><td data-t="ch38-182">پیام برای صفحه بعدی</td></tr>
+                <tr><td data-t="ch38-183"><code>session</code> و <code>secret_key</code></td><td data-t="ch38-184">کوکی امضاشده. خواندنی است، پس چیز خصوصی در آن نگذارید</td></tr>
+                <tr><td><code>generate_password_hash</code></td><td data-t="ch38-185">هرگز رمز را خام ذخیره نکنید</td></tr>
+                <tr><td><code>@login_required</code></td><td data-t="ch38-186">دکوراتور محافظ صفحه</td></tr>
+                <tr><td><code>jsonify(...), 201</code></td><td data-t="ch38-187">پاسخ JSON با کد وضعیت درست</td></tr>
+                <tr><td><code>get_json(silent=True)</code></td><td data-t="ch38-188">بدنه غیر JSON یعنی ۴۰۰، نه ۵۰۰</td></tr>
+                <tr><td><code>db.get_or_404</code></td><td data-t="ch38-189">شیء یا ۴۰۴ تمیز</td></tr>
+                <tr><td><code>@app.cli.command</code></td><td data-t="ch38-190">فرمان، به جای مسیری که پایگاه داده را دست می‌زند</td></tr>
+                <tr><td data-t="ch38-191">کارخانه برنامه و بلوپرینت</td><td data-t="ch38-192">تا پروژه بعد از سی مسیر خوانا بماند</td></tr>
+            </tbody>
+        </table>
+    </div>
+
+    <div class="exercise">
+        <h3 data-t="ch38-193">تمرین‌های فصل سی و هشت</h3>
+        <ol>
+            <li data-t="ch38-194">سایتی با سه صفحه بسازید: خانه، درباره ما و تماس، با یک منوی مشترک در قالب پایه.</li>
+            <li data-t="ch38-195">مسیری بسازید که عددی بگیرد و جدول ضرب آن عدد را در یک جدول HTML نشان دهد.</li>
+            <li data-t="ch38-196">صفحه ۴۰۴ و ۵۰۰ اختصاصی برای سایتتان بنویسید.</li>
+            <li data-t="ch38-197">فهرست دانشجویان را از یک فایل JSON بخوانید و با <code>for</code> و <code>if</code> در قالب نمایش دهید.</li>
+            <li data-t="ch38-198">یک فرم نظرسنجی بسازید که همه فیلدها را اعتبارسنجی کند، خطاها را با <code>flash</code> نشان دهد، و بعد از ثبت موفق هدایت کند.</li>
+            <li data-t="ch38-199">جست‌وجوی <code>?q=</code> روی همان فهرست پیاده کنید.</li>
+            <li data-t="ch38-200">ورود کاربر با رمز درهم‌شده و دکوراتور <code>@login_required</code> بسازید و صفحه پروفایل را محافظت کنید.</li>
+            <li data-t="ch38-201">به سایتتان صفحه خروج اضافه کنید و مطمئن شوید نشست کاملاً پاک می‌شود.</li>
+            <li data-t="ch38-202">یک REST API برای «کارهای امروز» بنویسید با هر شش عمل و کدهای وضعیت درست.</li>
+            <li data-t="ch38-203">برای همان API یک مشتری با <code>requests</code> بنویسید که <code>timeout</code> دارد و ۴۰۴ را از ۵۰۰ تشخیص می‌دهد.</li>
+            <li data-t="ch38-204">پروژه یادداشت را با یک مدل تازه گسترش دهید: برچسب‌ها، با رابطه چندبه‌چند.</li>
+            <li data-t="ch38-205">به پروژه یادداشت، صفحه‌بندی اضافه کنید: ده یادداشت در هر صفحه.</li>
+            <li data-t="ch38-206">توضیح دهید چرا <code>debug=True</code> روی سرور واقعی خطرناک است و دقیقاً چه چیزی را در اختیار مهاجم می‌گذارد.</li>
+            <li data-t="ch38-207">توضیح دهید چرا فیلتر <code>safe</code> روی داده‌ای که کاربر نوشته، یک حفره امنیتی است. یک نمونه ورودی بنویسید که حمله را نشان دهد.</li>
+        </ol>
+    </div>
+
+    <div class="pager">
+        <a href="chapter-37.html">فصل قبل: همروندی، نخ‌ها و asyncio</a>
+        <a href="chapter-39.html">فصل بعد: پروژه پایانی، Git و GitHub</a>
+    </div>
+
+</main>
+
+</body>
+</html>

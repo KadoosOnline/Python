@@ -1,0 +1,449 @@
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="فصل چهار: نوع bool، عملگرهای مقایسه‌ای، دستور if و else، تورفتگی و عملگرهای منطقی and و or و not">
+    <title>فصل ۴: شرط‌ها</title>
+    <link rel="icon" href="logokm.png" type="image/png">
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<header class="book-bar">
+    <a class="name" href="index.html">برنامه‌نویسی پایتون</a>
+    <a href="index.html">فهرست مطالب</a>
+</header>
+
+<main class="paper">
+
+    <div class="chapter-head">
+        <span class="chapter-num">فصل ۴</span>
+        <h1 data-t="ch04-001">شرط‌ها</h1>
+        <p class="lead" data-t="ch04-002">
+            تا اینجا برنامه‌های ما همیشه یک مسیر را می‌رفتند. از این فصل به بعد
+            برنامه می‌تواند تصمیم بگیرد. این نقطه‌ای است که کد شما از یک
+            ماشین‌حساب به یک برنامه واقعی تبدیل می‌شود.
+        </p>
+    </div>
+
+    <div class="mini-toc">
+        <span class="box-title" data-t="ch04-003">در این فصل می‌خوانید</span>
+        <ol>
+            <li data-t="ch04-004"><a href="#s1">نوع bool و عملگرهای مقایسه‌ای</a></li>
+            <li data-t="ch04-005"><a href="#s2">تفاوت مساوی و دو مساوی</a></li>
+            <li data-t="ch04-006"><a href="#s3">اولین if</a></li>
+            <li data-t="ch04-007"><a href="#s4">تورفتگی</a></li>
+            <li><a href="#s5">else</a></li>
+            <li data-t="ch04-008"><a href="#s6">مقایسه رشته‌ها</a></li>
+            <li data-t="ch04-009"><a href="#s7">عملگرهای منطقی</a></li>
+            <li data-t="ch04-010"><a href="#s8">ورود با نام کاربری و رمز</a></li>
+            <li data-t="ch04-011"><a href="#s9">چند مقدار مجاز با or</a></li>
+            <li data-t="ch04-012"><a href="#s10">زوج یا فرد، مثبت یا منفی</a></li>
+            <li data-t="ch04-013"><a href="#s11">شرط روی یک کاراکتر</a></li>
+            <li data-t="ch04-014"><a href="#s12">ترکیب and و or با پرانتز</a></li>
+        </ol>
+    </div>
+
+    <h2 id="s1" data-t="ch04-015">۱. نوع bool و عملگرهای مقایسه‌ای</h2>
+
+    <p data-t="ch04-016">
+        در فصل اول گفتیم که <code>bool</code> نوعی است که فقط دو مقدار دارد:
+        <code>True</code> و <code>False</code>. حالا می‌بینیم این مقدارها از کجا
+        می‌آیند. هر <strong>مقایسه</strong> یک مقدار بولی تولید می‌کند.
+    </p>
+
+    <pre class="code"><code># A comparison is an expression whose value is either True or False.
+print(5 &gt; 3)      # True
+print(5 &lt; 3)      # False
+print(5 == 5)     # True   -&gt; '==' asks "are they equal?"
+print(5 != 5)     # False  -&gt; '!=' asks "are they different?"
+print(5 &gt;= 5)     # True
+print(5 &lt;= 4)     # False
+
+# Careful: '=' stores a value, '==' compares two values.
+age = 18          # assignment
+print(age == 18)  # comparison -&gt; True
+
+# The result of a comparison is a real value of type bool.
+result = 10 &gt; 2
+print(result, type(result))</code></pre>
+    <p class="code-caption" data-t="ch04-017">مقایسه و نوع بولی: نمونه 01_booleans.py</p>
+
+    <pre class="out">True
+False
+True
+False
+True
+False
+True
+True &lt;class 'bool'&gt;</pre>
+
+    <div class="table-scroll">
+        <table>
+            <thead>
+                <tr><th data-t="ch04-018">عملگر</th><th data-t="ch04-019">سؤالی که می‌پرسد</th><th data-t="ch04-020">مثال درست</th></tr>
+            </thead>
+            <tbody>
+                <tr><td><code>==</code></td><td data-t="ch04-021">آیا برابرند</td><td><code>5 == 5</code></td></tr>
+                <tr><td><code>!=</code></td><td data-t="ch04-022">آیا نابرابرند</td><td><code>5 != 3</code></td></tr>
+                <tr><td><code>&gt;</code></td><td data-t="ch04-023">آیا بزرگ‌تر است</td><td><code>5 &gt; 3</code></td></tr>
+                <tr><td><code>&lt;</code></td><td data-t="ch04-024">آیا کوچک‌تر است</td><td><code>3 &lt; 5</code></td></tr>
+                <tr><td><code>&gt;=</code></td><td data-t="ch04-025">آیا بزرگ‌تر یا مساوی است</td><td><code>5 &gt;= 5</code></td></tr>
+                <tr><td><code>&lt;=</code></td><td data-t="ch04-026">آیا کوچک‌تر یا مساوی است</td><td><code>4 &lt;= 5</code></td></tr>
+            </tbody>
+        </table>
+    </div>
+
+    <p data-t="ch04-027">
+        خط آخر مثال مهم است: نتیجه مقایسه یک <strong>مقدار واقعی</strong> است که
+        می‌شود آن را در متغیر ذخیره کرد، چاپ کرد و نوعش را پرسید. یعنی
+        <code>True</code> چیزی از جنس داده است، درست مثل عدد ۵.
+    </p>
+
+    <h2 id="s2" data-t="ch04-028">۲. تفاوت مساوی و دو مساوی</h2>
+
+    <div class="warn">
+        <span class="box-title" data-t="ch04-029">پرتکرارترین خطای این فصل</span>
+        <p data-t="ch04-030">
+            یک علامت مساوی یعنی <strong>بریز داخل</strong>:
+            <code>age = 18</code> مقدار ۱۸ را در متغیر می‌گذارد. دو علامت مساوی
+            یعنی <strong>آیا برابر است</strong>: <code>age == 18</code> یک سؤال
+            می‌پرسد و جوابش <code>True</code> یا <code>False</code> است. اگر در
+            یک <code>if</code> اشتباهی یکی بنویسید، پایتون خطای نگارشی می‌دهد.
+            خوشبختانه اینجا پایتون سخت‌گیر است و اجازه نمی‌دهد این اشتباه
+            بی‌سروصدا بماند.
+        </p>
+    </div>
+
+    <h2 id="s3" data-t="ch04-031">۳. اولین if</h2>
+
+    <p data-t="ch04-032">
+        دستور <code>if</code> می‌گوید: اگر این شرط درست بود، این چند خط را اجرا
+        کن؛ وگرنه از رویشان بپر.
+    </p>
+
+    <pre class="code"><code># The indented block runs ONLY when the condition is True.
+age = 19
+
+if age &gt; 18:
+    print('Welcome')          # this line belongs to the if (4 spaces)
+
+print('End of the program')   # this line always runs (not indented)</code></pre>
+    <p class="code-caption" data-t="ch04-033">ساده‌ترین شرط: نمونه 02_first_if.py</p>
+
+    <pre class="out">Welcome
+End of the program</pre>
+
+    <h3 data-t="ch04-034">شرح مثال</h3>
+
+    <ul>
+        <li data-t="ch04-035">ساختار همیشه همین است: کلمه <code>if</code>، بعد شرط، بعد <strong>دونقطه</strong>.</li>
+        <li data-t="ch04-036">فراموش کردن دونقطه رایج‌ترین خطای نگارشی این فصل است.</li>
+        <li data-t="ch04-037">خط‌هایی که <strong>تو رفته‌اند</strong> متعلق به <code>if</code> هستند. خط آخر تو نرفته، پس همیشه اجرا می‌شود.</li>
+        <li data-t="ch04-038">پرانتز دور شرط ضرورتی ندارد. در بعضی زبان‌ها اجباری است، در پایتون نه.</li>
+    </ul>
+
+    <h2 id="s4" data-t="ch04-039">۴. تورفتگی</h2>
+
+    <p data-t="ch04-040">
+        در بیشتر زبان‌های برنامه‌نویسی، بلوک کد را با آکولاد مشخص می‌کنند و فاصله
+        ابتدای خط فقط برای زیبایی است. در پایتون این‌طور نیست:
+        <strong>تورفتگی بخشی از دستور زبان است</strong>. پایتون از روی فاصله
+        ابتدای خط می‌فهمد کدام خط‌ها داخل <code>if</code> هستند.
+    </p>
+
+    <ul>
+        <li data-t="ch04-041">استاندارد پایتون <strong>چهار فاصله</strong> است. VS Code وقتی بعد از دونقطه اینتر بزنید، خودش این کار را می‌کند.</li>
+        <li data-t="ch04-042">تب و فاصله را قاطی نکنید. ظاهرشان یکی است ولی پایتون فرقشان را می‌فهمد و خطای عجیب می‌دهد.</li>
+        <li data-t="ch04-043">همه خط‌های یک بلوک باید <strong>دقیقاً</strong> یک اندازه تو رفته باشند.</li>
+        <li data-t="ch04-044">اگر تورفتگی را فراموش کنید، خطای <code>IndentationError</code> می‌گیرید.</li>
+    </ul>
+
+    <div class="note">
+        <span class="box-title" data-t="ch04-045">چرا پایتون این کار را می‌کند</span>
+        <p data-t="ch04-046">
+            چون برنامه‌نویس‌ها به هر حال کدشان را تو می‌بردند تا خوانا شود.
+            طراح پایتون گفت اگر همه این کار را می‌کنند، پس بگذاریم همین معنی هم
+            داشته باشد و از شر آکولاد خلاص شویم. نتیجه این است که کد همه
+            برنامه‌نویس‌های پایتون شبیه هم و مرتب است.
+        </p>
+    </div>
+
+    <h2 id="s5" data-t="ch04-047">۵. else</h2>
+
+    <p data-t="ch04-048">
+        <code>else</code> یعنی «در غیر این صورت». بلوکی که وقتی شرط نادرست باشد
+        اجرا می‌شود.
+    </p>
+
+    <pre class="code"><code># Reading a number and deciding with it.
+user_input = input('Age: ')
+age = int(user_input)
+
+if age &gt;= 18:
+    print('Welcome!')
+else:
+    print('Access denied.')</code></pre>
+    <p class="code-caption" data-t="ch04-049">شرط روی ورودی کاربر: نمونه 04_age_check.py</p>
+
+    <pre class="out">Age: 15
+Access denied.</pre>
+
+    <h3 data-t="ch04-050">شرح مثال</h3>
+
+    <ul>
+        <li data-t="ch04-051"><code>else</code> شرط ندارد، فقط دونقطه دارد.</li>
+        <li data-t="ch04-052"><code>else</code> باید دقیقاً هم‌تراز <code>if</code> خودش باشد، نه تو رفته‌تر.</li>
+        <li data-t="ch04-053">حتماً یکی از دو بلوک اجرا می‌شود، هرگز هر دو و هرگز هیچ‌کدام.</li>
+        <li data-t="ch04-054">به خاطر داشته باشید که <code>input</code> رشته می‌دهد، پس اگر می‌خواهید عددی مقایسه کنید باید اول <code>int</code> بزنید. اگر یادتان برود، <code>'15' &gt;= 18</code> خطای <code>TypeError</code> می‌دهد.</li>
+    </ul>
+
+    <h2 id="s6" data-t="ch04-055">۶. مقایسه رشته‌ها</h2>
+
+    <pre class="code"><code># Strings are compared character by character, and the comparison is
+# case sensitive: 'Kadoos' and 'kadoos' are NOT equal.
+name = input('Enter your name: ')
+
+if name == 'kadoos':
+    print('Welcome', name)
+else:
+    print('Access denied!')
+
+# To ignore the capitals, lower the text before comparing.
+if name.lower() == 'kadoos':
+    print('(case-insensitive check) Welcome', name)</code></pre>
+    <p class="code-caption" data-t="ch04-056">مقایسه متن: نمونه 05_compare_strings.py</p>
+
+    <h3 data-t="ch04-057">شرح مثال</h3>
+
+    <ul>
+        <li data-t="ch04-058">مقایسه رشته‌ها به حروف بزرگ و کوچک <strong>حساس</strong> است. <code>'Kadoos'</code> با <code>'kadoos'</code> برابر نیست.</li>
+        <li data-t="ch04-059">راه حل استاندارد: پیش از مقایسه، هر دو طرف را با <code>lower()</code> کوچک کنید.</li>
+        <li data-t="ch04-060">در کار واقعی معمولاً <code>strip()</code> هم اضافه می‌شود، چون کاربر ممکن است فاصله اضافه تایپ کند: <code>name.strip().lower() == 'kadoos'</code>.</li>
+    </ul>
+
+    <h2 id="s7" data-t="ch04-061">۷. عملگرهای منطقی</h2>
+
+    <p data-t="ch04-062">
+        گاهی یک شرط کافی نیست. سه عملگر منطقی به ما اجازه می‌دهند شرط‌ها را
+        ترکیب کنیم.
+    </p>
+
+    <pre class="code"><code># and -&gt; True only when BOTH sides are True
+# or  -&gt; True when AT LEAST ONE side is True
+# not -&gt; reverses the value
+
+age = 20
+has_ticket = True
+
+print(age &gt;= 18 and has_ticket)     # True
+print(age &gt;= 18 or has_ticket)      # True
+print(not has_ticket)               # False
+
+# A very common pattern: is a value inside a range?
+score = 15
+if score &gt;= 10 and score &lt;= 20:
+    print('Valid score')
+
+# Python also allows the mathematical way of writing it:
+if 10 &lt;= score &lt;= 20:
+    print('Valid score (chained comparison)')</code></pre>
+    <p class="code-caption" data-t="ch04-063">سه عملگر منطقی: نمونه 06_and_or_not.py</p>
+
+    <div class="table-scroll">
+        <table>
+            <thead>
+                <tr><th data-t="ch04-064">عملگر</th><th data-t="ch04-065">نتیجه <code>True</code> است وقتی</th><th data-t="ch04-066">یادآوری فارسی</th></tr>
+            </thead>
+            <tbody>
+                <tr><td><code>and</code></td><td data-t="ch04-067">هر دو طرف درست باشند</td><td data-t="ch04-068">و</td></tr>
+                <tr><td><code>or</code></td><td data-t="ch04-069">دست‌کم یک طرف درست باشد</td><td data-t="ch04-070">یا</td></tr>
+                <tr><td><code>not</code></td><td data-t="ch04-071">طرف مقابلش نادرست باشد</td><td data-t="ch04-072">نقیض</td></tr>
+            </tbody>
+        </table>
+    </div>
+
+    <h3 data-t="ch04-073">شرح مثال</h3>
+
+    <ul>
+        <li data-t="ch04-074">هر طرف <code>and</code> و <code>or</code> باید یک شرط کامل باشد. نوشتن <code>if score &gt;= 10 and &lt;= 20</code> غلط است.</li>
+        <li data-t="ch04-075">پایتون امکان زیبایی دارد که اکثر زبان‌ها ندارند: <code>10 &lt;= score &lt;= 20</code> دقیقاً همان‌طور که در ریاضی می‌نویسیم کار می‌کند و خواناتر است.</li>
+        <li data-t="ch04-076">وقتی متغیر خودش بولی است، ضرورتی ندارد بنویسید <code>has_ticket == True</code>. خود <code>has_ticket</code> کافی است. برنامه‌نویس‌های حرفه‌ای شکل کوتاه را می‌نویسند.</li>
+    </ul>
+
+    <h2 id="s8" data-t="ch04-077">۸. ورود با نام کاربری و رمز</h2>
+
+    <pre class="code"><code># Constants are written in CAPITALS by convention: they are not meant to change.
+USERNAME = 'admin'
+PASSWORD = 'admin'
+
+user = input('Enter username: ')
+password = input('Enter password: ')
+
+# Both conditions must be true, so we use 'and'.
+if user == USERNAME and password == PASSWORD:
+    print('Welcome,', user)
+else:
+    print('Access denied!')</code></pre>
+    <p class="code-caption" data-t="ch04-078">ورود به سیستم: نمونه 07_login.py</p>
+
+    <h3 data-t="ch04-079">شرح مثال</h3>
+
+    <ul>
+        <li data-t="ch04-080">نام‌های با حروف بزرگ یعنی <strong>ثابت</strong>: مقداری که قرار نیست در طول برنامه عوض شود. این فقط یک قرارداد است و پایتون جلوی تغییرشان را نمی‌گیرد، ولی همه برنامه‌نویس‌ها آن را رعایت می‌کنند.</li>
+        <li data-t="ch04-081">چون هر دو شرط باید برقرار باشند، <code>and</code> به کار رفته است.</li>
+        <li data-t="ch04-082">در برنامه واقعی هرگز رمز عبور را به این شکل و به صورت متن ساده داخل کد نمی‌نویسند. در فصل سی و هشتم می‌بینید که رمز را باید <strong>درهم‌سازی</strong> کرد و در پایگاه داده نگه داشت.</li>
+    </ul>
+
+    <h2 id="s9" data-t="ch04-083">۹. چند مقدار مجاز با or</h2>
+
+    <pre class="code"><code># Accepting several valid names with 'or'.
+name = input('Enter your name: ')
+
+if name == 'alireza' or name == 'omid' or name == 'arad':
+    print('Welcome', name)
+else:
+    print('Access denied!')
+
+# A shorter and much more readable way (we will study lists in session 09):
+if name in ('alireza', 'omid', 'arad'):
+    print('(short version) Welcome', name)</code></pre>
+    <p class="code-caption" data-t="ch04-084">چند نام مجاز: نمونه 08_multiple_names.py</p>
+
+    <h3 data-t="ch04-085">شرح مثال</h3>
+
+    <ul>
+        <li data-t="ch04-086">در شکل اول، هر بار باید کل مقایسه را بنویسید. نوشتن <code>if name == 'alireza' or 'omid'</code> یک اشتباه بسیار رایج است که خطا نمی‌دهد ولی همیشه درست حساب می‌شود، چون رشته ناخالی در پایتون معادل <code>True</code> است.</li>
+        <li data-t="ch04-087">شکل دوم با <code>in</code> هم کوتاه‌تر است و هم خواناتر. اضافه کردن نام چهارم فقط یک کلمه است.</li>
+        <li data-t="ch04-088">آنچه داخل پرانتز آمده یک <strong>تاپل</strong> است که در فصل چهاردهم می‌بینید. با لیست هم دقیقاً همین کار را می‌شود کرد.</li>
+    </ul>
+
+    <h2 id="s10" data-t="ch04-089">۱۰. زوج یا فرد، مثبت یا منفی</h2>
+
+    <p data-t="ch04-090">
+        حالا عملگر باقیمانده فصل دوم به کار می‌آید. عددی زوج است که باقیمانده‌اش
+        بر ۲ صفر باشد.
+    </p>
+
+    <pre class="code"><code># A number is even when the remainder of its division by 2 is zero.
+user_input = input('Please enter a number: ')
+number = int(user_input)
+
+if number % 2 == 0:
+    print('Even')
+else:
+    print('Odd')</code></pre>
+    <p class="code-caption" data-t="ch04-091">زوج یا فرد: نمونه 09_even_or_odd.py</p>
+
+    <pre class="code"><code># Deciding on the sign of a number.
+user_input = input('Enter a number: ')
+number = float(user_input)
+
+if number &gt;= 0:
+    print('+')
+else:
+    print('-')</code></pre>
+    <p class="code-caption" data-t="ch04-092">علامت عدد: نمونه 10_positive_or_negative.py</p>
+
+    <p data-t="ch04-093">
+        در مثال دوم دقت کنید که صفر در دسته مثبت‌ها افتاده است، چون شرط
+        <code>&gt;=</code> است. اگر بخواهید صفر حالت سومی داشته باشد، به
+        <code>elif</code> نیاز دارید که موضوع فصل بعد است.
+    </p>
+
+    <h2 id="s11" data-t="ch04-094">۱۱. شرط روی یک کاراکتر</h2>
+
+    <pre class="code"><code># A condition can be written on a single character of a string.
+name = input('Enter your name: ')
+
+# name[0] is the first character. An empty answer would crash the program,
+# so we check the length first.
+if len(name) &gt; 0 and name[0].lower() == 's':
+    print('Salam')
+else:
+    print('Hello')</code></pre>
+    <p class="code-caption" data-t="ch04-095">شرط روی حرف اول: نمونه 11_first_letter.py</p>
+
+    <h3 data-t="ch04-096">شرح مثال</h3>
+
+    <ul>
+        <li data-t="ch04-097">اگر کاربر چیزی وارد نکند و فقط اینتر بزند، <code>name</code> رشته خالی می‌شود و <code>name[0]</code> خطای <code>IndexError</code> می‌دهد. شرط <code>len(name) &gt; 0</code> جلوی این را می‌گیرد.</li>
+        <li data-t="ch04-098">این کار به یک ویژگی مهم <code>and</code> تکیه دارد: پایتون طرف راست را <strong>فقط وقتی</strong> بررسی می‌کند که طرف چپ درست باشد. به این <strong>ارزیابی کوتاه</strong> می‌گویند. اگر طول صفر باشد، پایتون اصلاً سراغ <code>name[0]</code> نمی‌رود.</li>
+        <li data-t="ch04-099">ترتیب دو شرط را عوض نکنید. اگر بنویسید <code>name[0].lower() == 's' and len(name) &gt; 0</code>، برنامه روی ورودی خالی خراب می‌شود.</li>
+    </ul>
+
+    <h2 id="s12" data-t="ch04-100">۱۲. ترکیب and و or با پرانتز</h2>
+
+    <pre class="code"><code># Combining 'and' and 'or'. The parentheses make the intention clear:
+# (male AND older than 15) OR (female AND older than 9)
+gender = input('Enter the gender (male / female): ')
+age_input = input('Enter the age: ')
+age = int(age_input)
+
+if (gender == 'male' and age &gt; 15) or (gender == 'female' and age &gt; 9):
+    print('She or he is ready to pray!')
+else:
+    print('Not ready yet.')</code></pre>
+    <p class="code-caption" data-t="ch04-101">ترکیب شرط‌ها: نمونه 12_prayer_age.py</p>
+
+    <h3 data-t="ch04-102">شرح مثال</h3>
+
+    <ul>
+        <li data-t="ch04-103">وقتی <code>and</code> و <code>or</code> با هم می‌آیند، <code>and</code> اولویت بالاتری دارد. یعنی حتی بدون پرانتز هم همین نتیجه به دست می‌آمد.</li>
+        <li data-t="ch04-104">با این حال پرانتزها را نگه می‌داریم، چون خواننده کد ضرورتی ندارد جدول اولویت را حفظ باشد. همان قانون فصل دوم: هر جا شک هست، پرانتز بگذارید.</li>
+        <li data-t="ch04-105">ساختار شرط را به زبان ساده برای خودتان بازگو کنید تا از درستی منطق آن مطمئن شوید: «اگر (مرد است و سنش بیشتر از ۱۵ سال است) یا (زن است و سنش بیشتر از ۹ سال است)». این روش به شما کمک می‌کند منطق شرط را پیش از اجرای کد بررسی کنید.</li>
+    </ul>
+
+    <div class="folder-ref">
+        <span class="box-title" data-t="ch04-106">فایل‌های تمرینی این فصل</span>
+        <p data-t="ch04-107">
+            پوشه <code>S04-conditionals</code> شامل نمونه‌های
+            <code>01_booleans.py</code> تا <code>12_prayer_age.py</code>.
+        </p>
+    </div>
+
+    <h2 data-t="ch04-108">خلاصه فصل</h2>
+
+    <div class="table-scroll">
+        <table>
+            <thead>
+                <tr><th data-t="ch04-109">ابزار</th><th data-t="ch04-110">وظیفه آن</th></tr>
+            </thead>
+            <tbody>
+                <tr><td><code>== != &gt; &lt; &gt;= &lt;=</code></td><td data-t="ch04-111">شش عملگر مقایسه‌ای. نتیجه‌شان بولی است</td></tr>
+                <tr><td data-t="ch04-112"><code>=</code> در برابر <code>==</code></td><td data-t="ch04-113">اولی مقداردهی، دومی مقایسه</td></tr>
+                <tr><td data-t="ch04-114"><code>if شرط:</code></td><td data-t="ch04-115">اجرای بلوک فقط وقتی شرط درست است</td></tr>
+                <tr><td><code>else:</code></td><td data-t="ch04-116">بلوکی که وقتی شرط نادرست است اجرا می‌شود</td></tr>
+                <tr><td data-t="ch04-117">تورفتگی</td><td data-t="ch04-118">چهار فاصله. در پایتون بخشی از دستور زبان است</td></tr>
+                <tr><td><code>and or not</code></td><td data-t="ch04-119">ترکیب و نقیض شرط‌ها</td></tr>
+                <tr><td><code>10 &lt;= x &lt;= 20</code></td><td data-t="ch04-120">مقایسه زنجیره‌ای، خواناتر از دو شرط با and</td></tr>
+                <tr><td><code>x in (a, b, c)</code></td><td data-t="ch04-121">جای چند <code>or</code> پشت سر هم</td></tr>
+                <tr><td data-t="ch04-122">ارزیابی کوتاه</td><td data-t="ch04-123">اگر طرف چپ <code>and</code> نادرست باشد، طرف راست بررسی نمی‌شود</td></tr>
+            </tbody>
+        </table>
+    </div>
+
+    <div class="exercise">
+        <h3 data-t="ch04-124">تمرین‌های فصل چهار</h3>
+        <ol>
+            <li data-t="ch04-125">یک عدد بگیرید و فقط با <code>if</code> و <code>else</code> بگویید مثبت است یا نه.</li>
+            <li data-t="ch04-126">دو عدد بگیرید و بزرگ‌ترشان را چاپ کنید.</li>
+            <li data-t="ch04-127">یک نمره بین ۰ تا ۲۰ بگیرید و اگر ۱۰ یا بیشتر بود <code>Passed</code> و وگرنه <code>Failed</code> چاپ کنید.</li>
+            <li data-t="ch04-128">یک سال بگیرید و بگویید کبیسه است یا نه: بر ۴ بخش‌پذیر باشد و بر ۱۰۰ نباشد، یا بر ۴۰۰ بخش‌پذیر باشد.</li>
+            <li data-t="ch04-129">نام کاربری و رمز بگیرید و فقط وقتی هر دو درست بودند اجازه ورود بدهید.</li>
+            <li data-t="ch04-130">یک کاراکتر بگیرید و با <code>isdigit()</code> بگویید رقم است یا نه.</li>
+            <li data-t="ch04-131">سه عدد بگیرید و بزرگ‌ترین را چاپ کنید، فقط با <code>if</code> و <code>else</code> و بدون تابع <code>max</code>.</li>
+            <li data-t="ch04-132">سن و نوع بلیت (<code>normal</code> یا <code>student</code>) را بگیرید و قیمت را چاپ کنید: دانش‌آموز زیر ۱۸ سال نصف قیمت و بقیه قیمت کامل.</li>
+        </ol>
+    </div>
+
+    <div class="pager">
+        <a href="chapter-03.html">فصل قبل: رشته‌ها</a>
+        <a href="chapter-05.html">فصل بعد: elif و شرط‌های تودرتو</a>
+    </div>
+
+</main>
+
+</body>
+</html>

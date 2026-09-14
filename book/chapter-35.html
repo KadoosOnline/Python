@@ -1,0 +1,898 @@
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="فصل سی و پنج: tkinter پیشرفته، کار با فایل و تصویر، ویجت‌های ttk، پنجره دوم مودال، جدول Treeview، بوم نقاشی، after و یک برنامه دیتابیسی کامل">
+    <title>فصل ۳۵: tkinter پیشرفته</title>
+    <link rel="icon" href="logokm.png" type="image/png">
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<header class="book-bar">
+    <a class="name" href="index.html">برنامه‌نویسی پایتون</a>
+    <a href="index.html">فهرست مطالب</a>
+</header>
+
+<main class="paper">
+
+    <div class="chapter-head">
+        <span class="chapter-num">فصل ۳۵</span>
+        <h1 data-t="ch35-001">tkinter پیشرفته</h1>
+        <p class="lead" data-t="ch35-002">
+            در فصل قبل «پنجره‌ای با چند دکمه» ساختیم. در این فصل به یک برنامه
+            دسکتاپ واقعی می‌رسیم: باز و ذخیره کردن فایل، تصویر، جدول، پنجره
+            دوم، زمان‌سنج، و در پایان یک برنامه مدیریت کتابخانه که روی پایگاه
+            داده کار می‌کند.
+        </p>
+    </div>
+
+    <div class="mini-toc">
+        <span class="box-title" data-t="ch35-003">در این فصل می‌خوانید</span>
+        <ol>
+            <li data-t="ch35-004"><a href="#s1">کلاس، به جای global</a></li>
+            <li data-t="ch35-005"><a href="#s2">باز کردن فایل و ویجت Text</a></li>
+            <li data-t="ch35-006"><a href="#s3">دفترچه یادداشت: ذخیره و تغییرات ذخیره‌نشده</a></li>
+            <li data-t="ch35-007"><a href="#s4">تصویر و دام نامرئی شدن</a></li>
+            <li data-t="ch35-008"><a href="#s5">لغزنده و جعبه چرخشی</a></li>
+            <li data-t="ch35-009"><a href="#s6">ttk و فهرست بازشو</a></li>
+            <li data-t="ch35-010"><a href="#s7">زبانه‌ها و نوار پیشرفت</a></li>
+            <li data-t="ch35-011"><a href="#s8">تنظیمات پنجره</a></li>
+            <li data-t="ch35-012"><a href="#s9">وضعیت ویجت‌ها</a></li>
+            <li data-t="ch35-013"><a href="#s10">پنجره دوم: دیالوگ مودال</a></li>
+            <li data-t="ch35-014"><a href="#s11">جدول Treeview</a></li>
+            <li data-t="ch35-015"><a href="#s12">بوم نقاشی و رویدادهای ماوس</a></li>
+            <li data-t="ch35-016"><a href="#s13">after و قانون طلایی</a></li>
+            <li data-t="ch35-017"><a href="#s14">پروژه: مدیریت کتابخانه</a></li>
+        </ol>
+    </div>
+
+    <h2 id="s1" data-t="ch35-018">۱. کلاس، به جای global</h2>
+
+    <p data-t="ch35-019">
+        در فصل قبل توابع پاسخ را داخل <code>main()</code> می‌نوشتیم تا
+        ویجت‌ها را ببینند. برای برنامه‌های بزرگ‌تر راه بهتری هست: کل پنجره را
+        در یک <strong>کلاس</strong> بگذاریم. ویجت‌ها صفت شیء می‌شوند
+        (<code>self.text_area</code>) و همه متدها به آنها دسترسی دارند، بدون
+        حتی یک <code>global</code>.
+    </p>
+
+    <pre class="code"><code>class FileViewer:
+    '''A tiny read-only viewer for text files.'''
+
+    def __init__(self, root: tk.Tk) -&gt; None:
+        self.root = root
+        self.root.title('File viewer')
+        self.root.geometry('600x500')
+        ...
+
+    def open_file(self) -&gt; None:
+        ...
+
+
+def main() -&gt; None:
+    root = tk.Tk()
+    FileViewer(root)
+    root.mainloop()</code></pre>
+    <p class="code-caption" data-t="ch35-020">ساختار استاندارد این فصل</p>
+
+    <p data-t="ch35-021">
+        از این به بعد همه نمونه‌های این فصل همین شکل را دارند. این همان
+        شیءگرایی فصل بیست و یکم است که حالا کاربرد واقعی پیدا کرده: یک شیء
+        که هم داده دارد (ویجت‌ها و وضعیت برنامه) و هم رفتار (متدهای پاسخ).
+    </p>
+
+    <h2 id="s2" data-t="ch35-022">۲. باز کردن فایل و ویجت Text</h2>
+
+    <pre class="code"><code>import tkinter as tk
+from tkinter import filedialog, messagebox
+
+
+class FileViewer:
+
+    def __init__(self, root: tk.Tk) -&gt; None:
+        ...
+        # A frame keeps the text area and its scrollbar side by side.
+        frame = tk.Frame(root)
+        frame.pack(fill='both', expand=True, padx=10, pady=10)
+
+        scrollbar = tk.Scrollbar(frame)
+        scrollbar.pack(side='right', fill='y')
+
+        # wrap='none' = do not break long lines; that is what a code viewer wants.
+        self.text_area = tk.Text(frame, wrap='none',
+                                 yscrollcommand=scrollbar.set)
+        self.text_area.pack(side='left', fill='both', expand=True)
+
+        # Second half of the connection: moving the bar scrolls the text.
+        scrollbar.config(command=self.text_area.yview)
+
+    def open_file(self) -&gt; None:
+        '''Ask for a file and show its content in the text area.'''
+        # Each filter is a (label, pattern) pair.
+        file_path = filedialog.askopenfilename(
+            title='Open',
+            filetypes=[('Python files', '*.py'),
+                       ('Text files', '*.txt'),
+                       ('All files', '*.*')],
+        )
+
+        # Cancel gives back an empty string.
+        if not file_path:
+            return
+
+        try:
+            with open(file_path, 'r', encoding='utf-8') as file:
+                content = file.read()
+        except OSError as error:
+            # A missing file, a folder, or no permission: never crash the GUI.
+            messagebox.showerror('Cannot open the file', str(error))
+            return
+        except UnicodeDecodeError:
+            messagebox.showerror('Cannot open the file',
+                                 'This file is not UTF-8 text (a picture?).')
+            return
+
+        # '1.0' is the start, tk.END is the end: clear, then insert.
+        self.text_area.delete('1.0', tk.END)
+        self.text_area.insert('1.0', content)
+        self.root.title(f'File viewer - {file_path}')</code></pre>
+    <p class="code-caption" data-t="ch35-023">نمایشگر فایل: نمونه 01_open_file/app.py</p>
+
+    <h3 data-t="ch35-024">شرح مثال</h3>
+
+    <ul>
+        <li data-t="ch35-025"><code>askopenfilename</code> پنجره استاندارد «باز کردن» سیستم‌عامل را نشان می‌دهد و مسیر انتخاب‌شده را برمی‌گرداند. اگر کاربر <strong>انصراف</strong> بزند، <strong>رشته خالی</strong> می‌دهد. همیشه بررسی کنید.</li>
+        <li data-t="ch35-026">ویجت <code>Text</code> چندخطی است و موقعیت‌هایش رشته‌هایی به شکل <code>'سطر.ستون'</code> هستند. سطرها از <strong>یک</strong> شمرده می‌شوند، پس ابتدای متن <code>'1.0'</code> است نه <code>'0.0'</code>.</li>
+        <li data-t="ch35-027">نوار پیمایش باید در <strong>هر دو جهت</strong> وصل شود: از ویجت به نوار با <code>yscrollcommand</code>، و از نوار به ویجت با <code>command</code>. با یک طرف، نوار حرکت می‌کند ولی متن نه.</li>
+        <li data-t="ch35-028">در برنامه گرافیکی هرگز نباید خطا به شکل ردیابی خام در ترمینال بیفتد. کاربر ترمینال را نمی‌بیند. هر خطا باید به یک <code>messagebox</code> تبدیل شود.</li>
+    </ul>
+
+    <h2 id="s3" data-t="ch35-029">۳. دفترچه یادداشت: ذخیره و تغییرات ذخیره‌نشده</h2>
+
+    <pre class="code"><code>    def _is_modified(self) -&gt; bool:
+        '''True when the text changed since the last save.'''
+        return bool(self.text.edit_modified())
+
+    def _mark_saved(self) -&gt; None:
+        '''Tell Tk "the current content is the saved content".'''
+        self.text.edit_modified(False)
+
+    def _confirm_discard(self) -&gt; bool:
+        '''Ask before losing unsaved work. True = it is safe to continue.'''
+        if not self._is_modified():
+            return True
+        answer = messagebox.askyesnocancel(
+            'Unsaved changes',
+            'Save the changes before continuing?')
+        if answer is None:          # Cancel
+            return False
+        if answer:                  # Yes -&gt; save first
+            return self.save_file()
+        return True                 # No -&gt; throw the changes away
+
+    def _write_to(self, path: str) -&gt; bool:
+        # 'end-1c' = everything except the newline Tk always keeps at the end.
+        content = self.text.get('1.0', 'end-1c')
+        try:
+            with open(path, 'w', encoding='utf-8') as file:
+                file.write(content)
+        except OSError as error:
+            messagebox.showerror('Cannot save the file', str(error))
+            return False
+        self._mark_saved()
+        return True
+
+    def on_close(self) -&gt; None:
+        if self._confirm_discard():
+            self.root.destroy()</code></pre>
+    <p class="code-caption" data-t="ch35-030">دفترچه: نمونه 02_save_file/app.py</p>
+
+    <h3 data-t="ch35-031">شرح مثال</h3>
+
+    <ul>
+        <li data-t="ch35-032"><code>edit_modified()</code> می‌گوید آیا متن از آخرین باری که پرچم را صفر کردیم تغییر کرده است. هر ویرایشگر واقعی با همین می‌فهمد کی باید بپرسد «ذخیره شود؟».</li>
+        <li data-t="ch35-033"><code>askyesnocancel</code> سه پاسخ دارد: <code>True</code>، <code>False</code> و <code>None</code> برای انصراف. دقت کنید که <code>if answer is None</code> باید <strong>قبل</strong> از <code>if answer</code> بیاید، چون <code>None</code> هم نادرست‌نماست.</li>
+        <li data-t="ch35-034"><code>'end-1c'</code> یعنی «تا انتها منهای یک کاراکتر». Tk همیشه یک خط جدید در انتهای <code>Text</code> نگه می‌دارد و بدون این ترفند، فایل شما با هر ذخیره یک خط خالی بیشتر پیدا می‌کند.</li>
+        <li data-t="ch35-035"><code>root.protocol('WM_DELETE_WINDOW', func)</code> دکمه ضربدر پنجره را می‌دزدد و تابع ما را صدا می‌زند، پس می‌توانیم جلوی بسته شدن را بگیریم.</li>
+        <li data-t="ch35-036">توابعی که <code>True</code> یا <code>False</code> برمی‌گردانند، زنجیره تصمیم‌ها را ساده می‌کنند: «اگر ذخیره موفق بود، ادامه بده».</li>
+    </ul>
+
+    <h2 id="s4" data-t="ch35-037">۴. تصویر و دام نامرئی شدن</h2>
+
+    <pre class="code"><code>'''Showing a picture -- and the famous "my image is invisible" trap.
+
+`tk.PhotoImage` understands GIF, PNG, PGM and PPM out of the box.
+(For JPEG you need the external package Pillow: `pip install pillow`.)
+
+THE TRAP
+--------
+Tk does not keep a Python reference to the image; only the C level of Tk knows
+about it. If the only Python name that points to the PhotoImage disappears,
+the garbage collector frees the object and the label shows... nothing.
+'''
+
+# The picture sits next to this file, so the program works no matter which
+# folder you run it from.
+IMAGE_PATH = Path(__file__).parent / 'picture.gif'
+
+
+class ImageWindow:
+
+    def __init__(self, root: tk.Tk) -&gt; None:
+        ...
+        try:
+            # str() because Tk wants a plain string, not a Path.
+            self.photo = tk.PhotoImage(file=str(IMAGE_PATH))
+        except tk.TclError:
+            # Wrong format or missing file: say so instead of crashing.
+            tk.Label(root,
+                     text=f'Cannot load {IMAGE_PATH.name}',
+                     fg='red').pack(pady=40)
+            return
+
+        # `self.photo` is what keeps the image alive.
+        tk.Label(root, image=self.photo).pack(padx=10, pady=10)</code></pre>
+    <p class="code-caption" data-t="ch35-038">تصویر: نمونه 03_image/app.py</p>
+
+    <div class="warn">
+        <span class="box-title" data-t="ch35-039">مشهورترین باگ tkinter</span>
+        <p data-t="ch35-040">
+            Tk خودش هیچ ارجاعی به تصویر نگه نمی‌دارد. اگر تنها نام پایتونی که
+            به <code>PhotoImage</code> اشاره می‌کند از بین برود (مثلاً یک
+            متغیر محلی که تابع تمام می‌شود)، زباله‌روب شیء را آزاد می‌کند و
+            برچسب <strong>هیچ چیز</strong> نشان نمی‌دهد. نه خطایی، نه پیامی؛
+            فقط یک کادر خالی. راه حل: تصویر را روی <code>self</code> یا روی
+            خود ویجت نگه دارید: <code>label.image = photo</code>.
+        </p>
+    </div>
+
+    <p data-t="ch35-041">
+        نکته دوم همان اندازه مهم است:
+        <code>Path(__file__).parent / 'picture.gif'</code>. مسیر نسبی ساده
+        به <strong>پوشه جاری</strong> وابسته است، نه به محل فایل برنامه. اگر
+        برنامه را از پوشه دیگری اجرا کنید، تصویر پیدا نمی‌شود. این را در فصل
+        هجدهم دیدید و در فصل سی و ششم موقع ساخت فایل اجرایی باز به آن
+        برمی‌گردیم.
+    </p>
+
+    <h2 id="s5" data-t="ch35-042">۵. لغزنده و جعبه چرخشی</h2>
+
+    <pre class="code"><code>class FontSizeDemo:
+    '''A label whose font size follows a slider.'''
+
+    def __init__(self, root: tk.Tk) -&gt; None:
+        self.label = tk.Label(root, text='Sample text', font=('Arial', 14))
+        self.label.pack(pady=20)
+
+        scale = tk.Scale(root, from_=10, to=40, orient='horizontal',
+                         length=250, label='Font size',
+                         command=self.update_font)
+        scale.set(14)               # this also fires update_font once
+        scale.pack()
+
+    def update_font(self, value: str) -&gt; None:
+        '''Tk passes the slider position as a string.'''
+        self.label.config(font=('Arial', int(value)))</code></pre>
+    <p class="code-caption" data-t="ch35-043">لغزنده: نمونه 04_scale/app.py</p>
+
+    <pre class="code"><code>    def show_total(self) -&gt; None:
+        raw = self.spinbox.get()
+        # The user may have typed anything inside the box.
+        if not raw.isdigit():
+            self.result.config(text='Please choose a whole number.', fg='red')
+            return
+        count = int(raw)
+        total = count * self.PRICE
+        self.result.config(text=f'{count} x {self.PRICE:,} = {total:,} toman',
+                           fg='black')</code></pre>
+    <p class="code-caption" data-t="ch35-044">جعبه چرخشی: نمونه 05_spinbox/app.py</p>
+
+    <h3 data-t="ch35-045">شرح مثال</h3>
+
+    <ul>
+        <li data-t="ch35-046">تابعی که به <code>command</code> یک <code>Scale</code> داده می‌شود، <strong>یک آرگومان</strong> می‌گیرد: مقدار تازه. و آن مقدار همیشه <strong>رشته</strong> است، مثل <code>'14'</code>، نه عدد.</li>
+        <li data-t="ch35-047"><code>Spinbox</code> هم <code>get()</code>اش رشته می‌دهد، و بدتر: کاربر می‌تواند داخل جعبه هر چیزی تایپ کند. پس پیش از تبدیل، اعتبارسنجی لازم است.</li>
+        <li data-t="ch35-048"><code>scale.set(14)</code> علاوه بر تنظیم مقدار اولیه، یک بار هم تابع پاسخ را اجرا می‌کند. این یعنی وضعیت اولیه صفحه درست نمایش داده می‌شود.</li>
+        <li data-t="ch35-049">درسی که در کل این فصل تکرار می‌شود: <strong>هر چیزی که از ویجت بیرون می‌آید متن است</strong>. با آن مثل ورودی کاربر رفتار کنید.</li>
+    </ul>
+
+    <h2 id="s6" data-t="ch35-050">۶. ttk و فهرست بازشو</h2>
+
+    <p data-t="ch35-051">
+        ماژول <code>tkinter.ttk</code> نسخه‌های تازه‌تر چند ویجت را دارد که
+        شبیه دکمه‌های خود سیستم‌عامل به نظر می‌رسند، و ویجت‌هایی می‌آورد که
+        <code>tkinter</code> ساده اصلاً ندارد:
+        <code>Combobox</code>، <code>Notebook</code>،
+        <code>Treeview</code> و <code>Progressbar</code>.
+    </p>
+
+    <pre class="code"><code>import tkinter as tk
+from tkinter import ttk
+
+
+CITIES = {
+    'Rasht': 'Gilan',
+    'Bandar Anzali': 'Gilan',
+    'Lahijan': 'Gilan',
+    'Tabriz': 'East Azerbaijan',
+    'Shiraz': 'Fars',
+}
+
+
+class ComboboxDemo:
+    '''Choose a city, see its province.'''
+
+    def __init__(self, root: tk.Tk) -&gt; None:
+        ttk.Label(root, text='City:').pack(pady=(20, 5))
+
+        self.city_var = tk.StringVar()
+        combo = ttk.Combobox(root, textvariable=self.city_var,
+                             values=list(CITIES), state='readonly', width=25)
+        combo.current(0)                    # select the first entry
+        combo.pack()
+
+        # A virtual event: it fires every time the selection changes.
+        combo.bind('&lt;&lt;ComboboxSelected&gt;&gt;', self.on_select)
+
+        self.answer = ttk.Label(root, text='', font=('Arial', 12))
+        self.answer.pack(pady=20)
+
+        self.on_select()                    # show the first answer at once
+
+    def on_select(self, event: 'tk.Event | None' = None) -&gt; None:
+        '''`bind` calls us with an event object; `self.on_select()` does not.'''
+        city = self.city_var.get()
+        self.answer.config(text=f'{city} is in {CITIES[city]} province.')</code></pre>
+    <p class="code-caption" data-t="ch35-052">فهرست بازشو: نمونه 06_combobox/app.py</p>
+
+    <h3 data-t="ch35-053">شرح مثال</h3>
+
+    <ul>
+        <li data-t="ch35-054">قاعده ساده این دوره: هر جا <code>ttk</code> ویجت را دارد از آن استفاده کنید، و برای <code>Text</code> و <code>Canvas</code> و <code>Listbox</code> از <code>tk</code> ساده، چون <code>ttk</code> نسخه‌ای از آنها ندارد.</li>
+        <li data-t="ch35-055"><code>state='readonly'</code> جلوی تایپ کردن مقدار دلخواه را می‌گیرد. بدون آن کاربر می‌تواند شهری بنویسد که در دیکشنری نیست و برنامه با <code>KeyError</code> بمیرد.</li>
+        <li data-t="ch35-056"><code>&lt;&lt;ComboboxSelected&gt;&gt;</code> با دو جفت کروشه، یک <strong>رویداد مجازی</strong> است. رویدادهای مجازی را با <code>bind</code> می‌گیریم، نه با <code>command</code>.</li>
+        <li data-t="ch35-057">پارامتر <code>event=None</code> ترفند مفیدی است: هم <code>bind</code> می‌تواند تابع را با یک آرگومان صدا بزند و هم خودمان بدون آرگومان.</li>
+        <li data-t="ch35-058"><code>combo.current(0)</code> روی فهرست <strong>خالی</strong> خطا ایجاد می‌کند. این یکی از باگ‌های نسخه اصلی برنامه کتابخانه بود.</li>
+    </ul>
+
+    <h2 id="s7" data-t="ch35-059">۷. زبانه‌ها و نوار پیشرفت</h2>
+
+    <pre class="code"><code>class NotebookDemo:
+    '''A window with three tabs.'''
+
+    def __init__(self, root: tk.Tk) -&gt; None:
+        notebook = ttk.Notebook(root)
+        notebook.pack(fill='both', expand=True, padx=10, pady=10)
+
+        notebook.add(self._build_welcome_tab(notebook), text='Welcome')
+        notebook.add(self._build_form_tab(notebook), text='Form')
+        notebook.add(self._build_progress_tab(notebook), text='Progress')
+
+    def _build_form_tab(self, parent: ttk.Notebook) -&gt; ttk.Frame:
+        frame = ttk.Frame(parent)
+        ttk.Label(frame, text='Name:').grid(row=0, column=0, padx=10, pady=10)
+        self.name_var = tk.StringVar()
+        ttk.Entry(frame, textvariable=self.name_var).grid(row=0, column=1)
+        self.hello = ttk.Label(frame, text='')
+        self.hello.grid(row=1, column=0, columnspan=2, pady=20)
+        ttk.Button(frame, text='Say hello',
+                   command=self.say_hello).grid(row=2, column=0, columnspan=2)
+        return frame
+
+    def _build_progress_tab(self, parent: ttk.Notebook) -&gt; ttk.Frame:
+        frame = ttk.Frame(parent)
+        self.bar = ttk.Progressbar(frame, length=300, mode='determinate')
+        self.bar.pack(pady=40)
+        ttk.Button(frame, text='+10 %', command=self.step_bar).pack()
+        return frame
+
+    def step_bar(self) -&gt; None:
+        # The bar stops at 100; start again from zero.
+        self.bar['value'] = (self.bar['value'] + 10) % 110</code></pre>
+    <p class="code-caption" data-t="ch35-060">زبانه‌ها: نمونه 07_notebook/app.py</p>
+
+    <p data-t="ch35-061">هر زبانه فقط یک <code>Frame</code> است که به <code>notebook.add()</code> داده می‌شود، و هر چه بلدیم داخلش کار می‌کند. توجه کنید که هر زبانه در یک <strong>متد جداگانه</strong> ساخته شده است. این عادت را از در همین مرحله داشته باشید: یک <code>__init__</code> دویست‌خطی، کابوس است.</p>
+
+    <h2 id="s8" data-t="ch35-062">۸. تنظیمات پنجره</h2>
+
+    <pre class="code"><code>def centre(window: tk.Misc, width: int, height: int) -&gt; None:
+    '''Place `window` in the middle of the screen with the given size.'''
+    screen_width = window.winfo_screenwidth()
+    screen_height = window.winfo_screenheight()
+    x = (screen_width - width) // 2
+    y = (screen_height - height) // 2
+    # The format is 'WIDTHxHEIGHT+X+Y'.
+    window.geometry(f'{width}x{height}+{x}+{y}')</code></pre>
+    <p class="code-caption" data-t="ch35-063">وسط‌چین کردن پنجره: نمونه 08_window_options/app.py</p>
+
+    <div class="table-scroll">
+        <table>
+            <thead>
+                <tr><th data-t="ch35-064">دستور</th><th data-t="ch35-065">وظیفه آن</th></tr>
+            </thead>
+            <tbody>
+                <tr><td><code>geometry('WxH+X+Y')</code></td><td data-t="ch35-066">اندازه و موقعیت روی صفحه</td></tr>
+                <tr><td><code>resizable(False, False)</code></td><td data-t="ch35-067">ممنوع کردن تغییر اندازه، افقی و عمودی</td></tr>
+                <tr><td data-t="ch35-068"><code>minsize()</code> و <code>maxsize()</code></td><td data-t="ch35-069">حد و مرز تغییر اندازه</td></tr>
+                <tr><td><code>attributes('-topmost', True)</code></td><td data-t="ch35-070">همیشه روی پنجره‌های دیگر</td></tr>
+                <tr><td><code>winfo_screenwidth()</code></td><td data-t="ch35-071">عرض صفحه نمایش، برای وسط‌چین کردن</td></tr>
+                <tr><td data-t="ch35-072"><code>iconify()</code> و <code>deiconify()</code></td><td data-t="ch35-073">کوچک کردن و برگرداندن</td></tr>
+                <tr><td><code>protocol('WM_DELETE_WINDOW', f)</code></td><td data-t="ch35-074">گرفتن دکمه ضربدر پنجره</td></tr>
+            </tbody>
+        </table>
+    </div>
+
+    <p data-t="ch35-075">
+        پنجره‌ای که وسط صفحه باز شود، حرفه‌ای‌تر به نظر می‌رسد. فرمول ساده
+        است: عرض صفحه منهای عرض پنجره، تقسیم بر دو.
+    </p>
+
+    <h2 id="s9" data-t="ch35-076">۹. وضعیت ویجت‌ها</h2>
+
+    <p data-t="ch35-077">دکمه خاکستری‌شده‌ای که کاربر نمی‌تواند فشارش دهد، بسیار مهربان‌تر از دکمه‌ای است که با فشردن، پیام خطا ایجاد می‌کند. قاعده: هر چه الان معنا ندارد را غیرفعال کنید و به محض اینکه معنا پیدا کرد فعالش کنید.</p>
+
+    <pre class="code"><code>    def update_state(self) -&gt; None:
+        '''The button is usable only while the box is ticked.'''
+        self.submit.config(state='normal' if self.accepted.get() else 'disabled')
+
+    def write_log(self, message: str) -&gt; None:
+        '''A read-only Text has to be unlocked before writing.'''
+        self.log.config(state='normal')
+        self.log.insert(tk.END, message + '\n')
+        self.log.see(tk.END)            # scroll down to the new line
+        self.log.config(state='disabled')</code></pre>
+    <p class="code-caption" data-t="ch35-078">وضعیت‌ها: نمونه 09_enable_disable/app.py</p>
+
+    <h3 data-t="ch35-079">شرح مثال</h3>
+
+    <ul>
+        <li data-t="ch35-080"><code>state='disabled'</code> ویجت را خاکستری می‌کند و ماوس را نادیده می‌گیرد. <code>state='readonly'</code> روی <code>Entry</code> و <code>Combobox</code> اجازه خواندن و کپی می‌دهد ولی تغییر نه.</li>
+        <li data-t="ch35-081">یک <code>Text</code> غیرفعال را <strong>خود برنامه هم</strong> نمی‌تواند بنویسد. پس الگو همیشه سه قدم است: باز کن، بنویس، دوباره قفل کن.</li>
+        <li data-t="ch35-082"><code>see(tk.END)</code> نمایش را تا آخرین خط پایین می‌برد. بدون آن، پیام‌های تازه زیر لبه پنجره پنهان می‌مانند.</li>
+    </ul>
+
+    <h2 id="s10" data-t="ch35-083">۱۰. پنجره دوم: دیالوگ مودال</h2>
+
+    <p data-t="ch35-084">
+        <code>tk.Tk()</code> فقط <strong>یک بار</strong> ساخته می‌شود، برای
+        پنجره اصلی. هر پنجره دیگری <code>tk.Toplevel(parent)</code> است. سه
+        فراخوانی، آن را به یک دیالوگ واقعی تبدیل می‌کنند.
+    </p>
+
+    <pre class="code"><code>class SettingsDialog(tk.Toplevel):
+    '''Ask for a user name and a font size; return them, or None on Cancel.'''
+
+    def __init__(self, parent: tk.Misc, username: str, size: int) -&gt; None:
+        super().__init__(parent)
+        self.title('Settings')
+        self.resizable(False, False)
+
+        # None means "the user cancelled".
+        self.result: tuple[str, int] | None = None
+
+        self.name_var = tk.StringVar(value=username)
+        self.size_var = tk.IntVar(value=size)
+        ...
+
+        self.transient(parent)      # keep it above the main window
+        self.grab_set()             # make it modal
+        # Closing with the X button is the same as pressing Cancel.
+        self.protocol('WM_DELETE_WINDOW', self.destroy)
+
+    def on_ok(self) -&gt; None:
+        name = self.name_var.get().strip()
+        if not name:
+            self.title('Settings - the name cannot be empty')
+            return
+        self.result = (name, self.size_var.get())
+        self.destroy()</code></pre>
+    <p class="code-caption" data-t="ch35-085">دیالوگ: نمونه 10_toplevel_dialog/app.py</p>
+
+    <pre class="code"><code>    def open_settings(self) -&gt; None:
+        dialog = SettingsDialog(self.root, self.username, self.size)
+        # Nothing below this line runs until the dialog is closed.
+        self.root.wait_window(dialog)
+        if dialog.result is not None:
+            self.username, self.size = dialog.result
+            self.refresh()</code></pre>
+    <p class="code-caption" data-t="ch35-086">استفاده از دیالوگ</p>
+
+    <div class="table-scroll">
+        <table>
+            <thead>
+                <tr><th data-t="ch35-087">فراخوانی</th><th data-t="ch35-088">وظیفه آن</th></tr>
+            </thead>
+            <tbody>
+                <tr><td><code>transient(parent)</code></td><td data-t="ch35-089">بالای پنجره والد می‌ماند و با آن کوچک می‌شود</td></tr>
+                <tr><td><code>grab_set()</code></td><td data-t="ch35-090">بقیه برنامه دیگر کلیک نمی‌گیرد. یعنی مودال</td></tr>
+                <tr><td><code>wait_window(dialog)</code></td><td data-t="ch35-091">صداکننده تا بسته شدن دیالوگ منتظر می‌ماند</td></tr>
+            </tbody>
+        </table>
+    </div>
+
+    <h3 data-t="ch35-092">شرح مثال</h3>
+
+    <ul>
+        <li data-t="ch35-093">چون منتظر می‌مانیم، دیالوگ می‌تواند <strong>مقدار برگرداند</strong>، درست مثل یک تابع. نتیجه در صفت <code>self.result</code> نگه داشته می‌شود.</li>
+        <li data-t="ch35-094"><code>None</code> یعنی کاربر انصراف داد. این قرارداد را در همه دیالوگ‌هایتان یکسان نگه دارید.</li>
+        <li data-t="ch35-095">دیالوگ از <code>tk.Toplevel</code> <strong>ارث می‌برد</strong>. این جایی است که وراثت فصل بیست و سوم واقعاً به کار می‌آید.</li>
+        <li data-t="ch35-096">بستن با ضربدر باید دقیقاً مثل زدن دکمه انصراف عمل کند، وگرنه کاربر گیج می‌شود.</li>
+    </ul>
+
+    <h2 id="s11" data-t="ch35-097">۱۱. جدول Treeview</h2>
+
+    <p data-t="ch35-098">
+        <code>ttk.Treeview</code> ویجت جدول است و قلب پروژه پایانی این فصل.
+    </p>
+
+    <pre class="code"><code>class TableDemo:
+    '''A searchable, sortable table.'''
+
+    def __init__(self, root: tk.Tk) -&gt; None:
+        self.people = list(PEOPLE)          # the real data lives here
+        self.sort_column = 'name'
+        self.sort_reverse = False
+        ...
+        self.tree = ttk.Treeview(root, columns=COLUMNS, show='headings',
+                                 selectmode='browse')
+        for column in COLUMNS:
+            # `lambda c=column:` freezes the current value of `column`;
+            # without it every heading would sort by the LAST column.
+            self.tree.heading(column, text=TITLES[column],
+                              command=lambda c=column: self.sort_by(c))
+            self.tree.column(column, width=120, anchor='center')
+        self.tree.pack(fill='both', expand=True, padx=10)
+
+    def visible_people(self) -&gt; list[dict]:
+        '''The rows that match the search box.'''
+        needle = self.search_var.get().strip().lower()
+        if not needle:
+            return self.people
+        return [person for person in self.people
+                if needle in person['name'].lower()
+                or needle in person['city'].lower()]
+
+    def refresh(self) -&gt; None:
+        '''Rebuild the table from scratch: clear, then insert.'''
+        self.tree.delete(*self.tree.get_children())
+        rows = sorted(self.visible_people(),
+                      key=lambda person: person[self.sort_column],
+                      reverse=self.sort_reverse)
+        for person in rows:
+            self.tree.insert('', tk.END,
+                             values=tuple(person[c] for c in COLUMNS))
+        self.status.config(text=f'{len(rows)} of {len(self.people)} rows')
+
+    def sort_by(self, column: str) -&gt; None:
+        '''Click the same title twice to reverse the order.'''
+        if column == self.sort_column:
+            self.sort_reverse = not self.sort_reverse
+        else:
+            self.sort_column = column
+            self.sort_reverse = False
+        self.refresh()</code></pre>
+    <p class="code-caption" data-t="ch35-099">جدول: نمونه 11_treeview/app.py</p>
+
+    <h3 data-t="ch35-100">شرح مثال</h3>
+
+    <ul>
+        <li data-t="ch35-101"><code>show='headings'</code> ستون درختی اضافه‌ای را که Treeview به طور پیش‌فرض سمت چپ می‌کشد پنهان می‌کند. تقریباً همیشه لازمش دارید.</li>
+        <li data-t="ch35-102">الگوی <code>refresh</code> ساده و مطمئن است: همه چیز را پاک کن، بعد از روی داده واقعی دوباره بساز. هم مرتب‌سازی و هم جست‌وجو با همین یک متد کار می‌کنند.</li>
+        <li data-t="ch35-103">باز هم دام <strong>اتصال دیرهنگام</strong>: <code>lambda c=column:</code>. بدون <code>c=column</code> همه عنوان‌ها بر اساس <strong>آخرین</strong> ستون مرتب می‌کنند.</li>
+        <li data-t="ch35-104">مرتب‌سازی با <code>sorted(key=...)</code> از فصل بیست و ششم انجام می‌شود، در پایتون، نه در ویجت.</li>
+    </ul>
+
+    <div class="warn">
+        <span class="box-title" data-t="ch35-105">ویجت انبار داده شما نیست</span>
+        <p data-t="ch35-106">
+            Treeview برای نمایش، همه چیز را به <strong>متن</strong> تبدیل
+            می‌کند. پس <code>item(...)['values']</code> ممکن است جایی که شما
+            عدد گذاشته بودید رشته بدهد، یا کلمه <code>yes</code> بدهد جایی که
+            مقدار واقعی <code>1</code> بوده است. داده واقعی را در پایتون نگه
+            دارید، اینجا در <code>self.people</code>. نسخه اصلی برنامه
+            کتابخانه دقیقاً همین اشتباه را می‌کرد و موقع ویرایش یک کتاب، کلمه
+            <code>yes</code> را در ستون <code>year</code> ذخیره می‌کرد.
+        </p>
+    </div>
+
+    <h2 id="s12" data-t="ch35-107">۱۲. بوم نقاشی و رویدادهای ماوس</h2>
+
+    <pre class="code"><code>class PaintApp:
+    '''A very small drawing program.'''
+
+    def __init__(self, root: tk.Tk) -&gt; None:
+        self.colour = 'black'
+        self.width = 3
+        # The point the line is drawn from; None while the button is up.
+        self.last: tuple[int, int] | None = None
+        ...
+        self.canvas = tk.Canvas(root, bg='white')
+        self.canvas.pack(fill='both', expand=True, padx=5, pady=5)
+
+        self.canvas.bind('&lt;Button-1&gt;', self.start_stroke)
+        self.canvas.bind('&lt;B1-Motion&gt;', self.draw)
+        self.canvas.bind('&lt;ButtonRelease-1&gt;', self.end_stroke)
+
+    def start_stroke(self, event: tk.Event) -&gt; None:
+        self.last = (event.x, event.y)
+
+    def draw(self, event: tk.Event) -&gt; None:
+        if self.last is None:
+            return
+        # A stroke is a chain of short straight lines between two mouse events.
+        self.canvas.create_line(self.last[0], self.last[1], event.x, event.y,
+                                fill=self.colour, width=self.width,
+                                capstyle='round', smooth=True)
+        self.last = (event.x, event.y)
+
+    def end_stroke(self, event: tk.Event) -&gt; None:
+        self.last = None</code></pre>
+    <p class="code-caption" data-t="ch35-108">نقاشی: نمونه 12_canvas_paint/app.py</p>
+
+    <div class="table-scroll">
+        <table>
+            <thead>
+                <tr><th data-t="ch35-109">رویداد</th><th data-t="ch35-110">کی رخ می‌دهد</th></tr>
+            </thead>
+            <tbody>
+                <tr><td><code>&lt;Button-1&gt;</code></td><td data-t="ch35-111">کلیک چپ</td></tr>
+                <tr><td><code>&lt;B1-Motion&gt;</code></td><td data-t="ch35-112">حرکت ماوس با دکمه چپ نگه‌داشته</td></tr>
+                <tr><td><code>&lt;ButtonRelease-1&gt;</code></td><td data-t="ch35-113">رها شدن دکمه چپ</td></tr>
+                <tr><td><code>&lt;Double-1&gt;</code></td><td data-t="ch35-114">دوبار کلیک</td></tr>
+                <tr><td><code>&lt;Return&gt;</code></td><td data-t="ch35-115">کلید Enter</td></tr>
+                <tr><td><code>&lt;Key&gt;</code></td><td data-t="ch35-116">هر کلید</td></tr>
+            </tbody>
+        </table>
+    </div>
+
+    <p data-t="ch35-117">نکته جالب اینکه «خط» در عملیت وجود ندارد: آنچه می‌بینید زنجیره‌ای از پاره‌خط‌های کوتاه بین دو رویداد متوالی ماوس است. متدهای <code>create_line</code>، <code>create_oval</code>، <code>create_rectangle</code> و <code>create_text</code> شناسه آیتم برمی‌گردانند که بعداً می‌توانید با آن آیتم را جابه‌جا، رنگ یا حذف کنید.</p>
+
+    <h2 id="s13" data-t="ch35-118">۱۳. after و قانون طلایی</h2>
+
+    <div class="warn">
+        <span class="box-title" data-t="ch35-119">مهم‌ترین قانون برنامه‌نویسی گرافیکی</span>
+        <p data-t="ch35-120">
+            <strong>هرگز</strong> داخل یک تابع پاسخ، <code>time.sleep()</code>
+            صدا نزنید و حلقه طولانی اجرا نکنید. تا وقتی تابع شما در حال اجراست،
+            حلقه رویداد <strong>متوقف</strong> است: پنجره دیگر بازترسیم
+            نمی‌شود، دکمه‌ها جواب نمی‌دهند، و سیستم‌عامل می‌گوید برنامه پاسخ
+            نمی‌دهد.
+        </p>
+    </div>
+
+    <pre class="code"><code>    def tick_clock(self) -&gt; None:
+        '''Show the time, then ask to be called again in one second.'''
+        self.clock_label.config(text=datetime.now().strftime('%H:%M:%S'))
+        self.root.after(1000, self.tick_clock)
+
+    def start_countdown(self) -&gt; None:
+        self.stop_countdown()           # never leave an old job running
+        self.remaining = 10
+        self.tick_countdown()
+
+    def tick_countdown(self) -&gt; None:
+        minutes, seconds = divmod(self.remaining, 60)
+        self.timer_label.config(text=f'{minutes:02d}:{seconds:02d}')
+        if self.remaining == 0:
+            self.timer_label.config(fg='red')
+            self.countdown_job = None
+            return
+        self.remaining -= 1
+        # Keep the id so that Stop can cancel this job.
+        self.countdown_job = self.root.after(1000, self.tick_countdown)
+
+    def stop_countdown(self) -&gt; None:
+        if self.countdown_job is not None:
+            self.root.after_cancel(self.countdown_job)
+            self.countdown_job = None
+
+    def freeze(self) -&gt; None:
+        '''What NOT to do: the clock above stops for three whole seconds.'''
+        time.sleep(3)</code></pre>
+    <p class="code-caption" data-t="ch35-121">ساعت و شمارش معکوس: نمونه 13_after_clock/app.py</p>
+
+    <h3 data-t="ch35-122">شرح مثال</h3>
+
+    <ul>
+        <li data-t="ch35-123"><code>widget.after(میلی‌ثانیه, تابع)</code> از حلقه رویداد می‌خواهد تابع را بعداً صدا بزند و <strong>بلافاصله</strong> برمی‌گردد. برنامه آزاد می‌ماند.</li>
+        <li data-t="ch35-124">تابعی که در انتهای خودش دوباره <code>after</code> می‌زند، یک ساعت یا زمان‌سنج یا انیمیشن می‌سازد.</li>
+        <li data-t="ch35-125"><code>after</code> یک شناسه کار برمی‌گرداند. آن را نگه دارید تا بتوانید با <code>after_cancel</code> لغوش کنید. <strong>همیشه</strong> پیش از زمان‌بندی کار تازه، قبلی را لغو کنید، وگرنه دو زمان‌سنج همزمان می‌شمارند و عدد دوتا دوتا می‌پرد.</li>
+        <li data-t="ch35-126">دکمه «انجماد» در همین نمونه عمداً گذاشته شده است: آن را بزنید و ببینید ساعت بالای پنجره سه ثانیه کامل می‌ایستد. یک بار دیدن این، از ده صفحه توضیح بهتر است.</li>
+        <li data-t="ch35-127">برای کار واقعاً سنگین در پس‌زمینه (دانلود، محاسبه طولانی) <code>after</code> کافی نیست و به نخ نیاز دارید: فصل سی و هفتم.</li>
+    </ul>
+
+    <h2 id="s14" data-t="ch35-128">۱۴. پروژه: مدیریت کتابخانه</h2>
+
+    <p data-t="ch35-129">
+        پروژه این فصل همه چیز را کنار هم می‌گذارد: زبانه‌ها، جدول‌ها، دیالوگ
+        مودال، فهرست بازشو، و پایگاه داده SQLite فصل سی و یکم. مهم‌ترین درسش
+        اما <strong>معماری</strong> است. برنامه سه فایل دارد:
+    </p>
+
+    <div class="table-scroll">
+        <table>
+            <thead>
+                <tr><th data-t="ch35-130">فایل</th><th data-t="ch35-131">نقش</th></tr>
+            </thead>
+            <tbody>
+                <tr><td><code>database.py</code></td><td data-t="ch35-132">همه SQL. اصلاً <code>tkinter</code> را <code>import</code> نمی‌کند</td></tr>
+                <tr><td><code>dialogs.py</code></td><td data-t="ch35-133">دو فرم مودال افزودن و ویرایش</td></tr>
+                <tr><td><code>app.py</code></td><td data-t="ch35-134">پنجره اصلی. یک خط SQL هم ندارد</td></tr>
+            </tbody>
+        </table>
+    </div>
+
+    <pre class="code"><code>'''The data layer of the library application.
+
+Everything that talks to SQLite lives HERE, and nothing in this file imports
+tkinter. That separation is the point of the example:
+
+* `database.py` knows about tables and rows, not about windows;
+* `app.py` knows about windows, not about SQL.
+
+You could plug the very same `Database` class into a Flask site (session 38)
+or into a PyQt window (session 36) without changing one line.
+'''
+
+class Database:
+    '''A thin wrapper around one SQLite connection.'''
+
+    def __init__(self, path: Path = DB_PATH) -&gt; None:
+        self.connection = sqlite3.connect(path)
+        self.connection.row_factory = sqlite3.Row
+        # Without this line ON DELETE CASCADE is silently ignored.
+        self.connection.execute('PRAGMA foreign_keys = ON')
+        # executescript runs several statements at once.
+        self.connection.executescript(SCHEMA)
+        self.connection.commit()
+
+    def list_books(self, search: str = '') -&gt; list[sqlite3.Row]:
+        if search:
+            pattern = f'%{search}%'
+            return self.query(
+                '''SELECT * FROM books
+                   WHERE title LIKE ? OR author LIKE ? OR isbn LIKE ?
+                   ORDER BY title''',
+                (pattern, pattern, pattern))
+        return self.query('SELECT * FROM books ORDER BY title')</code></pre>
+    <p class="code-caption" data-t="ch35-135">لایه داده: نمونه 14_library_app/database.py</p>
+
+    <p data-t="ch35-136">
+        و مهم‌ترین متد کل پروژه، امانت دادن کتاب است:
+    </p>
+
+    <pre class="code"><code>    def borrow(self, book_id: int, member_id: int) -&gt; None:
+        '''Lend a book. Two statements, ONE transaction.
+
+        If the UPDATE failed after the INSERT succeeded, the book would be
+        borrowed and still marked as available. `with self.connection:`
+        commits when the block ends normally and rolls back on any exception.
+        '''
+        now = datetime.now().strftime('%Y-%m-%d %H:%M')
+        with self.connection:
+            # The WHERE ... AND available = 1 makes the check atomic.
+            cursor = self.connection.execute(
+                'UPDATE books SET available = 0 WHERE id = ? AND available = 1',
+                (book_id,))
+            if cursor.rowcount == 0:
+                raise ValueError('That book is not available any more.')
+            self.connection.execute(
+                'INSERT INTO borrowings (book_id, member_id, borrow_date) '
+                'VALUES (?, ?, ?)',
+                (book_id, member_id, now))</code></pre>
+    <p class="code-caption" data-t="ch35-137">امانت دادن: تراکنش اتمی</p>
+
+    <h3 data-t="ch35-138">پنج اشتباهی که در نسخه اصلی این پروژه بود</h3>
+
+    <ul>
+        <li data-t="ch35-139">
+            برنامه مقدارها را <strong>از داخل Treeview</strong> می‌خواند تا
+            کتاب را ویرایش کند. جدول برای نمایش، <code>available</code> را به
+            <code>yes</code> و <code>no</code> تبدیل می‌کرد، پس ویرایش یک
+            کتاب، کلمه <code>yes</code> را در ستون <code>year</code>
+            می‌نوشت. نسخه بازنویسی‌شده سطرهای واقعی را در یک دیکشنری نگه
+            می‌دارد.
+        </li>
+        <li data-t="ch35-140">
+            امانت دادن، <strong>دو دستور با دو commit جداگانه</strong> بود.
+            اگر دومی شکست می‌خورد، کتاب هم امانت داده شده بود و هم موجود
+            می‌ماند. حالا هر دو در یک تراکنش‌اند و بررسی «هنوز آزاد است؟» جزو
+            خود <code>UPDATE</code> است.
+        </li>
+        <li data-t="ch35-141">
+            <code>PRAGMA foreign_keys = ON</code> نوشته نشده بود، پس
+            <code>ON DELETE</code> اصلاً هیچ کاری نمی‌کرد.
+        </li>
+        <li data-t="ch35-142">
+            هر فراخوانی یک اتصال تازه باز و بسته می‌کرد، و یک
+            <code>except Exception</code> خالی همه خطاها را می‌بلعید.
+        </li>
+        <li data-t="ch35-143">
+            فیلد سال هر چیزی را می‌پذیرفت، و فهرست بازشوی خالی
+            <code>current(0)</code> را می‌ترکاند.
+        </li>
+    </ul>
+
+    <div class="tip">
+        <span class="box-title" data-t="ch35-144">چرا لایه‌بندی اینقدر مهم است</span>
+        <p data-t="ch35-145">
+            چون <code>database.py</code> هیچ چیز از پنجره نمی‌داند، همان کلاس
+            را می‌توانید بدون تغییر یک خط، زیر یک برنامه PySide6 در فصل سی و
+            ششم یا زیر یک سایت Flask در فصل سی و هشتم بگذارید. این دقیقاً
+            کاری است که در پروژه پایانی فصل سی و نهم انجام می‌دهیم. هر وقت
+            دیدید کد رابط کاربری دارد SQL می‌نویسد، بدانید جایی از طراحی
+            اشتباه رفته است.
+        </p>
+    </div>
+
+    <div class="folder-ref">
+        <span class="box-title" data-t="ch35-146">فایل‌های تمرینی این فصل</span>
+        <p data-t="ch35-147">
+            پوشه <code>S35-tkinter-advanced</code> شامل چهارده پوشه است، از
+            <code>01_open_file</code> تا <code>14_library_app</code>. پروژه
+            را با <code>python app.py</code> در پوشه چهاردهم اجرا کنید؛ فایل
+            <code>library.db</code> را خودش کنار خودش می‌سازد و برای شروع از
+            صفر کافی است پاکش کنید. روی لینوکس گاهی باید tkinter را جداگانه
+            نصب کنید: <code>sudo apt install python3-tk</code>.
+        </p>
+    </div>
+
+    <h2 data-t="ch35-148">خلاصه فصل</h2>
+
+    <div class="table-scroll">
+        <table>
+            <thead>
+                <tr><th data-t="ch35-149">ابزار</th><th data-t="ch35-150">وظیفه آن</th></tr>
+            </thead>
+            <tbody>
+                <tr><td><code>filedialog.askopenfilename</code></td><td data-t="ch35-151">انتخاب فایل. انصراف یعنی رشته خالی</td></tr>
+                <tr><td><code>filedialog.asksaveasfilename</code></td><td data-t="ch35-152">پرسیدن محل ذخیره</td></tr>
+                <tr><td data-t="ch35-153"><code>Text</code> و <code>'1.0'</code> و <code>'end-1c'</code></td><td data-t="ch35-154">ویجت چندخطی و موقعیت‌هایش</td></tr>
+                <tr><td><code>edit_modified()</code></td><td data-t="ch35-155">آیا متن از آخرین ذخیره تغییر کرده</td></tr>
+                <tr><td><code>Scrollbar</code></td><td data-t="ch35-156">باید در هر دو جهت وصل شود</td></tr>
+                <tr><td><code>PhotoImage</code></td><td data-t="ch35-157">GIF و PNG. مرجعش را نگه دارید</td></tr>
+                <tr><td data-t="ch35-158"><code>Scale</code> و <code>Spinbox</code></td><td data-t="ch35-159">هر دو مقدار را به شکل رشته می‌دهند</td></tr>
+                <tr><td><code>ttk.Combobox</code></td><td data-t="ch35-160">فهرست بازشو، با <code>&lt;&lt;ComboboxSelected&gt;&gt;</code></td></tr>
+                <tr><td><code>ttk.Notebook</code></td><td data-t="ch35-161">زبانه‌ها. هر زبانه یک <code>Frame</code></td></tr>
+                <tr><td><code>ttk.Progressbar</code></td><td data-t="ch35-162">نوار پیشرفت</td></tr>
+                <tr><td><code>ttk.Treeview</code></td><td data-t="ch35-163">جدول. انبار داده شما نیست</td></tr>
+                <tr><td><code>Toplevel</code> + <code>grab_set</code> + <code>wait_window</code></td><td data-t="ch35-164">دیالوگ مودال که مقدار برمی‌گرداند</td></tr>
+                <tr><td><code>state='disabled'</code></td><td data-t="ch35-165">غیرفعال کردن ویجت</td></tr>
+                <tr><td data-t="ch35-166"><code>Canvas</code> و <code>bind</code></td><td data-t="ch35-167">ترسیم و رویدادهای ماوس</td></tr>
+                <tr><td data-t="ch35-168"><code>after()</code> و <code>after_cancel()</code></td><td data-t="ch35-169">کار زمان‌بندی‌شده بدون قفل شدن پنجره</td></tr>
+                <tr><td data-t="ch35-170"><code>time.sleep()</code> در تابع پاسخ</td><td data-t="ch35-171">همیشه باگ است</td></tr>
+            </tbody>
+        </table>
+    </div>
+
+    <div class="exercise">
+        <h3 data-t="ch35-172">تمرین‌های فصل سی و پنج</h3>
+        <ol>
+            <li data-t="ch35-173">به نمایشگر فایل، دکمه «شمارش کلمات» اضافه کنید که تعداد کلمه‌ها و خط‌های فایل باز را نشان دهد.</li>
+            <li data-t="ch35-174">در دفترچه یادداشت، سطر و ستون فعلی مکان‌نما را در یک نوار وضعیت پایین پنجره نشان دهید.</li>
+            <li data-t="ch35-175">به نمونه تصویر، دکمه‌های بعدی و قبلی اضافه کنید که همه فایل‌های تصویری یک پوشه را بگردند.</li>
+            <li data-t="ch35-176">مبدل واحد بسازید: یک <code>Combobox</code> برای انتخاب واحد، یک <code>Entry</code> برای مقدار و یک برچسب برای پاسخ.</li>
+            <li data-t="ch35-177">ترکیب‌کننده رنگ بسازید: سه لغزنده قرمز و سبز و آبی که رنگ پس‌زمینه یک قاب را زنده عوض کنند و کد رنگ را نشان دهند.</li>
+            <li data-t="ch35-178">شمارش معکوس را به یک زمان‌سنج پومودورو تبدیل کنید: بیست و پنج دقیقه کار، پنج دقیقه استراحت، با پیام بین آنها.</li>
+            <li data-t="ch35-179">به جدول نمونه یازدهم، دکمه افزودن با دیالوگ مودال و دکمه حذف با تأیید اضافه کنید.</li>
+            <li data-t="ch35-180">سطرهای جدول را رنگی کنید: نمره زیر ده با پس‌زمینه قرمز کم‌رنگ، با <code>tag_configure</code>.</li>
+            <li data-t="ch35-181">به پروژه کتابخانه، زبانه «تاریخچه امانت» اضافه کنید که امانت‌های بسته‌شده را هم نشان دهد.</li>
+            <li data-t="ch35-182">قانونی بگذارید که یک عضو نتواند بیش از سه کتاب همزمان امانت بگیرد. قانون را در <code>database.py</code> بنویسید، نه در رابط کاربری.</li>
+            <li data-t="ch35-183">موعد بازگشت چهارده‌روزه اضافه کنید و امانت‌های دیرکرددار را قرمز نشان دهید.</li>
+            <li data-t="ch35-184">زبانه «آمار» بسازید: تعداد کتاب‌ها، اعضا، کتاب‌های بیرون، و پنج عنوان پرامانت‌تر.</li>
+            <li data-t="ch35-185">توضیح دهید چرا پروژه، SQL را در <code>database.py</code> نگه می‌دارد. برای بردن همین برنامه به PySide6 چه چیزی باید عوض شود؟</li>
+            <li data-t="ch35-186">اگر دکمه امانت را خیلی سریع دو بار بزنید چه می‌شود؟ کدام خط <code>database.py</code> از شما محافظت می‌کند؟</li>
+        </ol>
+    </div>
+
+    <div class="pager">
+        <a href="chapter-34.html">فصل قبل: رابط گرافیکی با tkinter</a>
+        <a href="chapter-36.html">فصل بعد: PySide6 و ساخت فایل اجرایی</a>
+    </div>
+
+</main>
+
+</body>
+</html>

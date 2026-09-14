@@ -1,0 +1,23 @@
+{% extends 'base.html' %}
+
+{% block title %}Courses &mdash; {{ site_name }}{% endblock %}
+
+{% block content %}
+    <h2>All the courses</h2>
+
+    <table>
+        <tr><th>Course</th><th>Sessions</th><th>Price</th></tr>
+        {% for course in courses %}
+            <tr>
+                <td>{{ course.title }}</td>
+                <td>{{ course.sessions }}</td>
+                <td>{{ '{:,}'.format(course.price) }}</td>
+            </tr>
+        {% endfor %}
+        <tr class="total">
+            <td>Total</td>
+            <td>{{ courses | sum(attribute='sessions') }}</td>
+            <td>{{ '{:,}'.format(courses | sum(attribute='price')) }}</td>
+        </tr>
+    </table>
+{% endblock %}
